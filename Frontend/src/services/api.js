@@ -1,0 +1,81 @@
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+
+async function request(path, { method = 'GET', body, headers = {} } = {}) {
+  const token = localStorage.getItem('token')
+  const authHeaders = {
+    'Content-Type': 'application/json',
+    ...headers,
+  }
+
+  if (token) {
+    authHeaders.Authorization = `Bearer ${token}`
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: authHeaders,
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  const data = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    const message = data?.message || 'Request failed'
+    throw new Error(message)
+  }
+
+  return data
+}
+
+export function loginUser(payload) {
+  return request('/auth/login', { method: 'POST', body: payload })
+}
+
+export function registerUser(payload) {
+  return request('/auth/register', { method: 'POST', body: payload })
+}
+
+// Course endpoints
+export function getCourses() {
+  return request('/courses')
+}
+
+export function getPublicCourses() {
+  return request('/courses/public')
+}
+
+export function enrollInCourse(id) {
+  return request(`/courses/${id}/enroll`, { method: 'POST' })
+}
+
+export function getCourseById(id) {
+  return request(`/courses/${id}`)
+}
+
+export function createCourse(payload) {
+  return request('/courses', { method: 'POST', body: payload })
+}
+
+export function importPlaylistPreview(url) {
+  return request('/courses/import-playlist', { method: 'POST', body: { url } })
+}
+
+export function updateCourse(id, payload) {
+  return request(`/courses/${id}`, { method: 'PUT', body: payload })
+}
+
+export function deleteCourse(id) {
+  return request(`/courses/${id}`, { method: 'DELETE' })
+}
+
+export function toggleVideoCompleted(courseId, videoId) {
+  return request(`/courses/${courseId}/videos/${videoId}/toggle`, { method: 'PATCH' })
+}
+
+export function updateVideoNotes(courseId, videoId, notes) {
+  return request(`/courses/${courseId}/videos/${videoId}/notes`, { method: 'PATCH', body: { notes } })
+}
+
+export function updateProfile(payload) {
+  return request('/auth/profile', { method: 'PUT', body: payload })
+}

@@ -1,0 +1,108 @@
+/* Root variables for dark mode (default) */
+:root {
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Primary Colors - Saffron / Terracotta */
+  --primary-color: #e2583e;
+  --primary-hover: #cb462d;
+  --primary-light: #2c1611;
+  
+  /* Background Colors - Deep Indigo Pigment */
+  --bg-primary: #0a0c16;
+  --bg-secondary: #121526;
+  --bg-tertiary: #1c2037;
+  
+  /* Text Colors */
+  --text-primary: #fdfbf8;
+  --text-secondary: #a7acbf;
+  --text-tertiary: #71778c;
+  
+  /* Border Colors */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  
+  /* Accent Colors */
+  --success: #34d399;
+  --warning: #ea9e24; /* Marigold Gold */
+  --error: #f87171;
+  --info: #9cb1ea;
+  
+  /* Shadow */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.6);
+  
+  /* Transitions */
+  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light mode variables - Warm Indian Cream & Sand */
+[data-theme="light"] {
+  /* Primary Colors */
+  --primary-color: #d84f33;
+  --primary-hover: #be3e25;
+  --primary-light: #fbece8;
+  
+  /* Background Colors */
+  --bg-primary: #fdfbf7;
+  --bg-secondary: #f5f3ec;
+  --bg-tertiary: #e9e6dc;
+  
+  /* Text Colors */
+  --text-primary: #0f121d;
+  --text-secondary: #4e5369;
+  --text-tertiary: #848b9f;
+  
+  /* Border Colors */
+  --border-color: rgba(15, 18, 29, 0.08);
+  --border-hover: rgba(15, 18, 29, 0.16);
+  
+  /* Accent Colors */
+  --success: #10b981;
+  --warning: #d98214;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Shadow */
+  --shadow-sm: 0 2px 4px rgba(15, 18, 29, 0.04);
+  --shadow-md: 0 8px 16px rgba(15, 18, 29, 0.08);
+  --shadow-lg: 0 16px 32px rgba(15, 18, 29, 0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center top;
+  color: var(--text-primary);
+  transition: var(--transition);
+  line-height: 1.6;
+}
+
+[data-theme="light"] body {
+  background-image: 
+    linear-gradient(to right, rgba(15, 18, 29, 0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 18, 29, 0.012) 1px, transparent 1px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
