@@ -797,3 +797,37 @@
   user-select: none;
 }
 
+.nonCreatorSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.settingsNotice {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.unenrollBtn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+
+.unenrollBtn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+

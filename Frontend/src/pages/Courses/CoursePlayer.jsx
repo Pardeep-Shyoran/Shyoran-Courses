@@ -19,6 +19,12 @@ const CoursePlayer = () => {
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
   const currentUserId = user?._id || user?.id;
   const isOwner = course && user && (course.user?._id === currentUserId || course.user === currentUserId);
+  const isActualCreator = course && user && (() => {
+    const creatorId = course.originalCreator
+      ? (course.originalCreator._id || course.originalCreator)
+      : (course.user?._id || course.user);
+    return creatorId === currentUserId;
+  })();
 
   const handleEnroll = async () => {
     setLoading(true)
@@ -158,6 +164,10 @@ const CoursePlayer = () => {
   // Settings Save handler
   const handleSaveSettings = async (e) => {
     e.preventDefault()
+    if (!isActualCreator) {
+      alert('Unauthorized to update course settings.')
+      return
+    }
     setSettingsSaving(true)
     try {
       const tagsArray = editTags.split(',').map(t => t.trim()).filter(Boolean)
@@ -177,14 +187,17 @@ const CoursePlayer = () => {
 
   // Delete course
   const handleDeleteCourse = async () => {
-    if (!window.confirm('Delete this course? All tracking progress and your notes will be permanently removed.')) {
+    const confirmMessage = isActualCreator
+      ? 'Delete this course? All tracking progress and your notes will be permanently removed.'
+      : 'Leave this course? Your notes and progress tracking will be removed.'
+    if (!window.confirm(confirmMessage)) {
       return
     }
     try {
       await deleteCourse(course._id)
       navigate('/courses')
     } catch (err) {
-      alert('Failed to delete course.')
+      alert(isActualCreator ? 'Failed to delete course.' : 'Failed to leave course.')
     }
   }
 
@@ -310,7 +323,7 @@ const CoursePlayer = () => {
                     className={`${styles.tabHeader} ${activeTab === 'settings' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('settings')}
                   >
-                    ⚙️ Settings
+                    {isActualCreator ? '⚙️ Settings' : '⚙️ Options'}
                   </button>
                 )}
               </div>
@@ -414,54 +427,71 @@ const CoursePlayer = () => {
                 {/* TAB: Settings */}
                 {activeTab === 'settings' && (
                   <div className={styles.settingsContainer}>
-                    <form onSubmit={handleSaveSettings} className={styles.settingsForm}>
-                      <div className={styles.inputGroup}>
-                        <label>Course Title</label>
-                        <input
-                          type="text"
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                          required
-                        />
-                      </div>
+                    {isActualCreator ? (
+                      <form onSubmit={handleSaveSettings} className={styles.settingsForm}>
+                        <div className={styles.inputGroup}>
+                          <label>Course Title</label>
+                          <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            required
+                          />
+                        </div>
 
-                      <div className={styles.inputGroup}>
-                        <label>Description</label>
-                        <textarea
-                          value={editDesc}
-                          onChange={(e) => setEditDesc(e.target.value)}
-                          rows="4"
-                        />
-                      </div>
+                        <div className={styles.inputGroup}>
+                          <label>Description</label>
+                          <textarea
+                            value={editDesc}
+                            onChange={(e) => setEditDesc(e.target.value)}
+                            rows="4"
+                          />
+                        </div>
 
-                      <div className={styles.inputGroup}>
-                        <label>Tags (comma separated)</label>
-                        <input
-                          type="text"
-                          placeholder="e.g. javascript, tutorial, coding"
-                          value={editTags}
-                          onChange={(e) => setEditTags(e.target.value)}
-                        />
-                      </div>
+                        <div className={styles.inputGroup}>
+                          <label>Tags (comma separated)</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. javascript, tutorial, coding"
+                            value={editTags}
+                            onChange={(e) => setEditTags(e.target.value)}
+                          />
+                        </div>
 
-                      <div className={styles.settingsActions}>
-                        <button
-                          type="submit"
-                          className={styles.saveSettingsBtn}
-                          disabled={settingsSaving}
-                        >
-                          {settingsSaving ? 'Saving...' : 'Update Settings'}
-                        </button>
+                        <div className={styles.settingsActions}>
+                          <button
+                            type="submit"
+                            className={styles.saveSettingsBtn}
+                            disabled={settingsSaving}
+                          >
+                            {settingsSaving ? 'Saving...' : 'Update Settings'}
+                          </button>
 
-                        <button
-                          type="button"
-                          onClick={handleDeleteCourse}
-                          className={styles.deleteCourseBtn}
-                        >
-                          ❌ Delete Course
-                        </button>
+                          <button
+                            type="button"
+                            onClick={handleDeleteCourse}
+                            className={styles.deleteCourseBtn}
+                          >
+                            ❌ Delete Course
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className={styles.nonCreatorSettings}>
+                        <p className={styles.settingsNotice}>
+                          You are enrolled in this public course. You can track progress and write notes, but editing course details is restricted to the course registrar.
+                        </p>
+                        <div className={styles.settingsActions}>
+                          <button
+                            type="button"
+                            onClick={handleDeleteCourse}
+                            className={styles.unenrollBtn}
+                          >
+                            🚪 Leave Course
+                          </button>
+                        </div>
                       </div>
-                    </form>
+                    )}
                   </div>
                 )}
               </div>
