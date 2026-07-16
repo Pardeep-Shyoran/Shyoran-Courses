@@ -86,3 +86,13 @@ export function updateVideoNotes(courseId, videoId, notes) {
 export function updateProfile(payload) {
   return request('/auth/profile', { method: 'PUT', body: payload })
 }
+
+// AI Assistant endpoints
+export function getVideoSummary(videoId, payload) {
+  return request(`/ai/video/${videoId}/summary`, { method: 'POST', body: payload })
+}
+
+export function chatWithAITutor(videoId, payload) {
+  return request(`/ai/video/${videoId}/chat`, { method: 'POST', body: payload })
+}
+

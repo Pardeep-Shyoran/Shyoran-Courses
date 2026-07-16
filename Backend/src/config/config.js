@@ -9,6 +9,7 @@ const _config = {
   JWT_SECRET: process.env.JWT_SECRET || "dev_jwt_secret_change_me",
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
   YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY || "",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
 };
 
 export default Object.freeze(_config);
