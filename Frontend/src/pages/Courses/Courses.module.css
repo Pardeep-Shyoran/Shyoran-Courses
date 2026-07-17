@@ -1,17 +1,87 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 8rem 20px 4rem 20px;
   min-height: calc(100vh - 150px);
+  position: relative;
+  overflow: visible;
 }
 
-/* Header */
+/* Header Section with Suryodaya Glows */
 .header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4rem;
+  width: 100%;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 250px;
+  background: radial-gradient(ellipse at center, rgba(226, 88, 62, 0.1) 0%, rgba(234, 158, 36, 0.05) 45%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(35px);
+}
+
+[data-theme="light"] .header::before {
+  background: radial-gradient(ellipse at center, rgba(216, 79, 51, 0.06) 0%, rgba(217, 130, 20, 0.03) 45%, transparent 70%);
+}
+
+.coursesMotif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  height: 380px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.motifSvg {
+  width: 100%;
+  height: 100%;
+  color: rgba(226, 88, 62, 0.12);
+}
+
+[data-theme="light"] .motifSvg {
+  color: rgba(216, 79, 51, 0.05);
+}
+
+.headerBadge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background-color: rgba(226, 88, 62, 0.08);
+  border: 1px solid rgba(226, 88, 62, 0.2);
+  color: var(--primary-color);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.headerContentWrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  gap: 24px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  gap: 20px;
 }
 
 .headerTitleArea {
@@ -21,17 +91,24 @@
 }
 
 .pageTitle {
+  font-family: var(--font-serif);
   font-size: 2.25rem;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.8px;
-  background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary-color) 100%);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.gradientText {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .pageSubtitle {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
   font-weight: 400;
 }
@@ -48,39 +125,53 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
-  border-radius: 10px;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
   font-weight: 600;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .myCoursesLinkBtn {
   background: var(--primary-light);
   color: var(--primary-color);
-  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-color: rgba(226, 88, 62, 0.2);
 }
 
 .myCoursesLinkBtn:hover {
   background: var(--primary-color);
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.15);
+  box-shadow: 0 8px 20px rgba(226, 88, 62, 0.25);
+  border-color: var(--primary-color);
 }
 
 .importBtn {
-  background: var(--primary-color);
+  background: linear-gradient(to bottom, #303550 0%, #131627 100%);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .importBtn:hover {
-  background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(96, 165, 250, 0.3);
+  border-color: var(--primary-color);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 8px 20px rgba(226, 88, 62, 0.25);
+}
+
+[data-theme="light"] .importBtn {
+  background: linear-gradient(to bottom, #ffffff 0%, #f4f1e8 100%);
+  color: #131627;
+  border-color: rgba(19, 22, 39, 0.15);
+  box-shadow: inset 0 1px 0 #ffffff, 0 4px 12px rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .importBtn:hover {
+  border-color: var(--primary-color);
+  box-shadow: inset 0 1px 0 #ffffff, 0 8px 20px rgba(216, 79, 51, 0.15);
 }
 
 .createBtn {
@@ -93,42 +184,64 @@
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 /* Workspace Tabs */
 .mainTabs {
+  background-color: rgba(18, 21, 38, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 6px;
+  margin-bottom: 35px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   gap: 8px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 12px;
+  z-index: 10;
+  position: relative;
+}
+
+[data-theme="light"] .mainTabs {
+  background-color: rgba(245, 243, 236, 0.6);
+  border-color: var(--border-color);
 }
 
 .mainTab {
-  background: transparent;
+  background: none;
   border: none;
-  padding: 8px 16px;
-  font-size: 0.95rem;
-  font-weight: 600;
   color: var(--text-secondary);
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
 .mainTab:hover {
-  background-color: var(--bg-secondary);
   color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .mainTab:hover {
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .activeMainTab {
-  background-color: rgba(96, 165, 250, 0.08);
-  color: var(--primary-color);
-  border: 1px solid rgba(96, 165, 250, 0.15);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .activeMainTab {
+  background: var(--bg-primary);
 }
 
 /* Toolbar */
@@ -139,10 +252,10 @@
   margin-bottom: 32px;
   gap: 20px;
   background: var(--bg-secondary);
-  padding: 12px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 16px;
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .searchWrapper {
@@ -157,6 +270,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-tertiary);
+  font-size: 0.85rem;
   pointer-events: none;
 }
 
@@ -165,16 +279,16 @@
   padding: 10px 12px 10px 38px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--text-primary);
   font-size: 0.875rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .searchInput:focus {
   border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.15);
+  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15);
 }
 
 .filterTabs {
@@ -183,15 +297,15 @@
 }
 
 .filterTab {
-  padding: 8px 14px;
+  padding: 8px 16px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.825rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .filterTab:hover {
