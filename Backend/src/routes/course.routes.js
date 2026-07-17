@@ -10,7 +10,8 @@ import {
   toggleVideoCompleted,
   updateVideoNotes,
   getPublicCourses,
-  enrollCourse
+  enrollCourse,
+  getStudyTrackerStats
 } from "../controller/course.controller.js";
 
 const router = Router();
@@ -27,6 +28,9 @@ router.route("/")
 
 router.route("/import-playlist")
   .post(importPlaylistPreview);
+
+router.route("/stats/study-tracker")
+  .get(getStudyTrackerStats);
 
 router.route("/:id")
   .get(getCourseById)

@@ -1026,3 +1026,458 @@
     width: 100%;
   }
 }
+
+/* Consistency Section */
+.consistencySection {
+  margin-bottom: 24px;
+}
+
+.consistencyCard {
+  display: flex;
+  gap: 20px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.heatmapWrapper {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0; /* Prevent overflow */
+}
+
+.heatmapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.heatmapLegend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.legendBox {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.trackerLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: var(--text-secondary);
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.miniSpinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.heatmapGridWrapper {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.heatmapRowLabels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 0 2px 0;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-align: right;
+  width: 24px;
+  user-select: none;
+}
+
+.heatmapGrid {
+  display: grid;
+  grid-template-rows: repeat(7, 11px);
+  grid-auto-flow: column;
+  gap: 3.5px;
+  padding: 12px 0 2px 0;
+}
+
+.heatmapCell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2.5px;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.heatmapCell:hover {
+  transform: scale(1.35);
+  z-index: 10;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.heatmapCellPad {
+  width: 11px;
+  height: 11px;
+  visibility: hidden;
+}
+
+/* Contribution Heatmap Color Levels (Dark Mode default - High Visibility) */
+.lvl0 { background-color: rgba(255, 255, 255, 0.12); }
+.lvl1 { background-color: #ffbba9; }
+.lvl2 { background-color: #ff886c; }
+.lvl3 { background-color: #ff522f; }
+.lvl4 { background-color: #ff1100; box-shadow: 0 0 6px rgba(255, 17, 0, 0.7); }
+
+/* Light Mode Overrides */
+[data-theme="light"] .lvl0 { 
+  background-color: rgba(0, 0, 0, 0.08); 
+}
+[data-theme="light"] .lvl1 {
+  background-color: #ffdcd3;
+}
+[data-theme="light"] .lvl2 {
+  background-color: #ffb4a2;
+}
+[data-theme="light"] .lvl3 {
+  background-color: #e2583e;
+}
+[data-theme="light"] .lvl4 {
+  background-color: #b52c14;
+  box-shadow: 0 0 5px rgba(181, 44, 20, 0.3);
+}
+
+/* Streak Stats Column styling */
+.streakStats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid var(--border-color);
+  padding-left: 20px;
+  gap: 12px;
+}
+
+.streakSubCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(145deg, var(--bg-primary), var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.streakSubCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.streakSubCard:nth-child(1)::before {
+  background-color: var(--primary-color);
+}
+
+.streakSubCard:nth-child(2)::before {
+  background-color: var(--success);
+}
+
+.streakSubCard:nth-child(3)::before {
+  background-color: var(--info);
+}
+
+.streakSubCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.streakEmoji {
+  font-size: 1.8rem;
+  user-select: none;
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.streakVal {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.streakLbl {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+
+/* Todo List Section */
+.todoSection {
+  margin-top: 0px;
+}
+
+.todoCard {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(145deg, var(--bg-secondary), var(--bg-tertiary));
+}
+
+.todoForm {
+  display: flex;
+  gap: 12px;
+}
+
+.todoInput {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.todoInput:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btnTodoAdd {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #f0765c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(226, 88, 62, 0.2);
+}
+
+.btnTodoAdd:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(226, 88, 62, 0.35);
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+}
+
+.btnTodoAdd:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btnTodoAdd:disabled {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.todoLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  color: var(--text-secondary);
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.todoEmpty {
+  color: var(--text-tertiary);
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 20px 0;
+  margin: 0;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.todoItem:hover {
+  border-color: rgba(226, 88, 62, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.todoCheckboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.todoCheckbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.todoText {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.completed .todoText {
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+.btnTodoDelete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.btnTodoDelete:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+/* Redesigned Checklist & Streaks tab styles */
+.heatmapFullRow {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.heatmapCardFull {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.checklistSplitRow {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.checklistColumn {
+  flex: 1.8;
+  min-width: 0;
+}
+
+.statsColumn {
+  flex: 1.2;
+  min-width: 0;
+}
+
+.columnTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.streaksSection {
+  width: 100%;
+}
+
+.streaksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .checklistSplitRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -96,3 +96,25 @@ export function chatWithAITutor(videoId, payload) {
   return request(`/ai/video/${videoId}/chat`, { method: 'POST', body: payload })
 }
 
+// Consistency Heatmap & Study Tracker endpoints
+export function getStudyTrackerStats(todayStr) {
+  return request(`/courses/stats/study-tracker?today=${todayStr}`)
+}
+
+// Todo List endpoints
+export function getTodos() {
+  return request('/todos')
+}
+
+export function createTodo(text) {
+  return request('/todos', { method: 'POST', body: { text } })
+}
+
+export function toggleTodo(id) {
+  return request(`/todos/${id}/toggle`, { method: 'PATCH' })
+}
+
+export function deleteTodo(id) {
+  return request(`/todos/${id}`, { method: 'DELETE' })
+}
+

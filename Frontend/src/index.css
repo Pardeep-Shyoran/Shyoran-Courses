@@ -98,11 +98,18 @@ body {
     linear-gradient(to bottom, rgba(15, 18, 29, 0.012) 1px, transparent 1px);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2 {
   font-family: var(--font-serif);
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--text-primary);
 }
 

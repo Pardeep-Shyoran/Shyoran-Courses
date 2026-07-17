@@ -1,6 +1,7 @@
 import Course from "../models/course.model.js";
 import User from "../models/user.model.js";
 import Enrollment from "../models/enrollment.model.js";
+import StudyActivity from "../models/studyActivity.model.js";
 import { extractPlaylistId, scrapePlaylist } from "../utils/youtubeScraper.js";
 
 // Helper function to merge enrollment progress and notes into a course object
@@ -253,9 +254,11 @@ export async function toggleVideoCompleted(req, res) {
       }
 
       let vp = (enrollment.videoProgress || []).find(p => p.videoId.toString() === videoId);
+      let isCompletedNow = false;
       if (vp) {
         vp.completed = !vp.completed;
         vp.watchedAt = vp.completed ? new Date() : null;
+        isCompletedNow = vp.completed;
       } else {
         enrollment.videoProgress.push({
           videoId: video._id,
@@ -264,9 +267,22 @@ export async function toggleVideoCompleted(req, res) {
           watchedAt: new Date(),
           notes: ""
         });
+        isCompletedNow = true;
       }
 
       await enrollment.save();
+
+      // Log study activity
+      const dateStr = new Date().toISOString().split('T')[0];
+      if (isCompletedNow) {
+        await StudyActivity.findOneAndUpdate(
+          { user: userId, course: courseId, type: "video_completed", videoId, dateStr },
+          { timestamp: new Date() },
+          { upsert: true, new: true }
+        );
+      } else {
+        await StudyActivity.deleteOne({ user: userId, course: courseId, type: "video_completed", videoId });
+      }
 
       const mergedCourse = mergeEnrollmentProgress(course, enrollment.toObject(), userId, req.user);
       return res.json(mergedCourse);
@@ -287,6 +303,18 @@ export async function toggleVideoCompleted(req, res) {
     video.watchedAt = video.completed ? new Date() : null;
 
     await course.save();
+
+    // Log study activity
+    const dateStr = new Date().toISOString().split('T')[0];
+    if (video.completed) {
+      await StudyActivity.findOneAndUpdate(
+        { user: userId, course: courseId, type: "video_completed", videoId, dateStr },
+        { timestamp: new Date() },
+        { upsert: true, new: true }
+      );
+    } else {
+      await StudyActivity.deleteOne({ user: userId, course: courseId, type: "video_completed", videoId });
+    }
 
     const populatedCourse = await Course.findById(courseId).populate("user", "name email role");
     res.json(populatedCourse);
@@ -331,6 +359,16 @@ export async function updateVideoNotes(req, res) {
 
       await enrollment.save();
 
+      // Log study activity
+      if (notes && notes.trim().length > 0) {
+        const dateStr = new Date().toISOString().split('T')[0];
+        await StudyActivity.findOneAndUpdate(
+          { user: userId, course: courseId, type: "notes_updated", videoId, dateStr },
+          { timestamp: new Date() },
+          { upsert: true, new: true }
+        );
+      }
+
       const mergedCourse = mergeEnrollmentProgress(course, enrollment.toObject(), userId, req.user);
       return res.json(mergedCourse);
     }
@@ -348,6 +386,16 @@ export async function updateVideoNotes(req, res) {
 
     video.notes = notes || "";
     await course.save();
+
+    // Log study activity
+    if (notes && notes.trim().length > 0) {
+      const dateStr = new Date().toISOString().split('T')[0];
+      await StudyActivity.findOneAndUpdate(
+        { user: userId, course: courseId, type: "notes_updated", videoId, dateStr },
+        { timestamp: new Date() },
+        { upsert: true, new: true }
+      );
+    }
 
     const populatedCourse = await Course.findById(courseId).populate("user", "name email role");
     res.json(populatedCourse);
@@ -422,3 +470,127 @@ export async function enrollCourse(req, res) {
     res.status(500).json({ message: "Failed to enroll in course", error: error.message });
   }
 }
+
+
+// Fetch consistency study stats (streak, heatmap)
+export async function getStudyTrackerStats(req, res) {
+  try {
+    const userId = req.user._id;
+    const clientTodayStr = req.query.today || new Date().toISOString().split('T')[0];
+
+    // 1. Dynamic backfill if user has 0 activities but has completed videos
+    const count = await StudyActivity.countDocuments({ user: userId });
+    if (count === 0) {
+      const enrollments = await Enrollment.find({ user: userId });
+      const activitiesToCreate = [];
+
+      for (const enrollment of enrollments) {
+        for (const vp of enrollment.videoProgress || []) {
+          if (vp.completed && vp.watchedAt) {
+            const dateStr = new Date(vp.watchedAt).toISOString().split('T')[0];
+            activitiesToCreate.push({
+              user: userId,
+              course: enrollment.course,
+              type: "video_completed",
+              videoId: vp.videoId,
+              dateStr,
+              timestamp: vp.watchedAt
+            });
+          }
+        }
+      }
+
+      const ownedCourses = await Course.find({ user: userId });
+      for (const course of ownedCourses) {
+        for (const video of course.videos || []) {
+          if (video.completed && video.watchedAt) {
+            const dateStr = new Date(video.watchedAt).toISOString().split('T')[0];
+            activitiesToCreate.push({
+              user: userId,
+              course: course._id,
+              type: "video_completed",
+              videoId: video._id,
+              dateStr,
+              timestamp: video.watchedAt
+            });
+          }
+        }
+      }
+
+      if (activitiesToCreate.length > 0) {
+        try {
+          await StudyActivity.insertMany(activitiesToCreate, { ordered: false });
+        } catch (err) {
+          // Ignore duplicates
+        }
+      }
+    }
+
+    // 2. Fetch all activities for user
+    const activities = await StudyActivity.find({ user: userId }).sort({ timestamp: 1 }).lean();
+
+    // 3. Compute counts by date
+    const dateCounts = {};
+    const activeDatesSet = new Set();
+    activities.forEach(act => {
+      const dStr = act.dateStr;
+      dateCounts[dStr] = (dateCounts[dStr] || 0) + 1;
+      activeDatesSet.add(dStr);
+    });
+
+    // 4. Compute streak details (longest and current)
+    const sortedDates = Array.from(activeDatesSet).sort(); // Ascending
+
+    let longestStreak = 0;
+    let currentRun = 0;
+    let prevDate = null;
+
+    for (const dateStr of sortedDates) {
+      const curDate = new Date(dateStr);
+      if (!prevDate) {
+        currentRun = 1;
+      } else {
+        const diffTime = curDate - prevDate;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          currentRun++;
+        } else if (diffDays > 1) {
+          longestStreak = Math.max(longestStreak, currentRun);
+          currentRun = 1;
+        }
+      }
+      prevDate = curDate;
+    }
+    longestStreak = Math.max(longestStreak, currentRun);
+
+    // Current streak relative to clientTodayStr
+    const clientToday = new Date(clientTodayStr);
+    const clientYesterday = new Date(clientToday);
+    clientYesterday.setDate(clientYesterday.getDate() - 1);
+    const clientYesterdayStr = clientYesterday.toISOString().split('T')[0];
+
+    let currentStreak = 0;
+    if (activeDatesSet.has(clientTodayStr) || activeDatesSet.has(clientYesterdayStr)) {
+      let checkDate = activeDatesSet.has(clientTodayStr) ? clientToday : clientYesterday;
+      while (true) {
+        const checkStr = checkDate.toISOString().split('T')[0];
+        if (activeDatesSet.has(checkStr)) {
+          currentStreak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+
+    res.json({
+      heatmap: dateCounts,
+      currentStreak,
+      longestStreak,
+      totalActivities: activities.length
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to load study tracker stats", error: error.message });
+  }
+}
+
