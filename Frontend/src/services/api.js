@@ -75,6 +75,10 @@ export function deleteCourse(id) {
   return request(`/courses/${id}`, { method: 'DELETE' })
 }
 
+export function refreshCoursePlaylist(id) {
+  return request(`/courses/${id}/refresh`, { method: 'POST' })
+}
+
 export function toggleVideoCompleted(courseId, videoId) {
   return request(`/courses/${courseId}/videos/${videoId}/toggle`, { method: 'PATCH' })
 }

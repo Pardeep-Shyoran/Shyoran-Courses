@@ -11,7 +11,8 @@ import {
   updateVideoNotes,
   getPublicCourses,
   enrollCourse,
-  getStudyTrackerStats
+  getStudyTrackerStats,
+  refreshCoursePlaylist
 } from "../controller/course.controller.js";
 
 const router = Router();
@@ -39,6 +40,9 @@ router.route("/:id")
 
 router.route("/:id/enroll")
   .post(enrollCourse);
+
+router.route("/:id/refresh")
+  .post(refreshCoursePlaylist);
 
 router.route("/:id/videos/:videoId/toggle")
   .patch(toggleVideoCompleted);

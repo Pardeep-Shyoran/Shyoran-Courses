@@ -9,14 +9,29 @@ const PlayerSidebar = ({
   handleToggleWatched,
   completedCount,
   totalCount,
-  completionPercentage
+  completionPercentage,
+  handleRefreshPlaylist,
+  refreshing
 }) => {
   const videos = course?.videos || []
 
   return (
     <aside className={styles.sidebarDirectory}>
       <div className={styles.sidebarHeader}>
-        <h3>Course Contents</h3>
+        <div className={styles.sidebarTitleRow}>
+          <h3>Course Contents</h3>
+          {course?.playlistId && (
+            <button
+              onClick={handleRefreshPlaylist}
+              className={styles.syncBtn}
+              title="Sync playlist with YouTube"
+              disabled={refreshing}
+            >
+              <span className={`${styles.syncIcon} ${refreshing ? styles.spinning : ''}`}>🔄</span>
+              {refreshing ? 'Syncing...' : 'Sync'}
+            </button>
+          )}
+        </div>
         <div className={styles.progressContainer}>
           <div className={styles.progressBarWrapper}>
             <div 

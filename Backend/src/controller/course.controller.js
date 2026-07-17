@@ -471,6 +471,80 @@ export async function enrollCourse(req, res) {
   }
 }
 
+// Refresh/sync the course's playlist videos from YouTube
+export async function refreshCoursePlaylist(req, res) {
+  try {
+    const courseId = req.params.id;
+    const userId = req.user._id;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    if (!course.playlistId) {
+      return res.status(400).json({ message: "This course is not linked to a YouTube playlist" });
+    }
+
+    const isOwner = course.user.toString() === userId.toString();
+    const enrollment = await Enrollment.findOne({ user: userId, course: courseId });
+
+    if (!isOwner && !enrollment) {
+      return res.status(403).json({ message: "Unauthorized to refresh this course" });
+    }
+
+    // Scrape the latest playlist details from YouTube
+    const scrapedData = await scrapePlaylist(course.playlistId);
+    const scrapedVideos = scrapedData.videos || [];
+
+    // Map existing videos by youtubeId to preserve IDs and progress
+    const existingVideosMap = new Map();
+    for (const v of course.videos) {
+      existingVideosMap.set(v.youtubeId, v);
+    }
+
+    const updatedVideos = [];
+    for (const sv of scrapedVideos) {
+      const existing = existingVideosMap.get(sv.youtubeId);
+      if (existing) {
+        // Update details but keep subdocument object & progress
+        existing.title = sv.title;
+        existing.duration = sv.duration;
+        updatedVideos.push(existing);
+      } else {
+        // New video found in the playlist
+        updatedVideos.push({
+          title: sv.title,
+          youtubeId: sv.youtubeId,
+          duration: sv.duration,
+          completed: false,
+          notes: ""
+        });
+      }
+    }
+
+    // Update course level details if scraped and sync videos array
+    if (scrapedData.title) course.title = scrapedData.title;
+    if (scrapedData.description) course.description = scrapedData.description;
+    if (scrapedData.thumbnail) course.thumbnail = scrapedData.thumbnail;
+    course.videos = updatedVideos;
+
+    await course.save();
+
+    // Fetch the updated populated/merged course model to return to frontend
+    const freshCourse = await Course.findById(courseId).populate("user", "name email role").lean();
+
+    if (enrollment) {
+      const mergedCourse = mergeEnrollmentProgress(freshCourse, enrollment.toObject(), userId, req.user);
+      return res.json(mergedCourse);
+    }
+
+    res.json(freshCourse);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to refresh playlist", error: error.message });
+  }
+}
+
 
 // Fetch consistency study stats (streak, heatmap)
 export async function getStudyTrackerStats(req, res) {

@@ -8,7 +8,8 @@ import {
   deleteCourse, 
   enrollInCourse,
   getVideoSummary,
-  chatWithAITutor
+  chatWithAITutor,
+  refreshCoursePlaylist
 } from '../../services/api'
 import PlayerHeader from './components/PlayerHeader'
 import PlayerVideoSection from './components/PlayerVideoSection'
@@ -27,6 +28,7 @@ const CoursePlayer = () => {
   const [course, setCourse] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
   const currentUserId = user?._id || user?.id;
@@ -47,6 +49,33 @@ const CoursePlayer = () => {
       alert(err.message || 'Failed to enroll in course.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleRefreshPlaylist = async () => {
+    if (!course) return
+    setRefreshing(true)
+    try {
+      const updatedCourse = await refreshCoursePlaylist(course._id)
+      setCourse(updatedCourse)
+
+      // Re-select active video if it still exists, otherwise default to first video
+      const videos = updatedCourse.videos || []
+      if (videos.length > 0) {
+        const stillExists = activeVideo ? videos.find(v => v.youtubeId === activeVideo.youtubeId) : null
+        if (stillExists) {
+          selectVideo(stillExists, updatedCourse)
+        } else {
+          selectVideo(videos[0], updatedCourse)
+        }
+      } else {
+        setActiveVideo(null)
+      }
+      alert('Playlist successfully synced with YouTube!')
+    } catch (err) {
+      alert(err.message || 'Failed to refresh playlist.')
+    } finally {
+      setRefreshing(false)
     }
   }
 
@@ -498,6 +527,8 @@ const CoursePlayer = () => {
           completedCount={completedCount}
           totalCount={totalCount}
           completionPercentage={completionPercentage}
+          handleRefreshPlaylist={handleRefreshPlaylist}
+          refreshing={refreshing}
         />
       </div>
     </div>

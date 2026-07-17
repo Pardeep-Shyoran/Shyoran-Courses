@@ -506,6 +506,58 @@
   color: var(--text-primary);
 }
 
+.sidebarTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sidebarTitleRow h3 {
+  margin-bottom: 0 !important;
+}
+
+.syncBtn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.syncBtn:hover:not(:disabled) {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.syncBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.syncBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.syncIcon {
+  display: inline-block;
+  font-size: 0.85rem;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
 .progressContainer {
   display: flex;
   flex-direction: column;
