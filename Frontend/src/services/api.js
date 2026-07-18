@@ -100,6 +100,14 @@ export function chatWithAITutor(videoId, payload) {
   return request(`/ai/video/${videoId}/chat`, { method: 'POST', body: payload })
 }
 
+export function getVideoFlashcards(videoId, payload) {
+  return request(`/ai/video/${videoId}/flashcards`, { method: 'POST', body: payload })
+}
+
+export function getVideoQuiz(videoId, payload) {
+  return request(`/ai/video/${videoId}/quiz`, { method: 'POST', body: payload })
+}
+
 // Consistency Heatmap & Study Tracker endpoints
 export function getStudyTrackerStats(todayStr) {
   return request(`/courses/stats/study-tracker?today=${todayStr}`)

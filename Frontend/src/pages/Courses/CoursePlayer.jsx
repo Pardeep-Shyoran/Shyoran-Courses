@@ -16,6 +16,7 @@ import PlayerVideoSection from './components/PlayerVideoSection'
 import PlayerSidebar from './components/PlayerSidebar'
 import PlayerNotesTab from './components/PlayerNotesTab'
 import PlayerAiTab from './components/PlayerAiTab'
+import PlayerPracticeTab from './components/PlayerPracticeTab'
 import PlayerAboutTab from './components/PlayerAboutTab'
 import PlayerSettingsTab from './components/PlayerSettingsTab'
 import styles from './CoursePlayer.module.css'
@@ -81,6 +82,40 @@ const CoursePlayer = () => {
 
   // Active video tracking
   const [activeVideo, setActiveVideo] = useState(null)
+  const playerIframeRef = useRef(null)
+  const [playerTime, setPlayerTime] = useState(0)
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (typeof event.data === 'string') {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.event === 'infoDelivery' && data.info && typeof data.info.currentTime === 'number') {
+            setPlayerTime(data.info.currentTime)
+          }
+        } catch (err) {
+          // Ignore
+        }
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
+
+  const handleSeek = (seconds) => {
+    if (playerIframeRef.current && playerIframeRef.current.contentWindow) {
+      playerIframeRef.current.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'seekTo',
+        args: [seconds, true]
+      }), '*')
+      playerIframeRef.current.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'playVideo',
+        args: []
+      }), '*')
+    }
+  }
 
   // Interactive workstation tabs: 'notes', 'about', 'settings', 'ai'
   const [activeTab, setActiveTab] = useState('notes')
@@ -418,6 +453,7 @@ const CoursePlayer = () => {
                 isOwner={isOwner}
                 handleToggleWatched={handleToggleWatched}
                 handleEnroll={handleEnroll}
+                iframeRef={playerIframeRef}
               />
 
               {/* Workstation Tab Headers */}
@@ -433,6 +469,12 @@ const CoursePlayer = () => {
                   onClick={() => setActiveTab('ai')}
                 >
                   🤖 AI Assistant
+                </button>
+                <button
+                  className={`${styles.tabHeader} ${activeTab === 'practice' ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab('practice')}
+                >
+                  ⚡ Active Recall
                 </button>
                 <button
                   className={`${styles.tabHeader} ${activeTab === 'about' ? styles.activeTab : ''}`}
@@ -464,6 +506,8 @@ const CoursePlayer = () => {
                     handleSaveNotes={handleSaveNotes}
                     handleEnroll={handleEnroll}
                     notesTextareaRef={notesTextareaRef}
+                    playerTime={playerTime}
+                    handleSeek={handleSeek}
                   />
                 )}
 
@@ -485,6 +529,16 @@ const CoursePlayer = () => {
                     handleAppendSummaryToNotes={handleAppendSummaryToNotes}
                     handleOverwriteNotesWithSummary={handleOverwriteNotesWithSummary}
                     chatEndRef={chatEndRef}
+                    handleSeek={handleSeek}
+                  />
+                )}
+
+                {activeTab === 'practice' && (
+                  <PlayerPracticeTab 
+                    isOwner={isOwner}
+                    activeVideo={activeVideo}
+                    course={course}
+                    handleEnroll={handleEnroll}
                   />
                 )}
 

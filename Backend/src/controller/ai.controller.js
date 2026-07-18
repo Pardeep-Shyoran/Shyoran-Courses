@@ -1,7 +1,7 @@
 import Course from "../models/course.model.js";
 import Enrollment from "../models/enrollment.model.js";
 import { getYoutubeTranscript } from "../utils/transcript.js";
-import { generateSummary, chatWithTutor } from "../utils/ai.js";
+import { generateSummary, chatWithTutor, generateFlashcards, generateQuiz } from "../utils/ai.js";
 
 /**
  * Helper to fetch a student's personal notes for a specific video.
@@ -106,5 +106,61 @@ export async function handleChatWithTutor(req, res) {
   } catch (error) {
     console.error("AI Tutor Chat Error:", error);
     res.status(500).json({ message: error.message || "AI Tutor service error" });
+  }
+}
+
+/**
+ * Generates flashcards for a video.
+ * Body parameters: courseId, youtubeId, title
+ */
+export async function handleGetFlashcards(req, res) {
+  try {
+    const { videoId } = req.params;
+    const { courseId, youtubeId, title } = req.body;
+
+    if (!courseId || !youtubeId || !title) {
+      return res.status(400).json({ message: "courseId, youtubeId, and title are required in request body" });
+    }
+
+    let transcriptText = "";
+    try {
+      transcriptText = await getYoutubeTranscript(youtubeId);
+    } catch (err) {
+      console.warn(`Transcript unavailable for flashcards ${youtubeId}:`, err.message);
+    }
+
+    const flashcards = await generateFlashcards(title, transcriptText);
+    res.json({ flashcards });
+  } catch (error) {
+    console.error("AI Flashcards Error:", error);
+    res.status(500).json({ message: error.message || "Failed to generate study flashcards" });
+  }
+}
+
+/**
+ * Generates quiz questions for a video.
+ * Body parameters: courseId, youtubeId, title
+ */
+export async function handleGetQuiz(req, res) {
+  try {
+    const { videoId } = req.params;
+    const { courseId, youtubeId, title } = req.body;
+
+    if (!courseId || !youtubeId || !title) {
+      return res.status(400).json({ message: "courseId, youtubeId, and title are required in request body" });
+    }
+
+    let transcriptText = "";
+    try {
+      transcriptText = await getYoutubeTranscript(youtubeId);
+    } catch (err) {
+      console.warn(`Transcript unavailable for quiz ${youtubeId}:`, err.message);
+    }
+
+    const quiz = await generateQuiz(title, transcriptText);
+    res.json({ quiz });
+  } catch (error) {
+    console.error("AI Quiz Error:", error);
+    res.status(500).json({ message: error.message || "Failed to generate practice quiz" });
   }
 }

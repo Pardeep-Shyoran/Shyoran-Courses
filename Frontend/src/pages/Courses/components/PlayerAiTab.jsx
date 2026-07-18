@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
+import { parseTimestamps } from '../../../utils/timestamps'
 import styles from '../CoursePlayer.module.css'
 
 const PlayerAiTab = ({
@@ -21,7 +22,8 @@ const PlayerAiTab = ({
   handleGetSummary,
   handleAppendSummaryToNotes,
   handleOverwriteNotesWithSummary,
-  chatEndRef
+  chatEndRef,
+  handleSeek
 }) => {
   return (
     <div className={styles.aiContainer}>
@@ -87,8 +89,25 @@ const PlayerAiTab = ({
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm]} 
                         rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                        components={{
+                          a: ({ href, children, ...props }) => {
+                            if (href && href.startsWith('seek://')) {
+                              const seconds = parseInt(href.replace('seek://', ''), 10)
+                              return (
+                                <button
+                                  onClick={() => handleSeek(seconds)}
+                                  className={styles.timestampBadge}
+                                  title={`Seek to ${children}`}
+                                >
+                                  ⏱️ {children}
+                                </button>
+                              )
+                            }
+                            return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                          }
+                        }}
                       >
-                        {msg.content}
+                        {parseTimestamps(msg.content)}
                       </ReactMarkdown>
                     </div>
                   </div>
@@ -183,8 +202,25 @@ const PlayerAiTab = ({
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]} 
                     rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                    components={{
+                      a: ({ href, children, ...props }) => {
+                        if (href && href.startsWith('seek://')) {
+                          const seconds = parseInt(href.replace('seek://', ''), 10)
+                          return (
+                            <button
+                              onClick={() => handleSeek(seconds)}
+                              className={styles.timestampBadge}
+                              title={`Seek to ${children}`}
+                            >
+                              ⏱️ {children}
+                            </button>
+                          )
+                        }
+                        return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                      }
+                    }}
                   >
-                    {aiSummary}
+                    {parseTimestamps(aiSummary)}
                   </ReactMarkdown>
                 </div>
               </div>

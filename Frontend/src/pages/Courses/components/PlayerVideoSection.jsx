@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '../CoursePlayer.module.css'
 
-const PlayerVideoSection = ({ activeVideo, isOwner, handleToggleWatched, handleEnroll }) => {
+const PlayerVideoSection = ({ activeVideo, isOwner, handleToggleWatched, handleEnroll, iframeRef }) => {
   if (!activeVideo) return null
 
   return (
@@ -9,6 +9,7 @@ const PlayerVideoSection = ({ activeVideo, isOwner, handleToggleWatched, handleE
       {/* Iframe Video Player */}
       <div className={styles.playerWrapper}>
         <iframe
+          ref={iframeRef}
           src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?enablejsapi=1&rel=0`}
           title={activeVideo.title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

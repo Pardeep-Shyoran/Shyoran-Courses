@@ -144,3 +144,80 @@ ${hasNotes ? `Student's Personal Notes: """\n${notesText}\n"""` : "Student's Per
   const response = await result.response;
   return response.text();
 }
+
+/**
+ * Generates an array of flashcards for active recall.
+ * @param {string} videoTitle 
+ * @param {string} transcriptText 
+ * @returns {Promise<Array>}
+ */
+export async function generateFlashcards(videoTitle, transcriptText) {
+  checkAIClient();
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3.1-flash-lite",
+    generationConfig: { responseMimeType: "application/json" }
+  });
+
+  const prompt = `
+You are an expert study assistant. Based on the video "${videoTitle}", generate 5-8 educational flashcards for study.
+Return a JSON array of objects. Each object MUST have:
+- "front": A clear, concise question or prompt (1 sentence max).
+- "back": A clear, informative answer or explanation (1-2 sentences).
+
+Focus on key concepts, vocabulary, code techniques, or definitions from the video content.
+Here is the transcript:
+"""
+${transcriptText || "[No transcript available, base flashcards on title]"}
+"""
+`;
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Failed to parse flashcards JSON:", text);
+    throw new Error("Failed to parse AI generated flashcards.");
+  }
+}
+
+/**
+ * Generates an array of multiple-choice questions for quizzes.
+ * @param {string} videoTitle 
+ * @param {string} transcriptText 
+ * @returns {Promise<Array>}
+ */
+export async function generateQuiz(videoTitle, transcriptText) {
+  checkAIClient();
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3.1-flash-lite",
+    generationConfig: { responseMimeType: "application/json" }
+  });
+
+  const prompt = `
+You are an expert tutor. Based on the video "${videoTitle}", generate 5 multiple choice questions (MCQs) to test the student's understanding.
+Return a JSON array of objects. Each object MUST have:
+- "question": The question text.
+- "options": An array of exactly 4 choices/options.
+- "correctAnswerIndex": The 0-based index of the correct option (0, 1, 2, or 3).
+- "explanation": A brief explanation of why this answer is correct and why the others are incorrect.
+
+Focus on testing comprehension, not trivial details.
+Here is the transcript:
+"""
+${transcriptText || "[No transcript available, base quiz on title]"}
+"""
+`;
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Failed to parse quiz JSON:", text);
+    throw new Error("Failed to parse AI generated quiz.");
+  }
+}
+
