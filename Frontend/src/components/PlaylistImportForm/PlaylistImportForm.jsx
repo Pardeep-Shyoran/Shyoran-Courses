@@ -1,9 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { importPlaylistPreview, createCourse } from '../../services/api'
 import styles from './PlaylistImportForm.module.css'
 
-const PlaylistImportForm = ({ onSuccess, onCancel }) => {
-  const [playlistUrl, setPlaylistUrl] = useState('')
+const PlaylistImportForm = ({ onSuccess, onCancel, initialUrl = '' }) => {
+  const [playlistUrl, setPlaylistUrl] = useState(initialUrl)
+
+  useEffect(() => {
+    if (initialUrl) {
+      setPlaylistUrl(initialUrl)
+    }
+  }, [initialUrl])
   const [importLoading, setImportLoading] = useState(false)
   const [importError, setImportError] = useState(null)
   const [previewData, setPreviewData] = useState(null)

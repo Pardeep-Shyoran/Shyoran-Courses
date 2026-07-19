@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 import todoRoutes from "./routes/todo.routes.js";
+import certificateRoutes from "./routes/certificate.routes.js";
 
 const App = express();
 
@@ -18,6 +19,7 @@ App.use("/api/auth", authRoutes);
 App.use("/api/courses", courseRoutes);
 App.use("/api/ai", aiRoutes);
 App.use("/api/todos", todoRoutes);
+App.use("/api/certificates", certificateRoutes);
 
 
 // Basic health endpoint for uptime/keep-alive pings

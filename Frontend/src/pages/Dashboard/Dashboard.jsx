@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getCourses, deleteCourse, getStudyTrackerStats } from '../../services/api'
+import { getCourses, deleteCourse, getStudyTrackerStats, getUserProfile } from '../../services/api'
 import DashboardHeader from './components/DashboardHeader'
 import DashboardOverview from './components/DashboardOverview'
 import DashboardChecklist from './components/DashboardChecklist'
 import DashboardCourses from './components/DashboardCourses'
 import DashboardAddCourse from './components/DashboardAddCourse'
 import DashboardProfile from './components/DashboardProfile'
+import DashboardRewards from './components/DashboardRewards'
 import styles from './Dashboard.module.css'
 
 const Dashboard = () => {
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Tab State: 'overview', 'courses', 'checklist', 'add-course', 'profile'
+  // Tab State: 'overview', 'courses', 'checklist', 'rewards', 'add-course', 'profile'
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     return params.get('tab') || 'overview'
@@ -27,7 +28,7 @@ const Dashboard = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const tab = params.get('tab')
-    if (tab && ['overview', 'courses', 'checklist', 'add-course', 'profile'].includes(tab)) {
+    if (tab && ['overview', 'courses', 'checklist', 'rewards', 'add-course', 'profile'].includes(tab)) {
       setActiveTab(tab)
     }
   }, [location.search])
@@ -44,6 +45,17 @@ const Dashboard = () => {
       const currentUserId = storedUser?._id || storedUser?.id
       const myCourses = data.filter(c => c.user?._id === currentUserId || c.user === currentUserId)
       setCourses(myCourses)
+      
+      // Load latest user details (such as current XP)
+      try {
+        const profileData = await getUserProfile()
+        if (profileData?.user) {
+          setUser(profileData.user)
+          localStorage.setItem('user', JSON.stringify(profileData.user))
+        }
+      } catch (pErr) {
+        console.error("Failed to load fresh user profile data:", pErr)
+      }
       
       setTrackerLoading(true)
       const todayStr = new Date().toISOString().split('T')[0]
@@ -214,6 +226,12 @@ const Dashboard = () => {
             Checklist & Streaks
           </button>
           <button 
+            className={`${styles.tabBtn} ${activeTab === 'rewards' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('rewards')}
+          >
+            Rewards & Certificates
+          </button>
+          <button 
             className={`${styles.tabBtn} ${activeTab === 'add-course' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('add-course')}
           >
@@ -254,6 +272,14 @@ const Dashboard = () => {
                 streak={streak}
                 trackerStats={trackerStats}
                 trackerLoading={trackerLoading}
+              />
+            )}
+
+            {activeTab === 'rewards' && (
+              <DashboardRewards
+                user={user}
+                courses={courses}
+                streak={streak}
               />
             )}
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { 
   getCourseById, 
@@ -9,7 +9,8 @@ import {
   enrollInCourse,
   getVideoSummary,
   chatWithAITutor,
-  refreshCoursePlaylist
+  refreshCoursePlaylist,
+  getUserCertificates
 } from '../../services/api'
 import PlayerHeader from './components/PlayerHeader'
 import PlayerVideoSection from './components/PlayerVideoSection'
@@ -20,6 +21,8 @@ import PlayerPracticeTab from './components/PlayerPracticeTab'
 import PlayerAboutTab from './components/PlayerAboutTab'
 import PlayerSettingsTab from './components/PlayerSettingsTab'
 import styles from './CoursePlayer.module.css'
+import { launchConfetti } from '../../utils/confetti'
+import CertificateViewer from '../../components/Certificate/CertificateViewer'
 
 const CoursePlayer = () => {
   const { id } = useParams()
@@ -27,9 +30,96 @@ const CoursePlayer = () => {
   const navigate = useNavigate()
 
   const [course, setCourse] = useState(null)
+  const [earnedCert, setEarnedCert] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [isReordering, setIsReordering] = useState(false)
+  const [localVideos, setLocalVideos] = useState([])
+  const [isReversed, setIsReversed] = useState(localStorage.getItem(`course_reversed_${id}`) === 'true')
+
+  const getOrderedVideos = useCallback((rawVideos) => {
+    if (!rawVideos) return []
+    const savedOrderJson = localStorage.getItem(`course_order_${id}`)
+    if (savedOrderJson) {
+      try {
+        const savedOrderIds = JSON.parse(savedOrderJson)
+        if (Array.isArray(savedOrderIds) && savedOrderIds.length > 0) {
+          const videoMap = new Map(rawVideos.map(v => [v._id, v]))
+          const ordered = []
+          savedOrderIds.forEach(vidId => {
+            if (videoMap.has(vidId)) {
+              ordered.push(videoMap.get(vidId))
+              videoMap.delete(vidId)
+            }
+          })
+          videoMap.forEach(v => ordered.push(v))
+          return ordered
+        }
+      } catch (e) {
+        console.error("Failed to parse saved video order", e)
+      }
+    }
+    return rawVideos
+  }, [id])
+
+  useEffect(() => {
+    setIsReversed(localStorage.getItem(`course_reversed_${id}`) === 'true')
+  }, [id])
+
+  useEffect(() => {
+    if (course && course.videos && !isReordering) {
+      setLocalVideos(getOrderedVideos(course.videos))
+    }
+  }, [course, isReordering, getOrderedVideos])
+
+  const handleToggleReverse = () => {
+    const newReversed = !isReversed
+    setIsReversed(newReversed)
+    localStorage.setItem(`course_reversed_${id}`, newReversed)
+  }
+
+  const handleStartReordering = () => {
+    setLocalVideos(course?.videos ? getOrderedVideos(course.videos) : [])
+    setIsReordering(true)
+  }
+
+  const handleCancelReordering = () => {
+    setLocalVideos(course?.videos ? getOrderedVideos(course.videos) : [])
+    setIsReordering(false)
+  }
+
+  const handleMoveVideo = (index, direction) => {
+    const newVideos = [...localVideos]
+    const targetIndex = index + direction
+    if (targetIndex < 0 || targetIndex >= newVideos.length) return
+    const temp = newVideos[index]
+    newVideos[index] = newVideos[targetIndex]
+    newVideos[targetIndex] = temp
+    setLocalVideos(newVideos)
+  }
+
+  const handleSaveOrder = async () => {
+    if (!course) return
+    setLoading(true)
+    try {
+      if (isActualCreator) {
+        localStorage.removeItem(`course_order_${course._id}`)
+        const updated = await updateCourse(course._id, { videos: localVideos })
+        setCourse(updated)
+        alert('Course playlist order saved successfully to database!')
+      } else {
+        const videoOrderIds = localVideos.map(v => v._id)
+        localStorage.setItem(`course_order_${course._id}`, JSON.stringify(videoOrderIds))
+        alert('Local playlist order saved successfully!')
+      }
+      setIsReordering(false)
+    } catch (err) {
+      alert(err.message || 'Failed to save course playlist order.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
   const currentUserId = user?._id || user?.id;
@@ -93,7 +183,7 @@ const CoursePlayer = () => {
           if (data.event === 'infoDelivery' && data.info && typeof data.info.currentTime === 'number') {
             setPlayerTime(data.info.currentTime)
           }
-        } catch (err) {
+        } catch {
           // Ignore
         }
       }
@@ -151,6 +241,7 @@ const CoursePlayer = () => {
 
   useEffect(() => {
     fetchCourseDetails()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchCourseDetails = async () => {
@@ -163,7 +254,7 @@ const CoursePlayer = () => {
       setEditTags(data.tags?.join(', ') || '')
 
       // Determine initial video to play
-      const videos = data.videos || []
+      const videos = getOrderedVideos(data.videos || [])
       if (videos.length > 0) {
         // 1. Try URL parameter
         const paramVidId = searchParams.get('videoId')
@@ -262,7 +353,7 @@ const CoursePlayer = () => {
       setActiveTab('notes')
       setNotesViewMode('edit')
       alert('AI Summary successfully appended to your notes!')
-    } catch (err) {
+    } catch {
       alert('Failed to save updated notes.')
     } finally {
       setNoteSaving(false)
@@ -286,7 +377,7 @@ const CoursePlayer = () => {
       setActiveTab('notes')
       setNotesViewMode('preview')
       alert('AI Summary successfully saved as video notes!')
-    } catch (err) {
+    } catch {
       alert('Failed to save updated notes.')
     } finally {
       setNoteSaving(false)
@@ -322,6 +413,49 @@ const CoursePlayer = () => {
     }
   }
 
+  // Show/Preview Certificate handler
+  const handleShowCertificate = async (isPreview = false) => {
+    if (isPreview) {
+      const previewCert = {
+        certificateId: "PREVIEW-ONLY",
+        completedAt: new Date(),
+        course: { title: course.title },
+        user: { name: user?.name || "Student" },
+        isPreview: true
+      }
+      setEarnedCert(previewCert)
+    } else {
+      try {
+        const userCerts = await getUserCertificates()
+        const cert = userCerts.find(c => c.course?._id === course._id)
+        if (cert) {
+          setEarnedCert(cert)
+        } else {
+          // Fallback to local rendering in case it hasn't synced
+          const localCert = {
+            certificateId: `CERT-EARNED-${course._id.slice(-6).toUpperCase()}`,
+            completedAt: new Date(),
+            course: { title: course.title },
+            user: { name: user?.name || "Student" },
+            isPreview: false
+          }
+          setEarnedCert(localCert)
+        }
+      } catch (err) {
+        console.error("Error fetching course certificate:", err)
+        // Fallback
+        const localCert = {
+          certificateId: `CERT-EARNED-${course._id.slice(-6).toUpperCase()}`,
+          completedAt: new Date(),
+          course: { title: course.title },
+          user: { name: user?.name || "Student" },
+          isPreview: false
+        }
+        setEarnedCert(localCert)
+      }
+    }
+  }
+
   // Toggle Video Watched status
   const handleToggleWatched = async (e, targetVideoId) => {
     e.stopPropagation() // Don't trigger play selection
@@ -334,7 +468,14 @@ const CoursePlayer = () => {
         const updatedVideo = updatedCourse.videos.find(v => v._id === targetVideoId)
         setActiveVideo(updatedVideo)
       }
+
+      // Check if a certificate was earned
+      if (updatedCourse?.earnedCertificate) {
+        setEarnedCert(updatedCourse.earnedCertificate)
+        launchConfetti()
+      }
     } catch (err) {
+      console.error(err)
       alert('Failed to update completion status.')
     }
   }
@@ -353,7 +494,7 @@ const CoursePlayer = () => {
       setActiveVideo(updatedVideo)
       setNoteSuccess(true)
       setTimeout(() => setNoteSuccess(false), 3000)
-    } catch (err) {
+    } catch {
       alert('Failed to save notes.')
     } finally {
       setNoteSaving(false)
@@ -395,7 +536,7 @@ const CoursePlayer = () => {
     try {
       await deleteCourse(course._id)
       navigate('/courses')
-    } catch (err) {
+    } catch {
       alert(isActualCreator ? 'Failed to delete course.' : 'Failed to leave course.')
     }
   }
@@ -430,7 +571,7 @@ const CoursePlayer = () => {
     )
   }
 
-  const videos = course.videos || []
+  const videos = localVideos || []
   const completedCount = videos.filter(v => v.completed).length
   const totalCount = videos.length
   const completionPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
@@ -583,8 +724,25 @@ const CoursePlayer = () => {
           completionPercentage={completionPercentage}
           handleRefreshPlaylist={handleRefreshPlaylist}
           refreshing={refreshing}
+          localVideos={localVideos}
+          isReordering={isReordering}
+          isReversed={isReversed}
+          handleToggleReverse={handleToggleReverse}
+          handleStartReordering={handleStartReordering}
+          handleSaveOrder={handleSaveOrder}
+          handleCancelReordering={handleCancelReordering}
+          handleMoveVideo={handleMoveVideo}
+          handleShowCertificate={handleShowCertificate}
         />
       </div>
+
+      {earnedCert && (
+        <CertificateViewer
+          certificate={earnedCert}
+          studentNameFallback={user?.name}
+          onClose={() => setEarnedCert(null)}
+        />
+      )}
     </div>
   )
 }

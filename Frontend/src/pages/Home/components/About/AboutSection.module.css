@@ -1,0 +1,231 @@
+.aboutPlatform {
+  padding: 8rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  border-top: 1px solid var(--border-color);
+}
+
+.aboutContainer {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.sectionHeaderBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.aboutTextContent h2 {
+  font-size: 2.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.aboutLead {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.aboutTextContent p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.aboutHighlights {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.highlightItem {
+  display: flex;
+  gap: 1rem;
+}
+
+.highlightCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(226, 88, 62, 0.1);
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 3px;
+  border: 1px solid rgba(226, 88, 62, 0.2);
+}
+
+.highlightItem h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.highlightItem p {
+  font-size: 0.925rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.aboutVisual {
+  display: flex;
+  justify-content: center;
+}
+
+/* Glassmorphic Visual Card */
+.glassCard {
+  background: rgba(18, 21, 38, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: transform 0.4s ease, border-color 0.4s ease;
+}
+
+.glassCard:hover {
+  transform: translateY(-5px);
+  border-color: rgba(226, 88, 62, 0.3);
+}
+
+.glassCardHeader {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+.dot:nth-child(1) { background-color: var(--error); opacity: 0.7; }
+.dot:nth-child(2) { background-color: var(--warning); opacity: 0.7; }
+.dot:nth-child(3) { background-color: var(--success); opacity: 0.7; }
+
+.cardTitle {
+  margin-left: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.glassCardBody {
+  padding: 2.25rem 2rem;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.75rem;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statItem h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
+}
+
+.statItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.benefitList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.benefitIcon {
+  font-size: 1.25rem;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .glassCard {
+  background: rgba(253, 251, 247, 0.7);
+  border-color: rgba(15, 18, 29, 0.05);
+  box-shadow: 0 10px 30px rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .glassCard:hover {
+  border-color: rgba(216, 79, 51, 0.2);
+}
+
+[data-theme="light"] .highlightCheck {
+  background-color: rgba(216, 79, 51, 0.06);
+  border-color: rgba(216, 79, 51, 0.15);
+}
+
+@media (max-width: 992px) {
+  .aboutContainer {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .aboutVisual {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutPlatform {
+    padding: 5rem 1rem;
+  }
+  .aboutTextContent h2 {
+    font-size: 2.25rem;
+  }
+}

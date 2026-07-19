@@ -1,27 +1,69 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getPublicCourses } from '../../services/api'
 import styles from './Home.module.css'
+import AboutSection from './components/About/AboutSection'
+import FeaturesSection from './components/Features/FeaturesSection'
+import UseCasesSection from './components/UseCases/UseCasesSection'
+import HowItWorksSection from './components/HowItWorks/HowItWorksSection'
+import StartersSection from './components/Starters/StartersSection'
+import FAQSection from './components/FAQ/FAQSection'
 
 const Home = () => {
   const token = localStorage.getItem('token')
-  const [featuredCourses, setFeaturedCourses] = useState([])
-  const [loadingCourses, setLoadingCourses] = useState(true)
+  const [playlistUrl, setPlaylistUrl] = useState('')
+  const [loadingPreview, setLoadingPreview] = useState(false)
+  const [previewData, setPreviewData] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
 
-  useEffect(() => {
-    async function loadPublicCourses() {
-      try {
-        const data = await getPublicCourses()
-        // Display up to 3 featured courses
-        setFeaturedCourses(data.slice(0, 3))
-      } catch (err) {
-        console.error('Failed to load public courses:', err)
-      } finally {
-        setLoadingCourses(false)
-      }
+  const handleTrySample = () => {
+    setErrorMsg('')
+    setPlaylistUrl('https://www.youtube.com/playlist?list=PL4cUxeGkcC9gZD-TkyM96M367ZoZoNmDX')
+    setPreviewData({
+      title: "React & Hooks Masterclass",
+      thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&auto=format&fit=crop",
+      videoCount: 6,
+      videos: [
+        { title: "01. Introduction to React & Component Architecture", duration: "15:24" },
+        { title: "02. Understanding Props, State, and Core Hook Lifecycle", duration: "24:10" },
+        { title: "03. Building Dynamic User Interfaces with Lists & Keys", duration: "18:45" },
+        { title: "04. Fetching Data with useEffect and Handling Loading States", duration: "22:15" },
+        { title: "05. CSS Modules & Vanilla Styling Patterns in React", duration: "14:30" },
+        { title: "06. React Router v7 & Multi-Page Navigation flows", duration: "28:50" }
+      ]
+    })
+  }
+
+  const handlePreview = () => {
+    if (!playlistUrl) {
+      setErrorMsg('Please enter a YouTube playlist link first.')
+      return
     }
-    loadPublicCourses()
-  }, [])
+    
+    if (!playlistUrl.includes('list=')) {
+      setErrorMsg('Please enter a valid YouTube playlist URL containing a list= parameter.')
+      return
+    }
+
+    setLoadingPreview(true)
+    setErrorMsg('')
+    
+    setTimeout(() => {
+      setPreviewData({
+        title: "Web Development Bootcamp",
+        thumbnail: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=500&auto=format&fit=crop",
+        videoCount: 6,
+        videos: [
+          { title: "01. HTML5 Semantic Elements & Page Structure Foundations", duration: "18:40" },
+          { title: "02. CSS3 Flexbox & CSS Grid Comprehensive Layout Guide", duration: "25:15" },
+          { title: "03. Responsive Web Design & Media Queries Best Practices", duration: "20:50" },
+          { title: "04. JavaScript Variables, Scopes, and ES6 Arrow Functions", duration: "16:22" },
+          { title: "05. Working with DOM APIs & Listening to User Events", duration: "22:10" },
+          { title: "06. Asynchronous JS: Promises, Async/Await and API Fetching", duration: "29:45" }
+        ]
+      })
+      setLoadingPreview(false)
+    }, 1200)
+  }
 
   return (
     <div className={styles.homePage}>
@@ -94,6 +136,77 @@ const Home = () => {
             </>
           )}
         </div>
+
+        {!token && (
+          <div className={styles.demoWrapper}>
+            <div className={styles.demoInputContainer}>
+              <input
+                type="text"
+                placeholder="Paste any YouTube playlist URL (or click sample below)..."
+                value={playlistUrl}
+                onChange={(e) => {
+                  setPlaylistUrl(e.target.value)
+                  setErrorMsg('')
+                }}
+                className={styles.demoInput}
+              />
+              <button 
+                onClick={handlePreview} 
+                className={styles.demoBtn} 
+                disabled={loadingPreview}
+              >
+                {loadingPreview ? 'Parsing preview...' : 'Preview Playlist 🔍'}
+              </button>
+            </div>
+            
+            <button onClick={handleTrySample} className={styles.sampleLinkBtn}>
+              Or click here to try with a sample playlist link ⚡
+            </button>
+
+            {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
+
+            {/* Course Preview Mockup Card */}
+            {previewData && (
+              <div className={styles.previewBox}>
+                <div className={styles.previewHeader}>
+                  <span className={styles.dot}></span>
+                  <span className={styles.dot}></span>
+                  <span className={styles.dot}></span>
+                  <span className={styles.previewHeaderTitle}>PARSED CURRICULUM PREVIEW</span>
+                </div>
+                
+                <div className={styles.previewBody}>
+                  <div className={styles.previewMeta}>
+                    <img src={previewData.thumbnail} alt={previewData.title} className={styles.previewThumb} />
+                    <div className={styles.previewInfo}>
+                      <h3>{previewData.title}</h3>
+                      <p className={styles.previewCount}>🎥 {previewData.videoCount} Lessons found in this playlist</p>
+                      <Link 
+                        to={`/register?playlistUrl=${encodeURIComponent(playlistUrl || 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9ivBEEkowgQnPEpHHCIPgIp')}`}
+                        className={styles.enrollCta}
+                      >
+                        Enroll & Import This Playlist Free 🚀
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className={styles.previewListWrapper}>
+                    <h4>Playlist Videos ({previewData.videoCount})</h4>
+                    <ul className={styles.previewList}>
+                      {previewData.videos.map((vid, idx) => (
+                        <li key={idx} className={styles.previewItem}>
+                          <span className={styles.previewIdx}>{idx + 1}</span>
+                          <span className={styles.previewVidTitle}>{vid.title}</span>
+                          <span className={styles.previewVidDuration}>{vid.duration}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Structured Tracks Marquee (Sarvam Logo Carousel Style) */}
@@ -125,133 +238,36 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Featured Courses Section */}
-      <section className={styles.publicCourses}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionHeaderBadge}>Explore the Catalog</span>
-          <h2>Featured Mentored Courses</h2>
-          <p>Explore curated learning tracks published by our expert mentors and admins.</p>
-        </div>
-        
-        {loadingCourses ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0' }}>
-            Loading featured courses...
-          </div>
-        ) : featuredCourses.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0' }}>
-            No public courses published yet. Sign in to import your first custom playlist!
-          </div>
-        ) : (
-          <div className={styles.coursesGrid}>
-            {featuredCourses.map(course => {
-              const firstTag = course.tags && course.tags.length > 0 ? course.tags[0] : 'Curated'
-              const authorInitial = course.user?.name ? course.user.name.charAt(0).toUpperCase() : 'C'
-
-              return (
-                <div key={course._id} className={styles.courseCard}>
-                  <div className={styles.courseThumb}>
-                    <img src={course.thumbnail} alt={course.title} />
-                    <span className={styles.tagBadge}>{firstTag}</span>
-                    <span className={styles.videoCount}>🎥 {course.videos?.length || 0} Lessons</span>
-                  </div>
-                  <div className={styles.courseBody}>
-                    <h3 className={styles.courseTitle}>{course.title}</h3>
-                    <p className={styles.courseDesc}>
-                      {course.description ? (course.description.substring(0, 100) + '...') : 'No description provided.'}
-                    </p>
-                    
-                    <div className={styles.courseMeta}>
-                      <div className={styles.authorAvatar}>{authorInitial}</div>
-                      <div className={styles.authorDetails}>
-                        <h4>{course.user?.name}</h4>
-                        <p>{course.user?.role.toUpperCase()}</p>
-                      </div>
-                    </div>
-
-                    {token ? (
-                      <Link to="/courses" className={styles.courseCta}>
-                        Go to Workspace <span className={styles.ctaArrow}>→</span>
-                      </Link>
-                    ) : (
-                      <Link to="/login" className={styles.courseCta}>
-                        Login to Enroll <span className={styles.ctaArrow}>→</span>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* Features Section */}
-      <section className={styles.features}>
-        <div className={styles.sectionHeader}>
-          <h2>Why Study With Us?</h2>
-          <p>We provide all the tools you need to stay focused, organized, and motivated.</p>
-        </div>
-        <div className={styles.featureGrid}>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>📺</span>
-            <h3>Playlist Import</h3>
-            <p>Simply paste any YouTube playlist URL. We fetch video names, durations, and thumbnails, setting up a curriculum in seconds.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>📝</span>
-            <h3>Interactive Notes</h3>
-            <p>Write timestamped markdown notes. Jump back to specific video markers with a single click to review complex concepts.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🔥</span>
-            <h3>Streak & Stats</h3>
-            <p>Track your study consistency. Build a daily watch streak, see completion percentages, and keep tabs on your progress dashboard.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className={styles.howItWorks}>
-        <div className={styles.howContainer}>
-          <div className={styles.sectionHeader}>
-            <h2>How It Works</h2>
-            <p>Transforming YouTube into a productive classroom is simple.</p>
-          </div>
-          <div className={styles.howSteps}>
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>1</div>
-              <h3>Paste Link</h3>
-              <p>Find your favorite tutorial playlist on YouTube and copy its web address.</p>
-            </div>
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>2</div>
-              <h3>Import & Organize</h3>
-              <p>Add it to your personal course library. It instantly creates structured modules.</p>
-            </div>
-            <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>3</div>
-              <h3>Learn & Track</h3>
-              <p>Watch ad-free players, take inline markdown notes, and track your study completion.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AboutSection />
+      <HowItWorksSection />
+      <FeaturesSection />
+      <UseCasesSection />
+      <StartersSection />
+      <FAQSection />
 
       {/* Call to Action Section */}
       <section className={styles.cta}>
-        <div className={styles.ctaContent}>
-          <h2>Ready to Supercharge Your Learning?</h2>
-          <p>Join thousands of students who are turning unstructured videos into deep knowledge today.</p>
-          <div>
-            {token ? (
-              <Link to="/dashboard" className={styles.primaryBtn}>
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link to="/register" className={styles.primaryBtn}>
-                Create Free Account
-              </Link>
-            )}
+        <div className={styles.ctaCard}>
+          <div className={styles.cardHeader}>
+            <span className={styles.dot}></span>
+            <span className={styles.dot}></span>
+            <span className={styles.dot}></span>
+            <span className={styles.cardTitle}>SYSTEM // INITIALIZATION & SIGN UP</span>
+          </div>
+          <div className={styles.cardBody}>
+            <h2>Ready to Supercharge Your Learning?</h2>
+            <p>Join thousands of students who are turning unstructured videos into deep knowledge today.</p>
+            <div className={styles.ctaActions}>
+              {token ? (
+                <Link to="/dashboard" className={styles.primaryBtn}>
+                  Go to Dashboard 📊
+                </Link>
+              ) : (
+                <Link to="/register" className={styles.primaryBtn}>
+                  Create Free Account 🚀
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>

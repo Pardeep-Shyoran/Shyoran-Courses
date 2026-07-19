@@ -173,7 +173,7 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Mobile Drawer Backdrop Overlay */}
-      <div 
+      <div
         className={`${styles.drawerOverlay} ${isMenuOpen ? styles.overlayVisible : ''}`}
         onClick={() => setIsMenuOpen(false)}
       />
@@ -188,7 +188,7 @@ const Layout = ({ children }) => {
             <circle cx="100" cy="100" r="80" stroke="var(--primary-color)" strokeWidth="0.25" strokeDasharray="3 3" opacity="0.15" />
             <circle cx="100" cy="100" r="60" stroke="var(--warning)" strokeWidth="0.25" opacity="0.2" />
             <circle cx="100" cy="100" r="40" stroke="var(--text-tertiary)" strokeWidth="0.5" strokeDasharray="1 5" opacity="0.3" />
-            
+
             {/* Architectural Gateway Arches (Indian Torana vaults) */}
             <path d="M60 180V100C60 77.9 77.9 60 100 60s40 17.9 40 40v80" stroke="var(--primary-color)" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
             <path d="M75 180V100C75 86.2 86.2 75 100 75s25 11.2 25 25v80" stroke="var(--warning)" strokeWidth="1" opacity="0.5" />
@@ -236,7 +236,7 @@ const Layout = ({ children }) => {
                 Convert YouTube playlists into interactive workspaces. Learn, take notes, and track progress.
               </p>
             </div>
-            
+
             <nav className={styles.footerNav}>
               <Link to="/" className={styles.footerNavLink}>Home</Link>
               <Link to="/about" className={styles.footerNavLink}>About</Link>

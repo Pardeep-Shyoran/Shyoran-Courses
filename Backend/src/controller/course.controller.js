@@ -2,6 +2,7 @@ import Course from "../models/course.model.js";
 import User from "../models/user.model.js";
 import Enrollment from "../models/enrollment.model.js";
 import StudyActivity from "../models/studyActivity.model.js";
+import Certificate from "../models/certificate.model.js";
 import { extractPlaylistId, scrapePlaylist } from "../utils/youtubeScraper.js";
 
 // Helper function to merge enrollment progress and notes into a course object
@@ -190,7 +191,7 @@ export async function importPlaylistPreview(req, res) {
 // Update general course details (title, description, tags, notes)
 export async function updateCourse(req, res) {
   try {
-    const { title, description, tags, notes } = req.body;
+    const { title, description, tags, notes, videos } = req.body;
     // Settings changes are restricted to the creator/owner of the course
     const course = await Course.findOne({ _id: req.params.id, user: req.user._id });
 
@@ -202,6 +203,7 @@ export async function updateCourse(req, res) {
     if (description !== undefined) course.description = description;
     if (tags !== undefined) course.tags = tags;
     if (notes !== undefined) course.notes = notes;
+    if (videos !== undefined) course.videos = videos;
 
     await course.save();
     res.json(course);
@@ -284,8 +286,44 @@ export async function toggleVideoCompleted(req, res) {
         await StudyActivity.deleteOne({ user: userId, course: courseId, type: "video_completed", videoId });
       }
 
+      // Award/deduct XP (+10 / -10)
+      const xpChange = isCompletedNow ? 10 : -10;
+      await User.findByIdAndUpdate(userId, { $inc: { xp: xpChange } });
+      await User.findOneAndUpdate({ _id: userId, xp: { $lt: 0 } }, { xp: 0 });
+
+      // Check if course is 100% completed
+      const totalVideos = (course.videos || []).length;
+      const completedVideos = (enrollment.videoProgress || []).filter(vp => vp.completed).length;
+      const isCourseFullyCompleted = totalVideos > 0 && completedVideos === totalVideos;
+
+      let earnedCertificate = null;
+      if (isCourseFullyCompleted) {
+        const existingCert = await Certificate.findOne({ user: userId, course: courseId });
+        if (!existingCert) {
+          const randStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+          const timeStr = Date.now().toString().slice(-4);
+          const certificateId = `CERT-${randStr}-${timeStr}`;
+
+          earnedCertificate = await Certificate.create({
+            user: userId,
+            course: courseId,
+            certificateId,
+            completedAt: new Date(),
+            xpAwarded: 250
+          });
+
+          await User.findByIdAndUpdate(userId, { $inc: { xp: 250 } });
+        }
+      }
+
       const mergedCourse = mergeEnrollmentProgress(course, enrollment.toObject(), userId, req.user);
-      return res.json(mergedCourse);
+      
+      const responseData = {
+        ...mergedCourse,
+        earnedCertificate: earnedCertificate ? earnedCertificate.toObject() : null
+      };
+
+      return res.json(responseData);
     }
 
     // 2. If not enrolled, check if owner
@@ -301,12 +339,13 @@ export async function toggleVideoCompleted(req, res) {
 
     video.completed = !video.completed;
     video.watchedAt = video.completed ? new Date() : null;
+    const isCompletedNow = video.completed;
 
     await course.save();
 
     // Log study activity
     const dateStr = new Date().toISOString().split('T')[0];
-    if (video.completed) {
+    if (isCompletedNow) {
       await StudyActivity.findOneAndUpdate(
         { user: userId, course: courseId, type: "video_completed", videoId, dateStr },
         { timestamp: new Date() },
@@ -316,8 +355,44 @@ export async function toggleVideoCompleted(req, res) {
       await StudyActivity.deleteOne({ user: userId, course: courseId, type: "video_completed", videoId });
     }
 
+    // Award/deduct XP (+10 / -10)
+    const xpChange = isCompletedNow ? 10 : -10;
+    await User.findByIdAndUpdate(userId, { $inc: { xp: xpChange } });
+    await User.findOneAndUpdate({ _id: userId, xp: { $lt: 0 } }, { xp: 0 });
+
+    // Check if course is 100% completed
+    const totalVideos = (course.videos || []).length;
+    const completedVideos = (course.videos || []).filter(v => v.completed).length;
+    const isCourseFullyCompleted = totalVideos > 0 && completedVideos === totalVideos;
+
+    let earnedCertificate = null;
+    if (isCourseFullyCompleted) {
+      const existingCert = await Certificate.findOne({ user: userId, course: courseId });
+      if (!existingCert) {
+        const randStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const timeStr = Date.now().toString().slice(-4);
+        const certificateId = `CERT-${randStr}-${timeStr}`;
+
+        earnedCertificate = await Certificate.create({
+          user: userId,
+          course: courseId,
+          certificateId,
+          completedAt: new Date(),
+          xpAwarded: 250
+        });
+
+        await User.findByIdAndUpdate(userId, { $inc: { xp: 250 } });
+      }
+    }
+
     const populatedCourse = await Course.findById(courseId).populate("user", "name email role");
-    res.json(populatedCourse);
+    
+    const responseData = {
+      ...populatedCourse.toObject(),
+      earnedCertificate: earnedCertificate ? earnedCertificate.toObject() : null
+    };
+
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: "Failed to toggle video status", error: error.message });
   }

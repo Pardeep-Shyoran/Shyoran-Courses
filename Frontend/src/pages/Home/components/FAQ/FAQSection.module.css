@@ -1,0 +1,200 @@
+.faqSection {
+  padding: 8rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  border-top: 1px solid var(--border-color);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.sectionHeaderBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
+.sectionHeader h2 {
+  font-size: 2.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faqContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.faqBrowserCard {
+  background: rgba(18, 21, 38, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  width: 100%;
+  max-width: 850px;
+}
+
+.cardHeader {
+  background: rgba(255, 255, 255, 0.015);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot:nth-child(1) { background-color: var(--error); opacity: 0.75; }
+.dot:nth-child(2) { background-color: var(--warning); opacity: 0.75; }
+.dot:nth-child(3) { background-color: var(--success); opacity: 0.75; }
+
+.cardTitle {
+  margin-left: 0.6rem;
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.cardBody {
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.accordionItem {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: rgba(10, 12, 22, 0.15);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.accordionItem:hover {
+  border-color: rgba(226, 88, 62, 0.15);
+  background-color: rgba(10, 12, 22, 0.25);
+}
+
+.accordionHeader {
+  width: 100%;
+  padding: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.chevron {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  transition: transform 0.3s ease;
+}
+
+.open .chevron {
+  transform: rotate(180deg);
+  color: var(--primary-color);
+}
+
+.open {
+  border-color: rgba(226, 88, 62, 0.25);
+}
+
+.accordionContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.open .accordionContent {
+  max-height: 200px;
+}
+
+.contentInner {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.contentInner p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .faqBrowserCard {
+  background: rgba(253, 251, 247, 0.5);
+  border-color: rgba(15, 18, 29, 0.04);
+}
+
+[data-theme="light"] .cardHeader {
+  background: rgba(15, 18, 29, 0.02);
+  border-bottom-color: rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .accordionItem {
+  background-color: rgba(253, 251, 247, 0.4);
+}
+
+[data-theme="light"] .accordionItem:hover {
+  background-color: rgba(253, 251, 247, 0.75);
+  border-color: rgba(216, 79, 51, 0.1);
+}
+
+[data-theme="light"] .open {
+  border-color: rgba(216, 79, 51, 0.2);
+}
+
+@media (max-width: 768px) {
+  .faqSection {
+    padding: 5rem 1rem;
+  }
+  .sectionHeader h2 {
+    font-size: 2.25rem;
+  }
+  .accordionHeader {
+    padding: 1.25rem;
+    font-size: 0.975rem;
+  }
+  .contentInner {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+  }
+}

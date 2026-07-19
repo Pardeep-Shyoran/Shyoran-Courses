@@ -15,6 +15,7 @@ function sanitizeUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    xp: user.xp || 0,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -103,5 +104,17 @@ export async function updateProfile(req, res) {
   } catch (err) {
     console.error("Update profile error:", err);
     res.status(500).json({ message: "Failed to update profile", error: err.message });
+  }
+}
+
+export async function getProfile(req, res) {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user: sanitizeUser(user) });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to get profile" });
   }
 }

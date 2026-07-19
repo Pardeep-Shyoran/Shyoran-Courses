@@ -4,7 +4,8 @@
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  padding-top: 6.5rem; /* Breathing room for floating navbar */
+  padding-top: 6.5rem;
+  /* Breathing room for floating navbar */
 }
 
 .navbar {
@@ -405,19 +406,17 @@
 .footerDivider {
   height: 1px;
   width: 100%;
-  background: linear-gradient(90deg, 
-    var(--border-color) 0%, 
-    rgba(255, 255, 255, 0.05) 50%, 
-    var(--border-color) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--border-color) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      var(--border-color) 100%);
 }
 
 [data-theme="light"] .footerDivider {
-  background: linear-gradient(90deg, 
-    var(--border-color) 0%, 
-    rgba(0, 0, 0, 0.03) 50%, 
-    var(--border-color) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--border-color) 0%,
+      rgba(0, 0, 0, 0.03) 50%,
+      var(--border-color) 100%);
 }
 
 .footerBottom {
@@ -467,10 +466,12 @@
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
   }
+
   70% {
     transform: scale(1);
     box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
   }
+
   100% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
@@ -492,7 +493,8 @@
   background-color: var(--bg-secondary);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
   z-index: 1050;
-  display: none; /* Hidden on desktop */
+  display: none;
+  /* Hidden on desktop */
   flex-direction: column;
   padding: 1.5rem;
   transform: translateX(100%);
@@ -654,7 +656,8 @@
   z-index: 1040;
   opacity: 0;
   pointer-events: none;
-  display: none; /* Hidden on desktop */
+  display: none;
+  /* Hidden on desktop */
   transition: opacity 0.4s ease;
 }
 

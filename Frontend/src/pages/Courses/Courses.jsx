@@ -25,6 +25,7 @@ const Courses = () => {
   // Modals state
   const [showImportModal, setShowImportModal] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [initialImportUrl, setInitialImportUrl] = useState('')
 
   const navigate = useNavigate()
 
@@ -33,6 +34,14 @@ const Courses = () => {
 
   useEffect(() => {
     fetchCoursesList()
+    const params = new URLSearchParams(window.location.search)
+    const playlistUrlParam = params.get('playlistUrl')
+    if (playlistUrlParam) {
+      setInitialImportUrl(playlistUrlParam)
+      setShowImportModal(true)
+      // Clear the url parameter to avoid popping up on manual page reload
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
   }, [])
 
   const fetchCoursesList = async () => {
@@ -150,11 +159,16 @@ const Courses = () => {
         title="Import YouTube Playlist"
       >
         <PlaylistImportForm 
+          initialUrl={initialImportUrl}
           onSuccess={() => {
             setShowImportModal(false)
+            setInitialImportUrl('')
             fetchCoursesList()
           }}
-          onCancel={() => setShowImportModal(false)}
+          onCancel={() => {
+            setShowImportModal(false)
+            setInitialImportUrl('')
+          }}
         />
       </Modal>
 

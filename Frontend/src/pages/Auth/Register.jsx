@@ -6,6 +6,9 @@ import styles from './Auth.module.css'
 
 const Register = () => {
   const navigate = useNavigate()
+  const params = new URLSearchParams(window.location.search)
+  const playlistUrl = params.get('playlistUrl')
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -28,7 +31,11 @@ const Register = () => {
       const data = await registerUser(form)
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/dashboard')
+      if (playlistUrl) {
+        navigate(`/courses?playlistUrl=${encodeURIComponent(playlistUrl)}`)
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(err.message || 'Registration failed. Please check your inputs.')
     } finally {
@@ -41,7 +48,7 @@ const Register = () => {
       title="Create Account"
       subtitle="Join to start learning and practicing"
       footerText="Already have an account?"
-      footerLink="/login"
+      footerLink={playlistUrl ? `/login?playlistUrl=${encodeURIComponent(playlistUrl)}` : '/login'}
       footerLinkText="Login"
     >
       <form className={styles.form} onSubmit={handleSubmit}>

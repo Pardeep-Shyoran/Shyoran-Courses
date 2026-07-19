@@ -1329,5 +1329,242 @@
   background: var(--primary-light);
 }
 
+/* Playlist Toolbar Styles */
+.playlistToolbar {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.toolbarContent {
+  display: flex;
+  gap: 10px;
+}
+
+.toolbarBtn {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbarBtn:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.activeToolbarBtn {
+  background: var(--primary-light) !important;
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.reorderActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reorderActiveLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--warning);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.reorderBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.saveOrderBtn {
+  flex: 2;
+  background: var(--success);
+  color: #111827;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.saveOrderBtn:hover {
+  background: var(--success);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.cancelReorderBtn {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cancelReorderBtn:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* Reordering List Styles */
+.reorderingList .videoItem {
+  cursor: default;
+}
+
+.reorderVideoItem {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.reorderVideoItem:hover {
+  background: rgba(234, 158, 36, 0.05) !important;
+}
+
+/* Reorder Item Controls */
+.reorderItemControls {
+  display: flex;
+  gap: 4px;
+  align-self: center;
+  margin-left: auto; /* Push it to the right */
+}
+
+.reorderArrowBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.reorderArrowBtn:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--primary-light);
+}
+
+.reorderArrowBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Sidebar Certificate Card Widget */
+.certificateProgressCard {
+  margin-top: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+.certCardUnlocked {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(226, 88, 62, 0.05) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 15px;
+  text-align: left;
+}
+
+.certCardLocked {
+  background: linear-gradient(135deg, rgba(30, 35, 60, 0.3) 0%, rgba(15, 18, 30, 0.5) 100%);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  text-align: left;
+}
+
+[data-theme="light"] .certCardLocked {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 243, 236, 0.9) 100%);
+}
+
+.certCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.certCardHeader h4 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.certIcon {
+  font-size: 1.1rem;
+}
+
+.certCardUnlocked p, .certCardLocked p {
+  margin: 0 0 12px 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.certViewBtn {
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(to bottom, #d4af37 0%, #aa7c11 100%);
+  color: #131627;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.2);
+}
+
+.certViewBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+.certPreviewBtn {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.certPreviewBtn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: var(--primary-light);
+}
+
+
 
 

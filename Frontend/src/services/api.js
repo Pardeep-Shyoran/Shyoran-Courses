@@ -91,6 +91,10 @@ export function updateProfile(payload) {
   return request('/auth/profile', { method: 'PUT', body: payload })
 }
 
+export function getUserProfile() {
+  return request('/auth/me')
+}
+
 // AI Assistant endpoints
 export function getVideoSummary(videoId, payload) {
   return request(`/ai/video/${videoId}/summary`, { method: 'POST', body: payload })
@@ -111,6 +115,15 @@ export function getVideoQuiz(videoId, payload) {
 // Consistency Heatmap & Study Tracker endpoints
 export function getStudyTrackerStats(todayStr) {
   return request(`/courses/stats/study-tracker?today=${todayStr}`)
+}
+
+// Certificate endpoints
+export function getUserCertificates() {
+  return request('/certificates')
+}
+
+export function getCertificateById(id) {
+  return request(`/certificates/${id}`)
 }
 
 // Todo List endpoints

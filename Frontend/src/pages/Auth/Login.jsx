@@ -6,6 +6,9 @@ import styles from './Auth.module.css'
 
 const Login = () => {
   const navigate = useNavigate()
+  const params = new URLSearchParams(window.location.search)
+  const playlistUrl = params.get('playlistUrl')
+
   const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,7 +26,11 @@ const Login = () => {
       const data = await loginUser(form)
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/dashboard')
+      if (playlistUrl) {
+        navigate(`/courses?playlistUrl=${encodeURIComponent(playlistUrl)}`)
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.')
     } finally {
@@ -36,7 +43,7 @@ const Login = () => {
       title="Login"
       subtitle="Access your account to continue learning"
       footerText="Don't have an account?"
-      footerLink="/register"
+      footerLink={playlistUrl ? `/register?playlistUrl=${encodeURIComponent(playlistUrl)}` : '/register'}
       footerLinkText="Register"
     >
       <form className={styles.form} onSubmit={handleSubmit}>
