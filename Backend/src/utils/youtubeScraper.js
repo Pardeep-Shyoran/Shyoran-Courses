@@ -48,12 +48,13 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
                       playlistSnippet.thumbnails?.medium?.url || 
                       playlistSnippet.thumbnails?.default?.url || "";
 
-    // 2. Fetch Playlist Items (Videos)
+    // 2. Fetch ALL Playlist Items using pagination tokens (no limit of 100)
     let videos = [];
     let nextPageToken = "";
-    let pagesToFetch = 2; // Fetch up to 100 videos
+    const maxPages = 200; // Cap at ~10,000 videos as safety limit
+    let pageCount = 0;
     
-    for (let page = 0; page < pagesToFetch; page++) {
+    do {
       const itemsUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`;
       const itemsRes = await fetch(itemsUrl);
       if (!itemsRes.ok) {
@@ -63,6 +64,9 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
       if (!itemsData.items || itemsData.items.length === 0) {
         break;
       }
+
+      const pageVideoIds = [];
+      const pageVideos = [];
       
       for (const item of itemsData.items) {
         const vSnippet = item.snippet;
@@ -70,10 +74,14 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
         if (!vSnippet || !vSnippet.resourceId?.videoId) continue;
         
         const vTitle = vSnippet.title || "Untitled Video";
+        // Ignore deleted or private video entries in playlist
+        if (vTitle === "Private video" || vTitle === "Deleted video") continue;
+
         const youtubeId = vSnippet.resourceId.videoId;
-        const duration = vDetails?.duration ? parseISODuration(vDetails.duration) : "";
-        
-        videos.push({
+        let duration = vDetails?.duration ? parseISODuration(vDetails.duration) : "";
+
+        pageVideoIds.push(youtubeId);
+        pageVideos.push({
           title: vTitle,
           youtubeId,
           duration,
@@ -81,10 +89,38 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
           notes: ""
         });
       }
+
+      // If durations are missing (playlistItems API does not provide ISO duration), batch query videos API
+      const missingDurationIds = pageVideos.filter(v => !v.duration).map(v => v.youtubeId);
+      if (missingDurationIds.length > 0) {
+        try {
+          const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${missingDurationIds.join(',')}&key=${apiKey}`);
+          if (videoRes.ok) {
+            const videoData = await videoRes.json();
+            const durationMap = new Map();
+            if (videoData.items) {
+              for (const vItem of videoData.items) {
+                if (vItem.contentDetails?.duration) {
+                  durationMap.set(vItem.id, parseISODuration(vItem.contentDetails.duration));
+                }
+              }
+            }
+            for (const v of pageVideos) {
+              if (!v.duration && durationMap.has(v.youtubeId)) {
+                v.duration = durationMap.get(v.youtubeId);
+              }
+            }
+          }
+        } catch (err) {
+          console.warn("Batch video duration fetch warning:", err.message);
+        }
+      }
+
+      videos.push(...pageVideos);
       
       nextPageToken = itemsData.nextPageToken;
-      if (!nextPageToken) break;
-    }
+      pageCount++;
+    } while (nextPageToken && pageCount < maxPages);
     
     return {
       title,
@@ -170,21 +206,99 @@ export async function scrapePlaylist(playlistId) {
     }
 
     const videos = [];
-    for (const item of contents) {
-      const v = item.playlistVideoRenderer;
-      if (!v || !v.videoId) continue;
+    let continuationToken = null;
 
-      const vTitle = v.title?.runs?.[0]?.text || v.title?.simpleText || "Untitled Video";
-      const youtubeId = v.videoId;
-      const duration = v.lengthText?.simpleText || v.lengthText?.runs?.[0]?.text || "";
-      
-      videos.push({
-        title: vTitle,
-        youtubeId,
-        duration,
-        completed: false,
-        notes: ""
-      });
+    for (const item of contents) {
+      if (item.playlistVideoRenderer) {
+        const v = item.playlistVideoRenderer;
+        if (!v || !v.videoId) continue;
+
+        const vTitle = v.title?.runs?.[0]?.text || v.title?.simpleText || "Untitled Video";
+        if (vTitle === "Private video" || vTitle === "Deleted video") continue;
+        const youtubeId = v.videoId;
+        const duration = v.lengthText?.simpleText || v.lengthText?.runs?.[0]?.text || "";
+        
+        videos.push({
+          title: vTitle,
+          youtubeId,
+          duration,
+          completed: false,
+          notes: ""
+        });
+      } else if (item.continuationItemRenderer) {
+        continuationToken = item.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token || null;
+      }
+    }
+
+    // Follow continuation tokens if playlist has more than ~100 items
+    const apiKeyMatch = html.match(/"INNERTUBE_API_KEY":\s*"([^"]+)"/) || html.match(/"apiKey":\s*"([^"]+)"/);
+    const innertubeApiKey = apiKeyMatch ? apiKeyMatch[1] : "";
+
+    let continuationCount = 0;
+    const maxContinuations = 100; // Cap at ~10,000 items
+
+    while (continuationToken && continuationCount < maxContinuations) {
+      continuationCount++;
+      try {
+        const contUrl = `https://www.youtube.com/youtubei/v1/browse?key=${innertubeApiKey}`;
+        const contRes = await fetch(contUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          },
+          body: JSON.stringify({
+            continuation: continuationToken,
+            context: {
+              client: {
+                clientName: "WEB",
+                clientVersion: "2.20240101.00.00"
+              }
+            }
+          })
+        });
+
+        if (!contRes.ok) break;
+        const contData = await contRes.json();
+        const actions = contData.onResponseReceivedActions;
+        if (!actions || !Array.isArray(actions)) break;
+
+        let newItems = [];
+        for (const action of actions) {
+          if (action.appendContinuationItemsAction?.continuationItems) {
+            newItems = action.appendContinuationItemsAction.continuationItems;
+          }
+        }
+
+        if (newItems.length === 0) break;
+
+        continuationToken = null;
+
+        for (const item of newItems) {
+          if (item.playlistVideoRenderer) {
+            const v = item.playlistVideoRenderer;
+            if (!v || !v.videoId) continue;
+
+            const vTitle = v.title?.runs?.[0]?.text || v.title?.simpleText || "Untitled Video";
+            if (vTitle === "Private video" || vTitle === "Deleted video") continue;
+            const youtubeId = v.videoId;
+            const duration = v.lengthText?.simpleText || v.lengthText?.runs?.[0]?.text || "";
+
+            videos.push({
+              title: vTitle,
+              youtubeId,
+              duration,
+              completed: false,
+              notes: ""
+            });
+          } else if (item.continuationItemRenderer) {
+            continuationToken = item.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token || null;
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to fetch continuation page:", e.message);
+        break;
+      }
     }
 
     if (!thumbnail && videos.length > 0) {
@@ -200,7 +314,6 @@ export async function scrapePlaylist(playlistId) {
     };
   } catch (error) {
     console.error("Scraper Error:", error);
-    // Propagate official API errors directly if a key is configured
     if (apiKey) {
       throw error;
     }
