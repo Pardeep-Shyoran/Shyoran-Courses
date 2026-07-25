@@ -10,7 +10,8 @@ const CoursesCatalog = ({
   currentUserId, 
   handleDeleteCourse, 
   handleEnrollCourse, 
-  activeMainTab 
+  activeMainTab,
+  setShowImportModal
 }) => {
   if (loading && courses.length === 0) {
     return (
@@ -51,9 +52,18 @@ const CoursesCatalog = ({
         <h3>No courses found</h3>
         <p>
           {activeMainTab === 'library'
-            ? 'Try refining your search or add a new course to get started.'
+            ? 'Try refining your search or add a new course with 1-click Quick Import.'
             : 'No public courses match your criteria.'}
         </p>
+        {activeMainTab === 'library' && setShowImportModal && (
+          <button 
+            onClick={() => setShowImportModal(true)} 
+            className={styles.primaryBtn} 
+            style={{ marginTop: '1rem' }}
+          >
+            ⚡ Quick Import a Playlist
+          </button>
+        )}
       </div>
     )
   }

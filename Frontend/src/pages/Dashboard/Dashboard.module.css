@@ -1681,3 +1681,172 @@
     align-items: stretch;
   }
 }
+
+/* Guided Onboarding Banner & Empty States */
+.onboardingBanner {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.75rem 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.onboardingBanner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary-color), var(--warning, #f59e0b));
+}
+
+.onboardingHeader {
+  margin-bottom: 1.5rem;
+}
+
+.onboardingBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  letter-spacing: 0.08em;
+  background: rgba(99, 102, 241, 0.12);
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.onboardingHeader h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.onboardingHeader p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+}
+
+.onboardingSteps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.onboardingStepCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.onboardingStepCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-color);
+}
+
+.stepNum {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.85rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepIcon {
+  font-size: 1.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.onboardingStepCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.onboardingStepCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Guided Empty State Card */
+.guidedEmptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.guidedEmptyCard {
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.guidedIconWrapper {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.guidedEmptyHeader h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.guidedEmptyHeader p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  max-width: 540px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.5;
+}
+
+.guidedActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.secondaryActionBtn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryActionBtn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary-color);
+}
+
+.quickImportOverviewSection {
+  margin-top: 1rem;
+}
+

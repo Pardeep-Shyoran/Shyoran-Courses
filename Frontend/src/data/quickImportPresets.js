@@ -1,0 +1,80 @@
+export const QUICK_IMPORT_PRESETS = [
+  {
+    id: 'react-hooks',
+    title: 'React & Hooks Masterclass',
+    author: 'Net Ninja',
+    videosCount: 30,
+    duration: '14.8 hrs',
+    emoji: '⚛️',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9gZD-TkyM96M367ZoZoNmDX',
+    level: 'Intermediate',
+    tag: 'Frontend Eng',
+    category: 'webdev',
+    description: 'Learn modern React from scratch including Hooks, Context API, React Router, and state management.'
+  },
+  {
+    id: 'html-css',
+    title: 'HTML & CSS Foundations',
+    author: 'Net Ninja',
+    videosCount: 15,
+    duration: '6.5 hrs',
+    emoji: '🎯',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9ivBEEkowgQnPEpHHCIPgIp',
+    level: 'Beginner',
+    tag: 'Web Development',
+    category: 'webdev',
+    description: 'Build modern responsive web pages with HTML5 semantic elements, CSS grid, flexbox, and CSS modules.'
+  },
+  {
+    id: 'modern-js',
+    title: 'Modern JavaScript Bootcamp',
+    author: 'Net Ninja',
+    videosCount: 24,
+    duration: '11.2 hrs',
+    emoji: '💻',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9i9Ae2D9GoMYSpMkc4_1ui9',
+    level: 'Beginner - Inter',
+    tag: 'Programming',
+    category: 'programming',
+    description: 'Master ES6+ JavaScript, Promises, Async/Await, DOM manipulation, and asynchronous programming.'
+  },
+  {
+    id: 'dsa',
+    title: 'Data Structures & Algorithms',
+    author: 'mycodeschool',
+    videosCount: 45,
+    duration: '18.5 hrs',
+    emoji: '📊',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PL2_aWCzGMAwI3W_yfNzCOIZ7Mx5oMaUtX',
+    level: 'All Levels',
+    tag: 'Computer Science',
+    category: 'cs',
+    description: 'Essential data structures (arrays, linked lists, trees, graphs) and algorithmic problem solving.'
+  },
+  {
+    id: 'nodejs-express',
+    title: 'Node.js & Express API',
+    author: 'Traversy Media',
+    videosCount: 22,
+    duration: '9.4 hrs',
+    emoji: '🟢',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PLillGF-RqqbdEw5zC3Yp4k-7O2D9c-j7d',
+    level: 'Intermediate',
+    tag: 'Backend Systems',
+    category: 'backend',
+    description: 'Create scalable REST APIs, authentication with JWT, middleware, and database integrations.'
+  },
+  {
+    id: 'python-basics',
+    title: 'Python Core & Scripting',
+    author: 'Programming with Mosh',
+    videosCount: 28,
+    duration: '8.2 hrs',
+    emoji: '🐍',
+    playlistUrl: 'https://www.youtube.com/playlist?list=PLTjRvDozrdlxj5wgH4qkvwSOdHLOC6V1f',
+    level: 'Beginner',
+    tag: 'Programming',
+    category: 'programming',
+    description: 'Learn fundamental Python programming, data types, object-oriented concepts, and automation.'
+  }
+]

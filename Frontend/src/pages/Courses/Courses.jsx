@@ -150,6 +150,7 @@ const Courses = () => {
         handleDeleteCourse={handleDeleteCourse}
         handleEnrollCourse={handleEnrollCourse}
         activeMainTab={activeMainTab}
+        setShowImportModal={setShowImportModal}
       />
 
       {/* IMPORT YT PLAYLIST MODAL */}

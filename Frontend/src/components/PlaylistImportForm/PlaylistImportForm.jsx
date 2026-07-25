@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { importPlaylistPreview, createCourse } from '../../services/api'
+import { QUICK_IMPORT_PRESETS } from '../../data/quickImportPresets'
 import styles from './PlaylistImportForm.module.css'
 
 const PlaylistImportForm = ({ onSuccess, onCancel, initialUrl = '' }) => {
@@ -14,21 +15,31 @@ const PlaylistImportForm = ({ onSuccess, onCancel, initialUrl = '' }) => {
   const [importError, setImportError] = useState(null)
   const [previewData, setPreviewData] = useState(null)
 
-  // Handle Playlist Fetching for preview
-  const handleFetchPlaylist = async (e) => {
-    e.preventDefault()
-    if (!playlistUrl) return
+  // Quick preset click handler
+  const handleSelectPresetChip = (url) => {
+    setPlaylistUrl(url)
+    fetchPlaylistByUrl(url)
+  }
+
+  const fetchPlaylistByUrl = async (targetUrl) => {
+    if (!targetUrl) return
     setImportLoading(true)
     setImportError(null)
     setPreviewData(null)
     try {
-      const data = await importPlaylistPreview(playlistUrl)
+      const data = await importPlaylistPreview(targetUrl)
       setPreviewData(data)
     } catch (err) {
       setImportError(err.message || 'Failed to parse playlist. Check URL or ensure it is public.')
     } finally {
       setImportLoading(false)
     }
+  }
+
+  // Handle Playlist Fetching for preview
+  const handleFetchPlaylist = async (e) => {
+    e.preventDefault()
+    fetchPlaylistByUrl(playlistUrl)
   }
 
   // Handle Save Course from Playlist Preview
@@ -59,8 +70,27 @@ const PlaylistImportForm = ({ onSuccess, onCancel, initialUrl = '' }) => {
       {!previewData ? (
         <form onSubmit={handleFetchPlaylist} className={styles.form}>
           <p className={styles.instruction}>
-            Paste a public YouTube Playlist link or Playlist ID. We will index all videos for custom roadmap progress tracking.
+            Paste a public YouTube Playlist link or Playlist ID, or pick a <strong>1-Click Quick Import preset</strong> below.
           </p>
+
+          <div className={styles.presetsWrapper}>
+            <span className={styles.presetsLabel}>⚡ Quick Presets:</span>
+            <div className={styles.presetChips}>
+              {QUICK_IMPORT_PRESETS.map((preset) => (
+                <button
+                  type="button"
+                  key={preset.id}
+                  className={styles.presetChip}
+                  onClick={() => handleSelectPresetChip(preset.playlistUrl)}
+                  disabled={importLoading}
+                >
+                  <span>{preset.emoji}</span>
+                  <span>{preset.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className={styles.inputGroup}>
             <label className={styles.label}>YouTube Playlist URL or ID</label>
             <input 

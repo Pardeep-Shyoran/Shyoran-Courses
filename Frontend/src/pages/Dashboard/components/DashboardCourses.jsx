@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import CourseCard from '../../../components/CourseCard/CourseCard'
+import QuickImportGrid from '../../../components/QuickImportGrid/QuickImportGrid'
 import styles from '../Dashboard.module.css'
 
 const DashboardCourses = ({ courses, handleDeleteCourse, setActiveTab }) => {
@@ -38,6 +39,15 @@ const DashboardCourses = ({ courses, handleDeleteCourse, setActiveTab }) => {
     return matchesSearch
   })
 
+  const resetFilters = () => {
+    setSearchQuery('')
+    setFilterType('all')
+  }
+
+  const handleQuickImportSelect = () => {
+    setActiveTab('add-course')
+  }
+
   return (
     <div className={styles.tabPane}>
       <div className={styles.paneHeader}>
@@ -51,48 +61,72 @@ const DashboardCourses = ({ courses, handleDeleteCourse, setActiveTab }) => {
       </div>
 
       {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrapper}>
-          <span className={styles.searchIcon}>🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search courses..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.searchInput}
-          />
+      {courses.length > 0 && (
+        <div className={styles.toolbar}>
+          <div className={styles.searchWrapper}>
+            <span className={styles.searchIcon}>🔍</span>
+            <input 
+              type="text" 
+              placeholder="Search courses..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+            />
+          </div>
+          <div className={styles.filterTabs}>
+            <button 
+              className={`${styles.filterTab} ${filterType === 'all' ? styles.activeFilter : ''}`}
+              onClick={() => setFilterType('all')}
+            >
+              <span>⚡ All</span>
+              <span className={styles.filterCountBadge}>{allCount}</span>
+            </button>
+            <button 
+              className={`${styles.filterTab} ${filterType === 'in-progress' ? styles.activeFilter : ''}`}
+              onClick={() => setFilterType('in-progress')}
+            >
+              <span>⏳ In Progress</span>
+              <span className={styles.filterCountBadge}>{inProgressCount}</span>
+            </button>
+            <button 
+              className={`${styles.filterTab} ${filterType === 'completed' ? styles.activeFilter : ''}`}
+              onClick={() => setFilterType('completed')}
+            >
+              <span>✅ Completed</span>
+              <span className={styles.filterCountBadge}>{completedCount}</span>
+            </button>
+          </div>
         </div>
-        <div className={styles.filterTabs}>
-          <button 
-            className={`${styles.filterTab} ${filterType === 'all' ? styles.activeFilter : ''}`}
-            onClick={() => setFilterType('all')}
-          >
-            <span>⚡ All</span>
-            <span className={styles.filterCountBadge}>{allCount}</span>
-          </button>
-          <button 
-            className={`${styles.filterTab} ${filterType === 'in-progress' ? styles.activeFilter : ''}`}
-            onClick={() => setFilterType('in-progress')}
-          >
-            <span>⏳ In Progress</span>
-            <span className={styles.filterCountBadge}>{inProgressCount}</span>
-          </button>
-          <button 
-            className={`${styles.filterTab} ${filterType === 'completed' ? styles.activeFilter : ''}`}
-            onClick={() => setFilterType('completed')}
-          >
-            <span>✅ Completed</span>
-            <span className={styles.filterCountBadge}>{completedCount}</span>
-          </button>
-        </div>
-      </div>
+      )}
 
-      {/* Courses Listing using CourseCard */}
-      {filteredCourses.length === 0 ? (
+      {/* Zero Enrolled Courses Empty State */}
+      {courses.length === 0 ? (
+        <div className={styles.guidedEmptyStateContainer}>
+          <div className={styles.guidedEmptyCard}>
+            <div className={styles.guidedEmptyHeader}>
+              <div className={styles.guidedIconWrapper}>📚</div>
+              <h3>Your Learning Library is Empty</h3>
+              <p>You haven't enrolled in any courses yet. Choose a 1-Click starter track below or import your custom YouTube playlist link!</p>
+              
+              <div className={styles.guidedActions}>
+                <button onClick={() => setActiveTab('add-course')} className={styles.createCourseBtn}>
+                  ⚡ 1-Click Quick Import
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <QuickImportGrid onSelectPreset={handleQuickImportSelect} title="Popular Recommended Playlists" />
+        </div>
+      ) : filteredCourses.length === 0 ? (
+        /* Filtered Search No Match Empty State */
         <div className={styles.emptyGrid}>
-          <div className={styles.emptyIcon}>📚</div>
+          <div className={styles.emptyIcon}>🔍</div>
           <h3>No courses match your filter</h3>
-          <p>Try searching for something else or import a new course.</p>
+          <p>We couldn't find any courses matching "{searchQuery}" with status "{filterType}".</p>
+          <button onClick={resetFilters} className={styles.secondaryActionBtn} style={{ marginTop: '1rem' }}>
+            🔄 Reset Search & Filters
+          </button>
         </div>
       ) : (
         <div className={styles.coursesGrid}>

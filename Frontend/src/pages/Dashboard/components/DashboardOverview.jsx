@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import QuickImportGrid from '../../../components/QuickImportGrid/QuickImportGrid'
 import styles from '../Dashboard.module.css'
 
 const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, handleLogout }) => {
@@ -29,6 +30,10 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
     .join('')
     .toUpperCase()
 
+  const handleQuickImportSelect = (url) => {
+    setActiveTab('add-course')
+  }
+
   return (
     <div className={styles.tabPane}>
       {/* Stats Grid */}
@@ -55,6 +60,40 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
           </div>
         </div>
       </section>
+
+      {/* Guided Onboarding Banner for New Users */}
+      {courses.length === 0 && (
+        <section className={styles.onboardingBanner}>
+          <div className={styles.onboardingHeader}>
+            <div className={styles.onboardingBadge}>🚀 QUICK START GUIDE</div>
+            <h2>Welcome to Shyoran Courses, {user.name.split(' ')[0]}!</h2>
+            <p>Get started in 3 simple steps to transform video playlists into your personalized learning tracks.</p>
+          </div>
+
+          <div className={styles.onboardingSteps}>
+            <div className={styles.onboardingStepCard}>
+              <div className={styles.stepNum}>1</div>
+              <div className={styles.stepIcon}>⚡</div>
+              <h4>Pick or Paste Playlist</h4>
+              <p>Choose a 1-click preset track below or paste any public YouTube playlist URL.</p>
+            </div>
+
+            <div className={styles.onboardingStepCard}>
+              <div className={styles.stepNum}>2</div>
+              <div className={styles.stepIcon}>🎯</div>
+              <h4>Track Lessons & Notes</h4>
+              <p>Watch embedded videos with auto-synced timestamps and interactive note-taking.</p>
+            </div>
+
+            <div className={styles.onboardingStepCard}>
+              <div className={styles.stepNum}>3</div>
+              <div className={styles.stepIcon}>🏆</div>
+              <h4>Build Consistency</h4>
+              <p>Maintain daily study streaks, unlock achievement badges, and earn rewards.</p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className={styles.dashboardSplit}>
         {/* Left Column */}
@@ -94,28 +133,25 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
               <div className={styles.emptyCourses}>
                 <p>Ready to start? Import a course or custom track to begin tracking your progress!</p>
                 <button onClick={() => setActiveTab('add-course')} className={styles.createCourseBtn}>
-                  Create a Course
+                  ⚡ Quick Import a Course
                 </button>
               </div>
             </section>
           )}
 
-          <section className={styles.recentSection}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Recent Course Progress</h2>
-              <button onClick={() => setActiveTab('courses')} className={styles.viewAllLink}>
-                View All Courses →
-              </button>
-            </div>
-            
-            {courses.length === 0 ? (
-              <div className={styles.emptyCourses}>
-                <p>You haven't enrolled in any courses yet.</p>
-                <button onClick={() => setActiveTab('add-course')} className={styles.createCourseBtn}>
-                  Add Your First Course
+          {courses.length === 0 ? (
+            <section className={styles.quickImportOverviewSection}>
+              <QuickImportGrid onSelectPreset={handleQuickImportSelect} title="Start Instantly with a Quick Track" />
+            </section>
+          ) : (
+            <section className={styles.recentSection}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Recent Course Progress</h2>
+                <button onClick={() => setActiveTab('courses')} className={styles.viewAllLink}>
+                  View All Courses →
                 </button>
               </div>
-            ) : (
+              
               <div className={styles.progressList}>
                 {courses.slice(0, 3).map(course => {
                   const completed = course.videos.filter(v => v.completed).length
@@ -145,8 +181,8 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
                   )
                 })}
               </div>
-            )}
-          </section>
+            </section>
+          )}
         </div>
 
         {/* Right Column */}
