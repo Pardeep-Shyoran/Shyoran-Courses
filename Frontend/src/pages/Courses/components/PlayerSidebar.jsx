@@ -167,7 +167,14 @@ const PlayerSidebar = ({
                     <span className={styles.itemTitle}>{vid.title}</span>
                     <div className={styles.itemDetails}>
                       <span className={styles.itemIndex}>#{vid.originalIndex + 1}</span>
-                      {isActive && <span className={styles.nowPlayingBadge}>▶ Playing</span>}
+                      {isActive && (
+                        <span className={styles.nowPlayingBadge}>
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                          </svg>
+                          <span>Playing</span>
+                        </span>
+                      )}
                       {vid.duration && <span className={styles.itemDuration}>• {vid.duration}</span>}
                       {hasNotes && <span className={styles.notesBadge} title="Notes written">📝 Notes</span>}
                     </div>

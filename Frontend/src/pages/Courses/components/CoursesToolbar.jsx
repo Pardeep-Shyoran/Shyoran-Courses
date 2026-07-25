@@ -33,19 +33,19 @@ const CoursesToolbar = ({ activeMainTab, searchQuery, setSearchQuery, filterType
             className={`${styles.filterTab} ${filterType === 'all' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('all')}
           >
-            All Courses
+            <span>⚡ All Courses</span>
           </button>
           <button 
             className={`${styles.filterTab} ${filterType === 'in-progress' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('in-progress')}
           >
-            In Progress
+            <span>⏳ In Progress</span>
           </button>
           <button 
             className={`${styles.filterTab} ${filterType === 'completed' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('completed')}
           >
-            Completed
+            <span>✅ Completed</span>
           </button>
         </div>
       )}

@@ -6,6 +6,19 @@ const DashboardCourses = ({ courses, handleDeleteCourse, setActiveTab }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'in-progress', 'completed'
 
+  // Category Counts
+  const allCount = courses.length
+  const completedCount = courses.filter(c => {
+    const total = c.videos.length
+    const completed = c.videos.filter(v => v.completed).length
+    return total > 0 && completed === total
+  }).length
+  const inProgressCount = courses.filter(c => {
+    const total = c.videos.length
+    const completed = c.videos.filter(v => v.completed).length
+    return (total > 0 && completed > 0 && completed < total) || (total > 0 && completed === 0)
+  }).length
+
   const filteredCourses = courses.filter(course => {
     const matchesSearch = 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -54,19 +67,22 @@ const DashboardCourses = ({ courses, handleDeleteCourse, setActiveTab }) => {
             className={`${styles.filterTab} ${filterType === 'all' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('all')}
           >
-            All
+            <span>⚡ All</span>
+            <span className={styles.filterCountBadge}>{allCount}</span>
           </button>
           <button 
             className={`${styles.filterTab} ${filterType === 'in-progress' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('in-progress')}
           >
-            In Progress
+            <span>⏳ In Progress</span>
+            <span className={styles.filterCountBadge}>{inProgressCount}</span>
           </button>
           <button 
             className={`${styles.filterTab} ${filterType === 'completed' ? styles.activeFilter : ''}`}
             onClick={() => setFilterType('completed')}
           >
-            Completed
+            <span>✅ Completed</span>
+            <span className={styles.filterCountBadge}>{completedCount}</span>
           </button>
         </div>
       </div>

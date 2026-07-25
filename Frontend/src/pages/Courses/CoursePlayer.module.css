@@ -6,37 +6,192 @@
   min-height: calc(100vh - 120px);
 }
 
-/* Breadcrumbs navigation */
-.breadcrumb {
+/* Player Header Wrapper */
+.playerHeaderWrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.playerNavRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 18px;
-  font-size: 0.825rem;
-  font-weight: 500;
-}
-
-.breadcrumb a {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-secondary);
-  text-decoration: none;
-  transition: var(--transition);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.22s ease;
 }
 
-.breadcrumb a:hover {
+[data-theme="light"] .backBtn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.backBtn svg {
+  color: var(--primary-color);
+  transition: transform 0.2s ease;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(226, 88, 62, 0.3);
+  color: var(--text-primary);
+}
+
+.backBtn:hover svg {
+  transform: translateX(-3px);
+}
+
+.playerBreadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.825rem;
+}
+
+.playerBreadcrumbLink {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.playerBreadcrumbLink:hover {
   color: var(--primary-color);
 }
 
-.separator {
+.playerBreadcrumbSep {
   color: var(--text-tertiary);
+  opacity: 0.5;
 }
 
-.current {
+.playerBreadcrumbCurrent {
   color: var(--text-primary);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 500px;
+  max-width: 400px;
+}
+
+.playerContextBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.playerContextInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.playerCourseTitle {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.playerBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.categoryTag {
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(226, 88, 62, 0.12);
+  color: var(--primary-color);
+  border: 1px solid rgba(226, 88, 62, 0.25);
+}
+
+.completedCertBadge {
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.playerProgressBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.progressLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.progressStatsText strong {
+  color: var(--text-primary);
+}
+
+.progressPercentNum {
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .progressBarTrack {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
+  border-radius: 9999px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(226, 88, 62, 0.4);
 }
 
 /* Workspace Grid */
@@ -138,24 +293,42 @@
 }
 
 .tabHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   padding: 12px 16px;
   color: var(--text-secondary);
-  font-weight: 700;
+  font-weight: 650;
   font-size: 0.825rem;
   cursor: pointer;
   transition: var(--transition);
+  font-family: inherit;
+}
+
+.tabHeader svg {
+  color: var(--text-tertiary);
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .tabHeader:hover {
   color: var(--text-primary);
 }
 
+.tabHeader:hover svg {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
 .activeTab {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
+}
+
+.activeTab svg {
+  color: var(--primary-color) !important;
 }
 
 .tabContent {
@@ -630,7 +803,7 @@
 }
 
 .activeVideoItem {
-  background: rgba(99, 102, 241, 0.1) !important;
+  background: rgba(226, 88, 62, 0.08) !important;
   border-left: 4px solid var(--primary-color);
 }
 
@@ -697,20 +870,26 @@
 }
 
 .nowPlayingBadge {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #818cf8 100%);
-  color: #111827;
-  padding: 1px 7px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
+  color: #ffffff;
+  padding: 2px 8px;
   border-radius: 12px;
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(226, 88, 62, 0.35);
+}
+
+.nowPlayingBadge svg {
+  color: #ffffff;
+  fill: currentColor;
 }
 
 .notesBadge {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(226, 88, 62, 0.12);
   color: var(--primary-color);
   padding: 1px 6px;
   border-radius: 4px;

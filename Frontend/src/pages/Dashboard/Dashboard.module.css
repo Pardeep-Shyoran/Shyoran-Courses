@@ -175,28 +175,30 @@
 
 /* Tab Navigation Wrapper */
 .tabNavbarWrapper {
-  background-color: rgba(18, 21, 38, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  background-color: rgba(18, 21, 38, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
   padding: 6px;
   margin-bottom: 35px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   z-index: 10;
   position: relative;
 }
 
 [data-theme="light"] .tabNavbarWrapper {
-  background-color: rgba(245, 243, 236, 0.6);
-  border-color: var(--border-color);
+  background-color: rgba(245, 243, 236, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .tabNavbar {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   width: 100%;
+  padding-bottom: 2px;
 }
 
 .tabNavbar::-webkit-scrollbar {
@@ -205,36 +207,71 @@
 }
 
 .tabBtn {
-  background: none;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-secondary);
-  padding: 10px 20px;
+  padding: 10px 18px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 550;
   cursor: pointer;
   border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  font-family: inherit;
+}
+
+.tabBtn svg {
+  color: var(--text-tertiary);
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .tabBtn:hover {
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.tabBtn:hover svg {
+  color: var(--primary-color);
+  transform: translateY(-1px);
 }
 
 [data-theme="light"] .tabBtn:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .activeTab {
-  color: var(--text-primary);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-hover);
-  box-shadow: var(--shadow-sm);
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(226, 88, 62, 0.35);
+  font-weight: 600;
+}
+
+.activeTab svg {
+  color: #ffffff !important;
 }
 
 [data-theme="light"] .activeTab {
-  background: var(--bg-primary);
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--warning) 100%);
+  box-shadow: 0 4px 14px rgba(216, 79, 51, 0.25);
+}
+
+.tabCountBadge {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.activeTab .tabCountBadge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
 }
 
 /* Content Pane */
@@ -753,29 +790,55 @@
 
 .filterTabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .filterTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 14px;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 9999px;
   color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: 550;
+  font-size: 0.82rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+[data-theme="light"] .filterTab {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .filterTab:hover {
   color: var(--text-primary);
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(226, 88, 62, 0.3);
 }
 
 .activeFilter {
-  color: var(--text-primary);
-  background: var(--bg-tertiary);
+  color: #ffffff;
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(226, 88, 62, 0.3);
+  font-weight: 600;
+}
+
+.filterCountBadge {
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.activeFilter .filterCountBadge {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 /* Empty listings */

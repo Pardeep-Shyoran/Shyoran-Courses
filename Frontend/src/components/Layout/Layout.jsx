@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import styles from './Layout.module.css'
 import GatewayLogo from '../GatewayLogo/GatewayLogo'
+import CommandPalette from '../CommandPalette/CommandPalette'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
 
 const Layout = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isNavHidden, setIsNavHidden] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const profileRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -40,15 +45,38 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false)
+      }
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsProfileOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   const isActive = (path) => location.pathname === path
 
   const token = localStorage.getItem('token')
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
+  const userInitial = user && user.name ? user.name.charAt(0).toUpperCase() : 'U'
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setIsMenuOpen(false)
+    setIsProfileOpen(false)
     navigate('/')
   }
 
@@ -68,29 +96,52 @@ const Layout = ({ children }) => {
             <ul className={styles.navLinks}>
               <li>
                 <Link to="/" className={`${styles.navLink} ${isActive('/') ? styles.activeLink : ''}`}>
-                  Home
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                  <span>Home</span>
                 </Link>
               </li>
               <li>
                 <Link to="/about" className={`${styles.navLink} ${isActive('/about') ? styles.activeLink : ''}`}>
-                  About
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>About</span>
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className={`${styles.navLink} ${isActive('/contact') ? styles.activeLink : ''}`}>
-                  Contact
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <span>Contact</span>
                 </Link>
               </li>
               {token && user && (
                 <>
                   <li>
                     <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard') ? styles.activeLink : ''}`}>
-                      Dashboard
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                      <span>Dashboard</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/courses" className={`${styles.navLink} ${isActive('/courses') ? styles.activeLink : ''}`}>
-                      Courses
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                      </svg>
+                      <span>Courses</span>
                     </Link>
                   </li>
                 </>
@@ -101,15 +152,91 @@ const Layout = ({ children }) => {
           {/* Desktop CTA / Profile Actions */}
           <div className={styles.desktopActions}>
             {token && user ? (
-              <div className={styles.profileSection}>
-                <div className={styles.userBadge}>
-                  <span className={styles.userIcon}>👤</span>
+              <div className={styles.profileDropdownContainer} ref={profileRef}>
+                <button
+                  className={`${styles.profileTrigger} ${isProfileOpen ? styles.profileTriggerActive : ''}`}
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  aria-expanded={isProfileOpen}
+                  aria-label="User profile menu"
+                >
+                  <div className={styles.avatarCircle}>
+                    {userInitial}
+                    <span className={styles.statusDot}></span>
+                  </div>
                   <span className={styles.userName}>{user.name.split(' ')[0]}</span>
-                  <span className={styles.statusDot}></span>
-                </div>
-                <button className={styles.logoutBtn} onClick={handleLogout}>
-                  Logout
+                  <svg
+                    className={`${styles.chevronIcon} ${isProfileOpen ? styles.chevronOpen : ''}`}
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
                 </button>
+
+                {isProfileOpen && (
+                  <div className={styles.dropdownMenu}>
+                    <div className={styles.dropdownHeader}>
+                      <div className={styles.dropdownAvatarLarge}>
+                        {userInitial}
+                      </div>
+                      <div className={styles.dropdownUserInfo}>
+                        <div className={styles.dropdownName}>{user.name}</div>
+                        <div className={styles.dropdownEmail}>{user.email || 'Learner Account'}</div>
+                        <span className={styles.roleBadge}>Learner</span>
+                      </div>
+                    </div>
+
+                    <div className={styles.dropdownDivider} />
+
+                    <div className={styles.dropdownItems}>
+                      <Link
+                        to="/dashboard"
+                        className={`${styles.dropdownItem} ${isActive('/dashboard') ? styles.activeDropdownItem : ''}`}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="7" height="7"></rect>
+                          <rect x="14" y="3" width="7" height="7"></rect>
+                          <rect x="14" y="14" width="7" height="7"></rect>
+                          <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                      </Link>
+
+                      <Link
+                        to="/courses"
+                        className={`${styles.dropdownItem} ${isActive('/courses') ? styles.activeDropdownItem : ''}`}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>My Courses</span>
+                      </Link>
+                    </div>
+
+                    <div className={styles.dropdownDivider} />
+
+                    <button
+                      className={styles.dropdownLogoutBtn}
+                      onClick={handleLogout}
+                    >
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                      </svg>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className={styles.authButtons}>
@@ -150,30 +277,69 @@ const Layout = ({ children }) => {
 
         <ul className={styles.mobileNavLinks}>
           <li>
+            <button 
+              className={styles.mobileNavSearchBtn} 
+              onClick={() => {
+                setIsMenuOpen(false)
+                setIsCommandPaletteOpen(true)
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span>Quick Search</span>
+              <kbd className={styles.searchShortcutKbd}>⌘K</kbd>
+            </button>
+          </li>
+          <li>
             <Link to="/" className={`${styles.mobileNavLink} ${isActive('/') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-              Home
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <span>Home</span>
             </Link>
           </li>
           <li>
             <Link to="/about" className={`${styles.mobileNavLink} ${isActive('/about') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-              About
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>About</span>
             </Link>
           </li>
           <li>
             <Link to="/contact" className={`${styles.mobileNavLink} ${isActive('/contact') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-              Contact
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <span>Contact</span>
             </Link>
           </li>
           {token && user && (
             <>
               <li>
                 <Link to="/dashboard" className={`${styles.mobileNavLink} ${isActive('/dashboard') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-                  Dashboard
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
                 </Link>
               </li>
               <li>
                 <Link to="/courses" className={`${styles.mobileNavLink} ${isActive('/courses') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-                  Courses
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <span>Courses</span>
                 </Link>
               </li>
             </>
@@ -184,11 +350,21 @@ const Layout = ({ children }) => {
           {token && user ? (
             <div className={styles.mobileProfileSection}>
               <div className={styles.mobileUserBadge}>
-                <span className={styles.userIcon}>👤</span>
-                <span className={styles.mobileUserName}>{user.name}</span>
+                <div className={styles.avatarCircleSmall}>
+                  {userInitial}
+                </div>
+                <div className={styles.mobileUserInfo}>
+                  <span className={styles.mobileUserName}>{user.name}</span>
+                  <span className={styles.mobileUserEmail}>{user.email || 'Learner'}</span>
+                </div>
               </div>
               <button className={styles.mobileLogoutBtn} onClick={handleLogout}>
-                Logout
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
               </button>
             </div>
           ) : (
@@ -210,7 +386,12 @@ const Layout = ({ children }) => {
         onClick={() => setIsMenuOpen(false)}
       />
 
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main}>
+        {(!location.pathname.startsWith('/courses/') || location.pathname === '/courses') && (
+          <Breadcrumbs />
+        )}
+        {children}
+      </main>
 
       <footer className={styles.footer}>
         {/* Subtle Torana Line Model Background */}
@@ -294,6 +475,27 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </footer>
+
+      {/* Floating Bottom-Left Quick Search Widget */}
+      <button 
+        className={styles.floatingSearchWidget}
+        onClick={() => setIsCommandPaletteOpen(true)}
+        aria-label="Quick Search (Cmd + K)"
+        title="Quick Search (Cmd + K)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span className={styles.floatingSearchLabel}>Search...</span>
+        <kbd className={styles.floatingKbd}>⌘K</kbd>
+      </button>
+
+      {/* Global Command Palette & Quick Search Modal */}
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen} 
+        setIsOpen={setIsCommandPaletteOpen} 
+      />
     </div>
   )
 }
