@@ -22,7 +22,13 @@
   border-radius: 20px;
   z-index: 1000;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, background-color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbarHidden {
+  transform: translate(-50%, -150%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 [data-theme="light"] .navbar {

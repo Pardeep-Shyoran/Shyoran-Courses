@@ -1,12 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import styles from './Layout.module.css'
 import GatewayLogo from '../GatewayLogo/GatewayLogo'
 
 const Layout = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isNavHidden, setIsNavHidden] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+    let ticking = false
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const diff = currentScrollY - lastScrollY
+
+      if (currentScrollY <= 60) {
+        setIsNavHidden(false)
+      } else if (diff > 8) {
+        setIsNavHidden(true)
+      } else if (diff < -8) {
+        setIsNavHidden(false)
+      }
+
+      lastScrollY = currentScrollY
+      ticking = false
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(handleScroll)
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const isActive = (path) => location.pathname === path
 
@@ -22,7 +54,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className={styles.layout}>
-      <nav className={styles.navbar}>
+      <nav className={`${styles.navbar} ${isNavHidden && !isMenuOpen ? styles.navbarHidden : ''}`}>
         <div className={styles.navContainer}>
           <div className={styles.logo}>
             <Link to="/" className={styles.logoLink}>
