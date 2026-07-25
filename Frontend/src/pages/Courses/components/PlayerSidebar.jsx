@@ -167,6 +167,7 @@ const PlayerSidebar = ({
                     <span className={styles.itemTitle}>{vid.title}</span>
                     <div className={styles.itemDetails}>
                       <span className={styles.itemIndex}>#{vid.originalIndex + 1}</span>
+                      {isActive && <span className={styles.nowPlayingBadge}>▶ Playing</span>}
                       {vid.duration && <span className={styles.itemDuration}>• {vid.duration}</span>}
                       {hasNotes && <span className={styles.notesBadge} title="Notes written">📝 Notes</span>}
                     </div>
