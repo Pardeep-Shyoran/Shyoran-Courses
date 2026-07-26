@@ -19,7 +19,7 @@ export async function authenticate(req, res, next) {
       res.clearCookie("token", {
         httpOnly: true,
         secure: config.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: config.NODE_ENV === "production" ? "none" : "lax",
       });
       return res.status(401).json({ message: "User not found" });
     }
@@ -30,7 +30,7 @@ export async function authenticate(req, res, next) {
     res.clearCookie("token", {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: config.NODE_ENV === "production" ? "none" : "lax",
     });
     res.status(401).json({ message: "Invalid or expired token" });
   }

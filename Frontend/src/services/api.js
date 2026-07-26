@@ -8,8 +8,10 @@ const getApiBaseUrl = () => {
 const API_BASE = getApiBaseUrl();
 
 async function request(path, { method = 'GET', body, headers = {} } = {}) {
+  const token = localStorage.getItem('token')
   const authHeaders = {
     'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...headers,
   }
 
@@ -36,15 +38,24 @@ async function request(path, { method = 'GET', body, headers = {} } = {}) {
   return data
 }
 
-export function loginUser(payload) {
-  return request('/auth/login', { method: 'POST', body: payload })
+export async function loginUser(payload) {
+  const data = await request('/auth/login', { method: 'POST', body: payload })
+  if (data?.token) {
+    localStorage.setItem('token', data.token)
+  }
+  return data
 }
 
-export function registerUser(payload) {
-  return request('/auth/register', { method: 'POST', body: payload })
+export async function registerUser(payload) {
+  const data = await request('/auth/register', { method: 'POST', body: payload })
+  if (data?.token) {
+    localStorage.setItem('token', data.token)
+  }
+  return data
 }
 
-export function logoutUser() {
+export async function logoutUser() {
+  localStorage.removeItem('token')
   return request('/auth/logout', { method: 'POST' })
 }
 

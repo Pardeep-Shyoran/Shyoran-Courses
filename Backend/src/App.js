@@ -10,6 +10,8 @@ import certificateRoutes from "./routes/certificate.routes.js";
 const App = express();
 
 
+App.set("trust proxy", 1);
+
 App.use(cors({
   origin: true,
   credentials: true
