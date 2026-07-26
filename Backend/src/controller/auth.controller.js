@@ -21,6 +21,13 @@ function sanitizeUser(user) {
   };
 }
 
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: config.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 export async function register(req, res) {
   try {
     const { name, email, password, role } = req.body;
@@ -39,6 +46,7 @@ export async function register(req, res) {
     const user = await User.create({ name, email, password, role: roleToSet });
     const token = signToken(user);
 
+    res.cookie("token", token, getCookieOptions());
     res.status(201).json({ user: sanitizeUser(user), token });
   } catch (err) {
     console.error("Registration error:", err);
@@ -65,10 +73,17 @@ export async function login(req, res) {
     }
 
     const token = signToken(user);
+    res.cookie("token", token, getCookieOptions());
     res.json({ user: sanitizeUser(user), token });
   } catch (err) {
     res.status(500).json({ message: "Failed to login" });
   }
+}
+
+export function logout(_req, res) {
+  const { maxAge, ...clearOptions } = getCookieOptions();
+  res.clearCookie("token", clearOptions);
+  res.json({ message: "Logged out successfully" });
 }
 
 export async function updateProfile(req, res) {

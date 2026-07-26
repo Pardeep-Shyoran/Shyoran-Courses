@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { registerUser } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import AuthLayout from './AuthLayout'
 import styles from './Auth.module.css'
 
 const Register = () => {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const params = new URLSearchParams(window.location.search)
   const playlistUrl = params.get('playlistUrl')
 
@@ -29,8 +31,7 @@ const Register = () => {
     setLoading(true)
     try {
       const data = await registerUser(form)
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      login(data.user)
       if (playlistUrl) {
         navigate(`/courses?playlistUrl=${encodeURIComponent(playlistUrl)}`)
       } else {

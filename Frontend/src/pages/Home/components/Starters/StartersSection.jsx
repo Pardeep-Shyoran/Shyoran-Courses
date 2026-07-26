@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../../context/AuthContext'
 import styles from './StartersSection.module.css'
 
 const categories = [
@@ -86,7 +87,7 @@ const startersData = [
 
 const StartersSection = () => {
   const navigate = useNavigate()
-  const token = localStorage.getItem('token')
+  const { token } = useAuth()
   const [activeCategory, setActiveCategory] = useState('all')
 
   const filteredPlaylists = activeCategory === 'all' 

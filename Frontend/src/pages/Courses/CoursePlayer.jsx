@@ -12,6 +12,7 @@ import {
   refreshCoursePlaylist,
   getUserCertificates
 } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import PlayerHeader from './components/PlayerHeader'
 import PlayerVideoSection from './components/PlayerVideoSection'
 import PlayerSidebar from './components/PlayerSidebar'
@@ -25,6 +26,7 @@ import { launchConfetti } from '../../utils/confetti'
 import CertificateViewer from '../../components/Certificate/CertificateViewer'
 
 const CoursePlayer = () => {
+  const { user } = useAuth()
   const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -121,7 +123,6 @@ const CoursePlayer = () => {
     }
   }
 
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
   const currentUserId = user?._id || user?.id;
   const isOwner = course && user && (course.user?._id === currentUserId || course.user === currentUserId);
   const isActualCreator = course && user && (() => {

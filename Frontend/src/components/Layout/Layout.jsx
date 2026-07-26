@@ -4,8 +4,10 @@ import styles from './Layout.module.css'
 import GatewayLogo from '../GatewayLogo/GatewayLogo'
 import CommandPalette from '../CommandPalette/CommandPalette'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
+import { useAuth } from '../../context/AuthContext'
 
 const Layout = ({ children }) => {
+  const { token, user, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isNavHidden, setIsNavHidden] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -68,13 +70,10 @@ const Layout = ({ children }) => {
 
   const isActive = (path) => location.pathname === path
 
-  const token = localStorage.getItem('token')
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
   const userInitial = user && user.name ? user.name.charAt(0).toUpperCase() : 'U'
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     setIsMenuOpen(false)
     setIsProfileOpen(false)
     navigate('/')
@@ -161,7 +160,6 @@ const Layout = ({ children }) => {
                 >
                   <div className={styles.avatarCircle}>
                     {userInitial}
-                    <span className={styles.statusDot}></span>
                   </div>
                   <span className={styles.userName}>{user.name.split(' ')[0]}</span>
                   <svg

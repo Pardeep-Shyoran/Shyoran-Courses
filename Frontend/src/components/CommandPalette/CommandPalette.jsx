@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCourses } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import styles from './CommandPalette.module.css'
 
 const CommandPalette = ({ isOpen, setIsOpen }) => {
+  const { token } = useAuth()
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [courses, setCourses] = useState([])
@@ -11,8 +13,6 @@ const CommandPalette = ({ isOpen, setIsOpen }) => {
   const inputRef = useRef(null)
   const resultsContainerRef = useRef(null)
   const navigate = useNavigate()
-
-  const token = localStorage.getItem('token')
 
   // Fetch courses list for search index when opened
   useEffect(() => {

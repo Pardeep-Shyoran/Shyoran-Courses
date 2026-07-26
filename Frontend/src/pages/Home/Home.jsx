@@ -7,9 +7,10 @@ import UseCasesSection from './components/UseCases/UseCasesSection'
 import HowItWorksSection from './components/HowItWorks/HowItWorksSection'
 import StartersSection from './components/Starters/StartersSection'
 import FAQSection from './components/FAQ/FAQSection'
+import { useAuth } from '../../context/AuthContext'
 
 const Home = () => {
-  const token = localStorage.getItem('token')
+  const { token } = useAuth()
   const [playlistUrl, setPlaylistUrl] = useState('')
   const [loadingPreview, setLoadingPreview] = useState(false)
   const [previewData, setPreviewData] = useState(null)

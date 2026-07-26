@@ -10,7 +10,10 @@ import certificateRoutes from "./routes/certificate.routes.js";
 const App = express();
 
 
-App.use(cors());
+App.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 App.use(cookieParser());
 App.use(express.json());

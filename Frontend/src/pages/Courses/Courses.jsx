@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCourses, deleteCourse, enrollInCourse } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import PlaylistImportForm from '../../components/PlaylistImportForm/PlaylistImportForm'
 import CustomCourseForm from '../../components/CustomCourseForm/CustomCourseForm'
@@ -11,6 +12,7 @@ import CoursesCatalog from './components/CoursesCatalog'
 import styles from './Courses.module.css'
 
 const Courses = () => {
+  const { user } = useAuth()
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -28,9 +30,6 @@ const Courses = () => {
   const [initialImportUrl, setInitialImportUrl] = useState('')
 
   const navigate = useNavigate()
-
-  // Load user
-  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
 
   useEffect(() => {
     fetchCoursesList()

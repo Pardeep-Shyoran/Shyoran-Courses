@@ -5,7 +5,8 @@ import User from "../models/user.model.js";
 export async function authenticate(req, res, next) {
   try {
     const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const tokenFromHeader = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const token = req.cookies?.token || tokenFromHeader;
 
     if (!token) {
       return res.status(401).json({ message: "Authorization token missing" });
@@ -15,12 +16,22 @@ export async function authenticate(req, res, next) {
     const user = await User.findById(payload.id).select("-password");
 
     if (!user) {
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: config.NODE_ENV === "production",
+        sameSite: "lax",
+      });
       return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (err) {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "lax",
+    });
     res.status(401).json({ message: "Invalid or expired token" });
   }
 }

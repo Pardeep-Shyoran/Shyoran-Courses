@@ -1,10 +1,15 @@
 import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const PublicRoute = ({ children }) => {
-  const token = localStorage.getItem('token')
+  const { isAuthenticated, loading } = useAuth()
+
+  if (loading) {
+    return null
+  }
 
   // If user is logged in, redirect to dashboard
-  if (token) {
+  if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />
   }
 

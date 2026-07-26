@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getCourses, deleteCourse, getStudyTrackerStats, getUserProfile } from '../../services/api'
+import { getCourses, deleteCourse, getStudyTrackerStats } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import DashboardHeader from './components/DashboardHeader'
 import DashboardOverview from './components/DashboardOverview'
 import DashboardChecklist from './components/DashboardChecklist'
@@ -11,13 +12,15 @@ import DashboardRewards from './components/DashboardRewards'
 import styles from './Dashboard.module.css'
 
 const Dashboard = () => {
-  const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
-  const [user, setUser] = useState(storedUser)
+  const { user: authUser, logout, updateUser } = useAuth()
+  const user = authUser
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
   const location = useLocation()
+
+  const userId = authUser?._id || authUser?.id
 
   // Tab State: 'overview', 'courses', 'checklist', 'rewards', 'add-course', 'profile'
   const [activeTab, setActiveTab] = useState(() => {
@@ -42,20 +45,9 @@ const Dashboard = () => {
     setError(null)
     try {
       const data = await getCourses()
-      const currentUserId = storedUser?._id || storedUser?.id
+      const currentUserId = user?._id || user?.id
       const myCourses = data.filter(c => c.user?._id === currentUserId || c.user === currentUserId)
       setCourses(myCourses)
-      
-      // Load latest user details (such as current XP)
-      try {
-        const profileData = await getUserProfile()
-        if (profileData?.user) {
-          setUser(profileData.user)
-          localStorage.setItem('user', JSON.stringify(profileData.user))
-        }
-      } catch (pErr) {
-        console.error("Failed to load fresh user profile data:", pErr)
-      }
       
       setTrackerLoading(true)
       const todayStr = new Date().toISOString().split('T')[0]
@@ -71,13 +63,12 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    if (!storedUser) return
+    if (!userId) return
     fetchDashboardData()
-  }, [])
+  }, [userId])
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     localStorage.removeItem('lastPlayed')
     navigate('/login')
   }
@@ -333,7 +324,7 @@ const Dashboard = () => {
             {activeTab === 'profile' && (
               <DashboardProfile
                 user={user}
-                setUser={setUser}
+                setUser={updateUser}
               />
             )}
           </>

@@ -1,5 +1,5 @@
 const getApiBaseUrl = () => {
-  const url = import.meta.env.VITE_API_URL;
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
   return url.endsWith('/api') || url.endsWith('/api/')
     ? url
     : `${url.replace(/\/$/, '')}/api`;
@@ -8,23 +8,25 @@ const getApiBaseUrl = () => {
 const API_BASE = getApiBaseUrl();
 
 async function request(path, { method = 'GET', body, headers = {} } = {}) {
-  const token = localStorage.getItem('token')
   const authHeaders = {
     'Content-Type': 'application/json',
     ...headers,
   }
 
-  if (token) {
-    authHeaders.Authorization = `Bearer ${token}`
-  }
-
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: authHeaders,
+    credentials: 'include',
     body: body ? JSON.stringify(body) : undefined,
   })
 
   const data = await res.json().catch(() => ({}))
+
+  if (res.status === 401) {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    window.dispatchEvent(new Event('auth:logout'))
+  }
 
   if (!res.ok) {
     const message = data?.message || 'Request failed'
@@ -40,6 +42,10 @@ export function loginUser(payload) {
 
 export function registerUser(payload) {
   return request('/auth/register', { method: 'POST', body: payload })
+}
+
+export function logoutUser() {
+  return request('/auth/logout', { method: 'POST' })
 }
 
 // Course endpoints

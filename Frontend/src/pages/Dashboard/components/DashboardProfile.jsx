@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { updateProfile } from '../../../services/api'
+import { useAuth } from '../../../context/AuthContext'
 import styles from '../Dashboard.module.css'
 
 const DashboardProfile = ({ user, setUser }) => {
+  const { updateUser } = useAuth()
   const [profileName, setProfileName] = useState(user?.name || '')
   const [profileEmail, setProfileEmail] = useState(user?.email || '')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -25,8 +27,10 @@ const DashboardProfile = ({ user, setUser }) => {
         payload.newPassword = newPassword
       }
       const data = await updateProfile(payload)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      setUser(data.user)
+      updateUser(data.user)
+      if (typeof setUser === 'function') {
+        setUser(data.user)
+      }
       setProfileSuccess('Profile updated successfully!')
       setCurrentPassword('')
       setNewPassword('')

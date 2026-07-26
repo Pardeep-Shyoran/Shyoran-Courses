@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { loginUser } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
 import AuthLayout from './AuthLayout'
 import styles from './Auth.module.css'
 
 const Login = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { login } = useAuth()
   const params = new URLSearchParams(window.location.search)
   const playlistUrl = params.get('playlistUrl')
+  const isExpiredNotice = location.state?.expired || params.get('expired') === 'true'
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
@@ -24,8 +28,7 @@ const Login = () => {
     setLoading(true)
     try {
       const data = await loginUser(form)
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      login(data.user)
       if (playlistUrl) {
         navigate(`/courses?playlistUrl=${encodeURIComponent(playlistUrl)}`)
       } else {
@@ -103,6 +106,26 @@ const Login = () => {
             />
           </div>
         </div>
+
+        {isExpiredNotice && !error && (
+          <div className={styles.error} style={{ background: 'rgba(234, 179, 8, 0.1)', borderColor: 'var(--warning, #eab308)', color: 'var(--warning, #eab308)' }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={styles.errorIcon}
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>Your session has expired. Please log in again.</span>
+          </div>
+        )}
 
         {error && (
           <div className={styles.error}>
