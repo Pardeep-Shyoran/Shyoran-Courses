@@ -34,15 +34,15 @@ async function request(path, { method = 'GET', body, headers = {} } = {}) {
   return data
 }
 
-export function loginUser(payload) {
+export async function loginUser(payload) {
   return request('/auth/login', { method: 'POST', body: payload })
 }
 
-export function registerUser(payload) {
+export async function registerUser(payload) {
   return request('/auth/register', { method: 'POST', body: payload })
 }
 
-export function logoutUser() {
+export async function logoutUser() {
   return request('/auth/logout', { method: 'POST' })
 }
 

@@ -47,7 +47,7 @@ export async function register(req, res) {
     const token = signToken(user);
 
     res.cookie("token", token, getCookieOptions());
-    res.status(201).json({ user: sanitizeUser(user), token });
+    res.status(201).json({ user: sanitizeUser(user) });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ message: "Failed to register user", error: err.message });
@@ -74,7 +74,7 @@ export async function login(req, res) {
 
     const token = signToken(user);
     res.cookie("token", token, getCookieOptions());
-    res.json({ user: sanitizeUser(user), token });
+    res.json({ user: sanitizeUser(user) });
   } catch (err) {
     res.status(500).json({ message: "Failed to login" });
   }

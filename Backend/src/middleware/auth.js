@@ -4,12 +4,10 @@ import User from "../models/user.model.js";
 
 export async function authenticate(req, res, next) {
   try {
-    const authHeader = req.headers.authorization || "";
-    const tokenFromHeader = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    const token = req.cookies?.token || tokenFromHeader;
+    const token = req.cookies?.token;
 
     if (!token) {
-      return res.status(401).json({ message: "Authorization token missing" });
+      return res.status(401).json({ message: "Authentication cookie missing" });
     }
 
     const payload = jwt.verify(token, config.JWT_SECRET);
