@@ -159,3 +159,24 @@ export function deleteTodo(id) {
   return request(`/todos/${id}`, { method: 'DELETE' })
 }
 
+// Timetable endpoints
+export function getTimetable() {
+  return request('/timetable')
+}
+
+export function createTimetableSlot(payload) {
+  return request('/timetable', { method: 'POST', body: payload })
+}
+
+export function updateTimetableSlot(id, payload) {
+  return request(`/timetable/${id}`, { method: 'PUT', body: payload })
+}
+
+export function deleteTimetableSlot(id) {
+  return request(`/timetable/${id}`, { method: 'DELETE' })
+}
+
+export function toggleTimetableSlotDate(id, dateStr) {
+  return request(`/timetable/${id}/toggle`, { method: 'PATCH', body: { dateStr } })
+}
+

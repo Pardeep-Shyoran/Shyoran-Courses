@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getTodos, createTodo, toggleTodo, deleteTodo } from '../../../services/api'
+import DashboardTimetable from './DashboardTimetable'
 import styles from '../Dashboard.module.css'
 
 const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
@@ -7,6 +8,7 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
   const [todoLoading, setTodoLoading] = useState(true)
   const [newTodoText, setNewTodoText] = useState('')
   const [todoSubmitting, setTodoSubmitting] = useState(false)
+  const [activeSubTab, setActiveSubTab] = useState('timetable') // 'timetable' or 'todos'
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -84,20 +86,48 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
     return days
   }
 
+  const remainingTodosCount = todos.filter(t => !t.completed).length
+
   return (
     <div className={styles.tabPane}>
+      {/* 1. Header */}
       <div className={styles.paneHeader}>
         <div>
           <h2 className={styles.paneTitle}>Consistency Tracker & Tasks</h2>
-          <p className={styles.paneSubtitle}>Build daily study habits, track your streak, and manage tasks.</p>
+          <p className={styles.paneSubtitle}>Build daily study habits, follow your regular time table schedule, and manage tasks.</p>
         </div>
       </div>
 
-      {/* 1. Full-Width Heatmap Row */}
+      {/* 2. Top Streak & Activity Stats Row */}
+      <section className={styles.topStreakRow}>
+        <div className={styles.streakSubCard}>
+          <span className={styles.streakEmoji}>🔥</span>
+          <div>
+            <span className={styles.streakVal}>{streak} {streak === 1 ? 'Day' : 'Days'}</span>
+            <span className={styles.streakLbl}>Current Streak</span>
+          </div>
+        </div>
+        <div className={styles.streakSubCard}>
+          <span className={styles.streakEmoji}>🏆</span>
+          <div>
+            <span className={styles.streakVal}>{trackerStats?.longestStreak || 0} Days</span>
+            <span className={styles.streakLbl}>Longest Streak</span>
+          </div>
+        </div>
+        <div className={styles.streakSubCard}>
+          <span className={styles.streakEmoji}>📚</span>
+          <div>
+            <span className={styles.streakVal}>{trackerStats?.totalActivities || 0}</span>
+            <span className={styles.streakLbl}>Total Activities</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Heatmap Graph Section (Top Position) */}
       <section className={styles.heatmapFullRow}>
         <div className={styles.heatmapCardFull}>
           <div className={styles.heatmapHeader}>
-            <span>Contribution Grid (Past 365 Days)</span>
+            <span>📊 Contribution Grid & Habit Analytics (Past 365 Days)</span>
             <div className={styles.heatmapLegend}>
               <span>Less</span>
               <div className={`${styles.legendBox} ${styles.lvl0}`}></div>
@@ -154,97 +184,93 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
         </div>
       </section>
 
-      {/* 2. Split Row: Checklist (60%) & Streak Stats (40%) */}
-      <div className={styles.checklistSplitRow}>
-        {/* Left Column: Checklist */}
-        <div className={styles.checklistColumn}>
-          <section className={styles.todoSection}>
-            <h3 className={styles.columnTitle}>📋 Daily Checklist / To-Do List</h3>
-            <div className={styles.todoCard}>
-              <form onSubmit={handleAddTodo} className={styles.todoForm}>
-                <input 
-                  type="text" 
-                  placeholder="Add a study task..." 
-                  value={newTodoText}
-                  onChange={(e) => setNewTodoText(e.target.value)}
-                  className={styles.todoInput}
-                  disabled={todoSubmitting}
-                  maxLength={80}
-                />
-                <button 
-                  type="submit" 
-                  disabled={todoSubmitting || !newTodoText.trim()} 
-                  className={styles.btnTodoAdd}
-                >
-                  {todoSubmitting ? '+' : 'Add'}
-                </button>
-              </form>
+      {/* 4. Sub-Tabs Navigation Bar (Below Heatmap) */}
+      <div className={styles.subTabNavigation}>
+        <button 
+          type="button"
+          className={`${styles.subTabBtn} ${activeSubTab === 'timetable' ? styles.activeSubTabBtn : ''}`}
+          onClick={() => setActiveSubTab('timetable')}
+        >
+          <span>📅 Time Table & Schedule</span>
+        </button>
 
-              {todoLoading ? (
-                <div className={styles.todoLoading}>
-                  <div className={styles.miniSpinner}></div>
-                  <p>Loading checklist...</p>
-                </div>
-              ) : todos.length === 0 ? (
-                <p className={styles.todoEmpty}>No tasks remaining! Add some goals to stay focused today.</p>
-              ) : (
-                <div className={styles.todoList}>
-                  {todos.map(todo => (
-                    <div key={todo._id} className={`${styles.todoItem} ${todo.completed ? styles.completed : ''}`}>
-                      <label className={styles.todoCheckboxContainer}>
-                        <input 
-                          type="checkbox" 
-                          checked={todo.completed} 
-                          onChange={() => handleToggleTodo(todo._id)}
-                          className={styles.todoCheckbox}
-                        />
-                        <span className={styles.todoText}>{todo.text}</span>
-                      </label>
-                      <button 
-                        onClick={() => handleDeleteTodo(todo._id)} 
-                        className={styles.btnTodoDelete}
-                        title="Delete task"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
-
-        {/* Right Column: Streak Stats */}
-        <div className={styles.statsColumn}>
-          <section className={styles.streaksSection}>
-            <h3 className={styles.columnTitle}>🔥 Streak & Uptime Stats</h3>
-            <div className={styles.streaksContainer}>
-              <div className={styles.streakSubCard}>
-                <span className={styles.streakEmoji}>🔥</span>
-                <div>
-                  <span className={styles.streakVal}>{streak}</span>
-                  <span className={styles.streakLbl}>Current Streak</span>
-                </div>
-              </div>
-              <div className={styles.streakSubCard}>
-                <span className={styles.streakEmoji}>🏆</span>
-                <div>
-                  <span className={styles.streakVal}>{trackerStats?.longestStreak || 0}</span>
-                  <span className={styles.streakLbl}>Longest Streak</span>
-                </div>
-              </div>
-              <div className={styles.streakSubCard}>
-                <span className={styles.streakEmoji}>📚</span>
-                <div>
-                  <span className={styles.streakVal}>{trackerStats?.totalActivities || 0}</span>
-                  <span className={styles.streakLbl}>Total Activities</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
+        <button 
+          type="button"
+          className={`${styles.subTabBtn} ${activeSubTab === 'todos' ? styles.activeSubTabBtn : ''}`}
+          onClick={() => setActiveSubTab('todos')}
+        >
+          <span>📋 Daily Checklist</span>
+          {remainingTodosCount > 0 && (
+            <span className={styles.subTabBadge}>{remainingTodosCount}</span>
+          )}
+        </button>
       </div>
+
+      {/* 5. Sub-Tab Content */}
+
+      {/* (A) Timely Study Schedule & Time Table */}
+      {activeSubTab === 'timetable' && (
+        <DashboardTimetable />
+      )}
+
+      {/* (B) Daily Checklist / To-Do List */}
+      {activeSubTab === 'todos' && (
+        <section className={styles.todoSection}>
+          <h3 className={styles.columnTitle}>📋 Daily Checklist / To-Do List</h3>
+          <div className={styles.todoCard}>
+            <form onSubmit={handleAddTodo} className={styles.todoForm}>
+              <input 
+                type="text" 
+                placeholder="Add a study task..." 
+                value={newTodoText}
+                onChange={(e) => setNewTodoText(e.target.value)}
+                className={styles.todoInput}
+                disabled={todoSubmitting}
+                maxLength={80}
+              />
+              <button 
+                type="submit" 
+                disabled={todoSubmitting || !newTodoText.trim()} 
+                className={styles.btnTodoAdd}
+              >
+                {todoSubmitting ? '+' : 'Add'}
+              </button>
+            </form>
+
+            {todoLoading ? (
+              <div className={styles.todoLoading}>
+                <div className={styles.miniSpinner}></div>
+                <p>Loading checklist...</p>
+              </div>
+            ) : todos.length === 0 ? (
+              <p className={styles.todoEmpty}>No tasks remaining! Add some goals to stay focused today.</p>
+            ) : (
+              <div className={styles.todoList}>
+                {todos.map(todo => (
+                  <div key={todo._id} className={`${styles.todoItem} ${todo.completed ? styles.completed : ''}`}>
+                    <label className={styles.todoCheckboxContainer}>
+                      <input 
+                        type="checkbox" 
+                        checked={todo.completed} 
+                        onChange={() => handleToggleTodo(todo._id)}
+                        className={styles.todoCheckbox}
+                      />
+                      <span className={styles.todoText}>{todo.text}</span>
+                    </label>
+                    <button 
+                      onClick={() => handleDeleteTodo(todo._id)} 
+                      className={styles.btnTodoDelete}
+                      title="Delete task"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
