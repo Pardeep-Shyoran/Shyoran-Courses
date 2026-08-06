@@ -11,7 +11,9 @@ const CoursesCatalog = ({
   handleDeleteCourse, 
   handleEnrollCourse, 
   activeMainTab,
-  setShowImportModal
+  setShowImportModal,
+  hasActiveFilters,
+  onResetFilters
 }) => {
   if (loading && courses.length === 0) {
     return (
@@ -49,21 +51,34 @@ const CoursesCatalog = ({
           <line x1="17" y1="17" x2="22" y2="17"></line>
           <line x1="17" y1="7" x2="22" y2="7"></line>
         </svg>
-        <h3>No courses found</h3>
+        <h3>No matching courses found</h3>
         <p>
-          {activeMainTab === 'library'
-            ? 'Try refining your search or add a new course with 1-click Quick Import.'
-            : 'No public courses match your criteria.'}
+          {hasActiveFilters
+            ? 'No courses match your active search or filter criteria.'
+            : activeMainTab === 'library'
+            ? 'Try adding a new course with 1-click Quick Import.'
+            : 'No public courses are available yet.'}
         </p>
-        {activeMainTab === 'library' && setShowImportModal && (
-          <button 
-            onClick={() => setShowImportModal(true)} 
-            className={styles.primaryBtn} 
-            style={{ marginTop: '1rem' }}
-          >
-            ⚡ Quick Import a Playlist
-          </button>
-        )}
+        <div className={styles.emptyActions}>
+          {hasActiveFilters && onResetFilters && (
+            <button 
+              onClick={onResetFilters} 
+              className={styles.secondaryBtn} 
+              style={{ marginTop: '1rem' }}
+            >
+              🔄 Clear Search & Filters
+            </button>
+          )}
+          {activeMainTab === 'library' && setShowImportModal && (
+            <button 
+              onClick={() => setShowImportModal(true)} 
+              className={styles.primaryBtn} 
+              style={{ marginTop: '1rem' }}
+            >
+              ⚡ Quick Import a Playlist
+            </button>
+          )}
+        </div>
       </div>
     )
   }

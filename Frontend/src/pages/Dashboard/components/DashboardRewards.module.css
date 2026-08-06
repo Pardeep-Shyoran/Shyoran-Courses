@@ -468,3 +468,240 @@
   margin: 0;
   line-height: 1.5;
 }
+
+/* 365-Day Annual Roadmap Timeline Section */
+.roadmapSection {
+  background: linear-gradient(135deg, rgba(20, 24, 45, 0.6) 0%, rgba(12, 15, 28, 0.8) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .roadmapSection {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(245, 243, 236, 0.95) 100%);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.roadmapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.roadmapTitle {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streakStatusBadge {
+  font-size: 0.85rem;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+
+.timelineWrapper {
+  position: relative;
+  padding: 20px 10px 10px 10px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.timelineTrack {
+  position: absolute;
+  top: 42px;
+  left: 30px;
+  right: 30px;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 99px;
+  z-index: 1;
+}
+
+.timelineProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e2583e, #f39c12, #d4af37, #9b59b6);
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+.nodesContainer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  min-width: 900px;
+  gap: 12px;
+}
+
+.milestoneNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.milestoneNode:hover {
+  transform: translateY(-4px);
+}
+
+.nodeCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.nodeLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Node States */
+.nodeUnlocked .nodeCircle {
+  background: linear-gradient(135deg, #d4af37 0%, #e2583e 100%);
+  border-color: #ffd700;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+}
+
+.nodeUnlocked .nodeLabel {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.nodeTarget .nodeCircle {
+  border-color: #e2583e;
+  background: rgba(226, 88, 62, 0.2);
+  animation: pulseNode 1.8s infinite;
+}
+
+.nodeTarget .nodeLabel {
+  color: #e2583e;
+  font-weight: 800;
+}
+
+.nodeLocked .nodeCircle {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+}
+
+@keyframes pulseNode {
+  0% {
+    box-shadow: 0 0 0 0 rgba(226, 88, 62, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(226, 88, 62, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(226, 88, 62, 0);
+  }
+}
+
+/* Category Filter Header & Pills */
+.categorySectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.categoryTabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 21, 38, 0.4);
+  padding: 4px;
+  border-radius: 99px;
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+[data-theme="light"] .categoryTabs {
+  background: rgba(245, 243, 236, 0.8);
+}
+
+.categoryTab {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.categoryTab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activeCategoryTab {
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(226, 88, 62, 0.3);
+}
+
+/* Card Progress Bar */
+.badgeProgressContainer {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.badgeProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.badgeProgressBarBg {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.badgeProgressBarFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+

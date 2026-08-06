@@ -8,6 +8,7 @@ const DashboardRewards = ({ user, courses, streak }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("all"); // 'all', 'streak', 'learning', 'certificates'
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -38,57 +39,282 @@ const DashboardRewards = ({ user, courses, streak }) => {
     totalCompletedVideos += completedCount;
   });
 
-  // Define Badges
+  const certCount = certificates.length;
+
+  // Complete List of Badges including 365-Day Annual Streak Progression
   const badges = [
+    // --- STREAK SYSTEM BADGES (365 DAYS) ---
+    {
+      id: "streak_3",
+      category: "streak",
+      name: "Spark of Passion",
+      desc: "Maintain a 3-day continuous study streak.",
+      icon: "🔥",
+      target: 3,
+      current: streak,
+      unlocked: streak >= 3,
+      unit: "days streak",
+    },
+    {
+      id: "streak_7",
+      category: "streak",
+      name: "Week Warrior",
+      desc: "Maintain a 7-day continuous study streak.",
+      icon: "⚡",
+      target: 7,
+      current: streak,
+      unlocked: streak >= 7,
+      unit: "days streak",
+    },
+    {
+      id: "streak_14",
+      category: "streak",
+      name: "Fortnight Focus",
+      desc: "Maintain a 14-day continuous study streak.",
+      icon: "🌟",
+      target: 14,
+      current: streak,
+      unlocked: streak >= 14,
+      unit: "days streak",
+    },
+    {
+      id: "streak_30",
+      category: "streak",
+      name: "Monthly Master",
+      desc: "Maintain a 30-day continuous study streak.",
+      icon: "🏆",
+      target: 30,
+      current: streak,
+      unlocked: streak >= 30,
+      unit: "days streak",
+    },
+    {
+      id: "streak_50",
+      category: "streak",
+      name: "50-Day Sentinel",
+      desc: "Maintain a 50-day continuous study streak.",
+      icon: "🛡️",
+      target: 50,
+      current: streak,
+      unlocked: streak >= 50,
+      unit: "days streak",
+    },
+    {
+      id: "streak_100",
+      category: "streak",
+      name: "Centurion Scholar",
+      desc: "Maintain a 100-day continuous study streak.",
+      icon: "💯",
+      target: 100,
+      current: streak,
+      unlocked: streak >= 100,
+      unit: "days streak",
+    },
+    {
+      id: "streak_150",
+      category: "streak",
+      name: "150-Day Titan",
+      desc: "Maintain a 150-day continuous study streak.",
+      icon: "⚔️",
+      target: 150,
+      current: streak,
+      unlocked: streak >= 150,
+      unit: "days streak",
+    },
+    {
+      id: "streak_200",
+      category: "streak",
+      name: "Bicentennial Vanguard",
+      desc: "Maintain a 200-day continuous study streak.",
+      icon: "🔱",
+      target: 200,
+      current: streak,
+      unlocked: streak >= 200,
+      unit: "days streak",
+    },
+    {
+      id: "streak_250",
+      category: "streak",
+      name: "Quarter-K Conqueror",
+      desc: "Maintain a 250-day continuous study streak.",
+      icon: "👑",
+      target: 250,
+      current: streak,
+      unlocked: streak >= 250,
+      unit: "days streak",
+    },
+    {
+      id: "streak_300",
+      category: "streak",
+      name: "300-Day Paragon",
+      desc: "Maintain a 300-day continuous study streak.",
+      icon: "💎",
+      target: 300,
+      current: streak,
+      unlocked: streak >= 300,
+      unit: "days streak",
+    },
+    {
+      id: "streak_350",
+      category: "streak",
+      name: "Apex Scholar",
+      desc: "Maintain a 350-day continuous study streak.",
+      icon: "🔮",
+      target: 350,
+      current: streak,
+      unlocked: streak >= 350,
+      unit: "days streak",
+    },
+    {
+      id: "streak_365",
+      category: "streak",
+      name: "Year-Long Legend",
+      desc: "Achieve a full 365-day (1 Year) non-stop study streak!",
+      icon: "🌌",
+      target: 365,
+      current: streak,
+      unlocked: streak >= 365,
+      unit: "days streak",
+    },
+
+    // --- LEARNING & VIDEO BADGES ---
     {
       id: "curious_mind",
+      category: "learning",
       name: "Curious Mind",
       desc: "Unlocked by completing your first video lesson.",
       icon: "🌱",
+      target: 1,
+      current: totalCompletedVideos,
       unlocked: totalCompletedVideos >= 1,
-      requirement: "Complete 1 video",
+      unit: "videos",
     },
     {
-      id: "habit_builder",
-      name: "Habit Builder",
-      desc: "Unlocked by maintaining a 3-day study streak.",
-      icon: "🔥",
-      unlocked: streak >= 3,
-      requirement: "3-day streak",
+      id: "video_scholar",
+      category: "learning",
+      name: "Video Scholar",
+      desc: "Unlocked by completing 10 video lessons.",
+      icon: "📹",
+      target: 10,
+      current: totalCompletedVideos,
+      unlocked: totalCompletedVideos >= 10,
+      unit: "videos",
     },
     {
-      id: "dedicated_learner",
-      name: "Dedicated Learner",
-      desc: "Unlocked by maintaining a 7-day study streak.",
-      icon: "⚡",
-      unlocked: streak >= 7,
-      requirement: "7-day streak",
+      id: "knowledge_master",
+      category: "learning",
+      name: "Knowledge Master",
+      desc: "Unlocked by completing 50 video lessons.",
+      icon: "🧠",
+      target: 50,
+      current: totalCompletedVideos,
+      unlocked: totalCompletedVideos >= 50,
+      unit: "videos",
     },
+
+    // --- CERTIFICATES & MASTERY ---
     {
       id: "roadmap_finisher",
+      category: "certificates",
       name: "Roadmap Finisher",
       desc: "Earned by completing a course roadmap at 100%.",
-      icon: "🏆",
-      unlocked: certificates.length >= 1,
-      requirement: "1 Course Certificate",
-    },
-    {
-      id: "scholar",
-      name: "Scholar",
-      desc: "Unlocked by earning 500 or more XP.",
-      icon: "🎓",
-      unlocked: userXp >= 500,
-      requirement: "Earn 500 XP",
+      icon: "🏅",
+      target: 1,
+      current: certCount,
+      unlocked: certCount >= 1,
+      unit: "certificates",
     },
     {
       id: "polymath",
+      category: "certificates",
       name: "Polymath",
       desc: "Unlocked by completing 3 distinct course roadmaps.",
+      icon: "🎓",
+      target: 3,
+      current: certCount,
+      unlocked: certCount >= 3,
+      unit: "certificates",
+    },
+    {
+      id: "grandmaster",
+      category: "certificates",
+      name: "Grandmaster",
+      desc: "Unlocked by completing 5 distinct course roadmaps.",
       icon: "👑",
-      unlocked: certificates.length >= 3,
-      requirement: "3 Course Certificates",
+      target: 5,
+      current: certCount,
+      unlocked: certCount >= 5,
+      unit: "certificates",
+    },
+
+    // --- XP & PROGRESSION ---
+    {
+      id: "xp_novice",
+      category: "learning",
+      name: "XP Novice",
+      desc: "Earn your first 100 XP milestone.",
+      icon: "✨",
+      target: 100,
+      current: userXp,
+      unlocked: userXp >= 100,
+      unit: "XP",
+    },
+    {
+      id: "xp_scholar",
+      category: "learning",
+      name: "XP Scholar",
+      desc: "Reach 500 total XP points.",
+      icon: "⚡",
+      target: 500,
+      current: userXp,
+      unlocked: userXp >= 500,
+      unit: "XP",
+    },
+    {
+      id: "xp_prodigy",
+      category: "learning",
+      name: "XP Prodigy",
+      desc: "Reach 1,500 total XP points.",
+      icon: "💎",
+      target: 1500,
+      current: userXp,
+      unlocked: userXp >= 1500,
+      unit: "XP",
+    },
+    {
+      id: "xp_master",
+      category: "learning",
+      name: "XP Master",
+      desc: "Reach 5,000 total XP points.",
+      icon: "🚀",
+      target: 5000,
+      current: userXp,
+      unlocked: userXp >= 5000,
+      unit: "XP",
     },
   ];
+
+  // Milestone nodes for 365-Day Roadmap Timeline
+  const streakMilestones = [
+    { day: 3, icon: "🔥", name: "3 Days" },
+    { day: 7, icon: "⚡", name: "7 Days" },
+    { day: 14, icon: "🌟", name: "14 Days" },
+    { day: 30, icon: "🏆", name: "30 Days" },
+    { day: 50, icon: "🛡️", name: "50 Days" },
+    { day: 100, icon: "💯", name: "100 Days" },
+    { day: 150, icon: "⚔️", name: "150 Days" },
+    { day: 200, icon: "🔱", name: "200 Days" },
+    { day: 250, icon: "👑", name: "250 Days" },
+    { day: 300, icon: "💎", name: "300 Days" },
+    { day: 350, icon: "🔮", name: "350 Days" },
+    { day: 365, icon: "🌌", name: "365 Days" },
+  ];
+
+  // Filter badges based on selected category tab
+  const filteredBadges = badges.filter((b) => {
+    if (activeCategory === "all") return true;
+    return b.category === activeCategory;
+  });
 
   const unlockedCount = badges.filter((b) => b.unlocked).length;
 
@@ -96,8 +322,10 @@ const DashboardRewards = ({ user, courses, streak }) => {
     <div className={styles.container}>
       <div className={styles.paneHeader}>
         <div>
-          <h2 className={styles.paneTitle}>Rewards & Achievements</h2>
-          <p className={styles.paneSubtitle}>Track your learning milestones, XP progress, and certifications.</p>
+          <h2 className={styles.paneTitle}>Rewards & 365-Day Achievements</h2>
+          <p className={styles.paneSubtitle}>
+            Track your annual study streaks, level progression, and verified course certifications.
+          </p>
         </div>
       </div>
 
@@ -133,40 +361,153 @@ const DashboardRewards = ({ user, courses, streak }) => {
             </div>
           </div>
           <div className={styles.statRow}>
+            <div className={styles.statIcon}>🔥</div>
+            <div className={styles.statInfo}>
+              <span>Current Streak</span>
+              <h4>{streak} {streak === 1 ? 'Day' : 'Days'}</h4>
+            </div>
+          </div>
+          <div className={styles.statRow}>
             <div className={styles.statIcon}>📜</div>
             <div className={styles.statInfo}>
-              <span>Certificates Earned</span>
+              <span>Certificates</span>
               <h4>{certificates.length}</h4>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Badges/Achievements Grid */}
-      <section>
-        <h3 className={styles.sectionTitle}>
-          <span>🎖️</span> Achievements & Badges
-        </h3>
-        <div className={styles.badgesGrid}>
-          {badges.map((badge) => (
+      {/* 365-Day Annual Streak Roadmap Timeline */}
+      <section className={styles.roadmapSection}>
+        <div className={styles.roadmapHeader}>
+          <h3 className={styles.roadmapTitle}>
+            <span>🌌</span> 365-Day Annual Streak Journey
+          </h3>
+          <span className={styles.streakStatusBadge}>
+            Current: <strong>{streak} / 365 Days</strong> ({Math.min(100, Math.round((streak / 365) * 100))}%)
+          </span>
+        </div>
+
+        <div className={styles.timelineWrapper}>
+          <div className={styles.timelineTrack}>
             <div
-              key={badge.id}
-              className={`${styles.badgeCard} ${
-                badge.unlocked ? styles.badgeCardUnlocked : styles.badgeCardLocked
-              }`}
+              className={styles.timelineProgressFill}
+              style={{ width: `${Math.min(100, Math.max(2, (streak / 365) * 100))}%` }}
+            ></div>
+          </div>
+
+          <div className={styles.nodesContainer}>
+            {streakMilestones.map((m) => {
+              const isUnlocked = streak >= m.day;
+              const isNextTarget = !isUnlocked && streak < m.day && (streakMilestones.find(item => item.day > streak)?.day === m.day);
+
+              return (
+                <div
+                  key={m.day}
+                  className={`${styles.milestoneNode} ${
+                    isUnlocked ? styles.nodeUnlocked : isNextTarget ? styles.nodeTarget : styles.nodeLocked
+                  }`}
+                  title={`${m.name}: ${isUnlocked ? 'Unlocked!' : `${m.day - streak} days remaining`}`}
+                >
+                  <div className={styles.nodeCircle}>
+                    <span>{m.icon}</span>
+                  </div>
+                  <span className={styles.nodeLabel}>{m.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Category Filter & Badges Grid */}
+      <section>
+        <div className={styles.categorySectionHeader}>
+          <h3 className={styles.sectionTitle}>
+            <span>🎖️</span> Achievements & Badges
+          </h3>
+
+          <div className={styles.categoryTabs}>
+            <button
+              type="button"
+              className={`${styles.categoryTab} ${activeCategory === "all" ? styles.activeCategoryTab : ""}`}
+              onClick={() => setActiveCategory("all")}
             >
-              <div className={styles.badgeIcon}>{badge.icon}</div>
-              <h4 className={styles.badgeName}>{badge.name}</h4>
-              <p className={styles.badgeDesc}>{badge.desc}</p>
-              <span
-                className={`${styles.badgeStatus} ${
-                  badge.unlocked ? styles.statusUnlocked : styles.statusLocked
+              All ({badges.length})
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.categoryTab} ${activeCategory === "streak" ? styles.activeCategoryTab : ""}`}
+              onClick={() => setActiveCategory("streak")}
+            >
+              🔥 Streak System ({badges.filter((b) => b.category === "streak").length})
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.categoryTab} ${activeCategory === "learning" ? styles.activeCategoryTab : ""}`}
+              onClick={() => setActiveCategory("learning")}
+            >
+              🧠 Learning & XP ({badges.filter((b) => b.category === "learning").length})
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.categoryTab} ${activeCategory === "certificates" ? styles.activeCategoryTab : ""}`}
+              onClick={() => setActiveCategory("certificates")}
+            >
+              📜 Certificates ({badges.filter((b) => b.category === "certificates").length})
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.badgesGrid}>
+          {filteredBadges.map((badge) => {
+            const pct = Math.min(100, Math.round((badge.current / badge.target) * 100));
+
+            return (
+              <div
+                key={badge.id}
+                className={`${styles.badgeCard} ${
+                  badge.unlocked ? styles.badgeCardUnlocked : styles.badgeCardLocked
                 }`}
               >
-                {badge.unlocked ? "Unlocked" : `Req: ${badge.requirement}`}
-              </span>
-            </div>
-          ))}
+                <div className={styles.badgeIcon}>{badge.icon}</div>
+                <h4 className={styles.badgeName}>{badge.name}</h4>
+                <p className={styles.badgeDesc}>{badge.desc}</p>
+
+                {/* Progress bar inside card */}
+                <div className={styles.badgeProgressContainer}>
+                  <div className={styles.badgeProgressHeader}>
+                    <span>Progress</span>
+                    <span>
+                      {badge.current} / {badge.target} {badge.unit}
+                    </span>
+                  </div>
+                  <div className={styles.badgeProgressBarBg}>
+                    <div
+                      className={styles.badgeProgressBarFill}
+                      style={{
+                        width: `${pct}%`,
+                        background: badge.unlocked
+                          ? "linear-gradient(90deg, #d4af37, #f39c12)"
+                          : "linear-gradient(90deg, #3498db, #2ecc71)",
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <span
+                  className={`${styles.badgeStatus} ${
+                    badge.unlocked ? styles.statusUnlocked : styles.statusLocked
+                  }`}
+                >
+                  {badge.unlocked ? "Unlocked ✨" : `${pct}% Completed`}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </section>
 

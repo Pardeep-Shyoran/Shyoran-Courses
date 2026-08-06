@@ -35,6 +35,26 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }
     navigate('/courses?tab=add')
   }
 
+  // Milestone calculation for 365-Day Year Streak System
+  const streakMilestones = [
+    { day: 3, name: "Spark of Passion", icon: "🔥" },
+    { day: 7, name: "Week Warrior", icon: "⚡" },
+    { day: 14, name: "Fortnight Focus", icon: "🌟" },
+    { day: 30, name: "Monthly Master", icon: "🏆" },
+    { day: 50, name: "50-Day Sentinel", icon: "🛡️" },
+    { day: 100, name: "Centurion Scholar", icon: "💯" },
+    { day: 150, name: "150-Day Titan", icon: "⚔️" },
+    { day: 200, name: "Bicentennial Vanguard", icon: "🔱" },
+    { day: 250, name: "Quarter-K Conqueror", icon: "👑" },
+    { day: 300, name: "300-Day Paragon", icon: "💎" },
+    { day: 350, name: "Apex Scholar", icon: "🔮" },
+    { day: 365, name: "Year-Long Legend", icon: "🌌" },
+  ]
+
+  const nextMilestone = streakMilestones.find(m => m.day > streak) || streakMilestones[streakMilestones.length - 1]
+  const daysRemaining = Math.max(0, nextMilestone.day - streak)
+  const milestonePct = Math.min(100, Math.round((streak / nextMilestone.day) * 100))
+
   return (
     <div className={styles.tabPane}>
       {/* Stats Grid */}
@@ -58,6 +78,30 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }
           <div className={styles.statsCard}>
             <span className={styles.statLabel}>Study Streak</span>
             <h3 className={styles.statValue}>{streak} {streak === 1 ? 'day' : 'days'}</h3>
+          </div>
+        </div>
+      </section>
+
+      {/* 365-Day Next Milestone Target Card */}
+      <section className={styles.milestoneOverviewCard}>
+        <div className={styles.milestoneOverviewHeader}>
+          <div className={styles.milestoneOverviewIcon}>{nextMilestone.icon}</div>
+          <div className={styles.milestoneOverviewText}>
+            <span>Next Annual Badge Target ({nextMilestone.day} Days)</span>
+            <h4>{nextMilestone.name}</h4>
+          </div>
+          <Link to="/dashboard?tab=rewards" className={styles.viewBadgesBtn}>
+            View Badges Roadmap →
+          </Link>
+        </div>
+
+        <div className={styles.milestoneOverviewProgress}>
+          <div className={styles.milestoneProgressInfo}>
+            <span>Streak Progress: <strong>{streak} / {nextMilestone.day} Days</strong> ({milestonePct}%)</span>
+            <span>{daysRemaining === 0 ? '✨ Milestone Reached!' : `🔥 ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} remaining`}</span>
+          </div>
+          <div className={styles.milestoneProgressBarBg}>
+            <div className={styles.milestoneProgressBarFill} style={{ width: `${milestonePct}%` }}></div>
           </div>
         </div>
       </section>

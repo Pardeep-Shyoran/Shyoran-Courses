@@ -42,9 +42,10 @@ const Courses = () => {
     }
   }, [location.search])
 
-  // Search & Filter state
+  // Search, Filter & Sort state
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterType, setFilterType] = useState('all') // 'all', 'in-progress', 'completed'
+  const [filterType, setFilterType] = useState('all') // 'all', 'in-progress', 'completed', 'not-started'
+  const [sortBy, setSortBy] = useState('newest') // 'newest', 'oldest', 'title-asc', 'title-desc', 'progress-desc', 'progress-asc', 'videos-desc', 'updated'
 
   // Modals state
   const [showImportModal, setShowImportModal] = useState(false)
@@ -105,6 +106,13 @@ const Courses = () => {
     }
   }
 
+  // Reset all filters & sorting
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setFilterType('all')
+    setSortBy('newest')
+  }
+
   // Main Tabs Separation
   const currentUserId = user?._id || user?.id
   const libraryCourses = courses.filter(course => course.user?._id === currentUserId)
@@ -115,29 +123,73 @@ const Courses = () => {
 
   const activeCoursesSet = activeMainTab === 'library' ? libraryCourses : exploreCourses
 
-  // Filter & Search computation
+  // Filter computation
   const filteredCourses = activeCoursesSet.filter(course => {
+    const q = searchQuery.trim().toLowerCase()
     const matchesSearch = 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase())
+      !q ||
+      course.title?.toLowerCase().includes(q) ||
+      course.description?.toLowerCase().includes(q) ||
+      (course.tags && course.tags.some(tag => tag.toLowerCase().includes(q)))
 
     if (activeMainTab === 'explore') {
       return matchesSearch
     }
 
-    const total = course.videos.length
-    const completed = course.videos.filter(v => v.completed).length
+    const total = course.videos?.length || 0
+    const completed = course.videos ? course.videos.filter(v => v.completed).length : 0
     const isCompleted = total > 0 && completed === total
     const isInProgress = total > 0 && completed > 0 && completed < total
+    const isNotStarted = total === 0 || completed === 0
 
     if (filterType === 'completed') {
       return matchesSearch && isCompleted
     }
     if (filterType === 'in-progress') {
-      return matchesSearch && (isInProgress || (total > 0 && completed === 0))
+      return matchesSearch && isInProgress
+    }
+    if (filterType === 'not-started') {
+      return matchesSearch && isNotStarted && !isCompleted
     }
     return matchesSearch
   })
+
+  // Sort computation
+  const filteredAndSortedCourses = [...filteredCourses].sort((a, b) => {
+    const aTotal = a.videos?.length || 0
+    const bTotal = b.videos?.length || 0
+    const aCompleted = a.videos ? a.videos.filter(v => v.completed).length : 0
+    const bCompleted = b.videos ? b.videos.filter(v => v.completed).length : 0
+    const aProgress = aTotal > 0 ? aCompleted / aTotal : 0
+    const bProgress = bTotal > 0 ? bCompleted / bTotal : 0
+
+    const aDate = new Date(a.createdAt || a._id?.substring(0, 8) ? parseInt(a._id?.substring(0, 8), 16) * 1000 : 0)
+    const bDate = new Date(b.createdAt || b._id?.substring(0, 8) ? parseInt(b._id?.substring(0, 8), 16) * 1000 : 0)
+    const aUpdated = new Date(a.updatedAt || aDate)
+    const bUpdated = new Date(b.updatedAt || bDate)
+
+    switch (sortBy) {
+      case 'oldest':
+        return aDate - bDate
+      case 'title-asc':
+        return (a.title || '').localeCompare(b.title || '')
+      case 'title-desc':
+        return (b.title || '').localeCompare(a.title || '')
+      case 'progress-desc':
+        return bProgress - aProgress
+      case 'progress-asc':
+        return aProgress - bProgress
+      case 'videos-desc':
+        return bTotal - aTotal
+      case 'updated':
+        return bUpdated - aUpdated
+      case 'newest':
+      default:
+        return bDate - aDate
+    }
+  })
+
+  const hasActiveFilters = searchQuery.trim() !== '' || filterType !== 'all' || sortBy !== 'newest'
 
   return (
     <div className={styles.container}>
@@ -170,18 +222,26 @@ const Courses = () => {
             setSearchQuery={setSearchQuery}
             filterType={filterType}
             setFilterType={setFilterType}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            resultCount={filteredAndSortedCourses.length}
+            totalCount={activeCoursesSet.length}
+            hasActiveFilters={hasActiveFilters}
+            onResetFilters={handleResetFilters}
           />
 
           <CoursesCatalog 
             loading={loading}
             error={error}
-            filteredCourses={filteredCourses}
+            filteredCourses={filteredAndSortedCourses}
             courses={courses}
             currentUserId={currentUserId}
             handleDeleteCourse={handleDeleteCourse}
             handleEnrollCourse={handleEnrollCourse}
             activeMainTab={activeMainTab}
             setShowImportModal={() => setActiveMainTab('add')}
+            hasActiveFilters={hasActiveFilters}
+            onResetFilters={handleResetFilters}
           />
         </>
       )}
