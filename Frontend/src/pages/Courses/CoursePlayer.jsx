@@ -338,6 +338,32 @@ const CoursePlayer = () => {
     }
   }
 
+  // Copy AI Complete Notes to Clipboard
+  const handleCopyNotes = async () => {
+    if (!aiSummary) return
+    try {
+      await navigator.clipboard.writeText(aiSummary)
+      alert('📋 Complete Video Notes copied to clipboard!')
+    } catch {
+      alert('Failed to copy notes to clipboard.')
+    }
+  }
+
+  // Download AI Complete Notes as Markdown File
+  const handleDownloadNotes = () => {
+    if (!aiSummary || !activeVideo) return
+    const filename = `${(activeVideo.title || 'Video_Notes').replace(/[^a-z0-9_-]/gi, '_')}_Complete_Notes.md`
+    const blob = new Blob([aiSummary], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   // Append summary to notes
   const handleAppendSummaryToNotes = async () => {
     if (!aiSummary || !activeVideo) return
@@ -353,7 +379,7 @@ const CoursePlayer = () => {
       setActiveVideo(updatedVideo)
       setActiveTab('notes')
       setNotesViewMode('edit')
-      alert('AI Summary successfully appended to your notes!')
+      alert('AI Complete Notes successfully appended to your notes!')
     } catch {
       alert('Failed to save updated notes.')
     } finally {
@@ -364,7 +390,7 @@ const CoursePlayer = () => {
   // Replace notes with summary
   const handleOverwriteNotesWithSummary = async () => {
     if (!aiSummary || !activeVideo) return
-    if (!window.confirm('Are you sure you want to replace your notes for this video with the AI summary? This cannot be undone.')) {
+    if (!window.confirm('Are you sure you want to replace your notes for this video with the AI Complete Video Notes? This cannot be undone.')) {
       return
     }
     setNoteContent(aiSummary)
@@ -377,7 +403,7 @@ const CoursePlayer = () => {
       setActiveVideo(updatedVideo)
       setActiveTab('notes')
       setNotesViewMode('preview')
-      alert('AI Summary successfully saved as video notes!')
+      alert('AI Complete Notes successfully saved as video notes!')
     } catch {
       alert('Failed to save updated notes.')
     } finally {
@@ -696,6 +722,8 @@ const CoursePlayer = () => {
                     handleGetSummary={handleGetSummary}
                     handleAppendSummaryToNotes={handleAppendSummaryToNotes}
                     handleOverwriteNotesWithSummary={handleOverwriteNotesWithSummary}
+                    handleCopyNotes={handleCopyNotes}
+                    handleDownloadNotes={handleDownloadNotes}
                     chatEndRef={chatEndRef}
                     handleSeek={handleSeek}
                   />

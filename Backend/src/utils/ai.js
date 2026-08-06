@@ -19,7 +19,7 @@ function checkAIClient() {
 }
 
 /**
- * Generates a structured Markdown study summary for a video.
+ * Generates AI Complete Step-by-Step Video Notes for a video.
  * @param {string} videoTitle 
  * @param {string} transcriptText 
  * @returns {Promise<string>}
@@ -31,36 +31,85 @@ export async function generateSummary(videoTitle, transcriptText) {
   let prompt = "";
   if (transcriptText && transcriptText.trim().length > 0) {
     prompt = `
-You are an expert educational content writer. Your task is to write a comprehensive, high-quality, and structured Markdown study guide/summary for a YouTube video.
+You are an elite educational AI assistant and expert note-taker. 
+Your task is to transform the provided YouTube video transcript into **AI Complete Step-by-Step Video Notes**. 
+
+CRITICAL DIRECTIVES:
+1. DO NOT INCLUDE timestamps (such as [01:23] or [MM:SS]). Focus purely on textbook-quality content, clean explanations, and structured layout.
+2. Ensure EVERY single topic and concept discussed in the video is fully covered topic-by-topic so a student can completely revise the video using these notes alone.
+3. Use clean Markdown with clear headings, bullet points, bold key terms, blockquotes for important tips, and syntax-highlighted code blocks.
 
 Video Title: "${videoTitle}"
-Transcript:
+
+Transcript text:
 """
 ${transcriptText}
 """
 
-Please format your response strictly using Markdown. The summary must include the following sections:
-1. **Overview**: A clear, engaging 3-4 sentence paragraph summarizing the core purpose and goal of this video.
-2. **Key Takeaways & Core Concepts**: Explain the main 3-5 concepts or lessons covered in the video, with a short explanation for each. Use bullet points.
-3. **Structured Study Outline**: A logical breakdown of the topics in sequential order. Include brief bullet points explaining what is discussed in each topic.
-4. **Glossary / Key Terms**: Define any technical terms, frameworks, commands, or jargon mentioned in the video.
-5. **Practical Exercise or Study Prompt**: Suggest a quick hands-on exercise, project idea, or a self-reflection prompt for the student to practice what they learned.
+Please format your response strictly using Markdown with the following exact section headers (so automated section filtering works seamlessly):
 
-Maintain a clear, academic, yet encouraging tone. Focus on educational utility. Use code blocks with appropriate syntax highlighting if code or commands are discussed.
+# 🎓 AI Complete Video Notes: ${videoTitle}
+
+## 📌 1. Executive Summary & Core Objectives
+- Write a 3-4 sentence comprehensive overview explaining the core theme, target audience, and key goals of this lesson.
+- List 3 primary learning outcomes.
+
+## 🎯 2. Essential Key Takeaways & Core Rules
+- Provide 4-6 high-impact bullet points summarizing the most critical rules, concepts, or formulas taught in this video.
+
+## 📋 3. Comprehensive Topic-by-Topic Breakdown
+Break down the video content into distinct, logical topics in sequential order. 
+For EACH topic discussed in the video:
+- Use a clear header: ### Topic: [Name of Topic]
+- Provide a thorough, step-by-step detailed explanation of what was taught under this topic.
+- Include complete code snippets, terminal commands, or structured bullet points.
+- Add a blockquote (> 💡 **Pro-Tip / Key Note:** ...) highlighting best practices or common pitfalls for this topic.
+
+## 💡 4. Technical Terms & Revision Cheat Sheet
+- Create a Markdown table or definition list defining every technical term, command, function, or framework mentioned in the video.
+
+## 🛠️ 5. Hands-on Practice & Code Exercises
+- Provide a practical hands-on challenge, code exercise, or self-directed project based directly on the video contents. Include complete code solutions or starter templates.
+
+## ❓ 6. Active Recall & Self-Check Questions
+- Provide 4 test-your-knowledge questions with answers to help students test their memory during revision.
+
+Tone: Clear, encouraging, textbook-quality, and extremely comprehensive.
 `;
   } else {
     // Fallback if transcript isn't available
     prompt = `
-You are an expert educational tutor. The student requested a summary for the video titled "${videoTitle}", but the video transcript is currently unavailable.
+You are an expert educational AI tutor. The student requested complete video notes for "${videoTitle}", but video captions were not directly available.
 
-Please generate a high-quality Markdown study outline and resource guide based *only* on the video title.
-Include:
-1. **Expected Concepts**: What topics and concepts are usually covered under this title? Explain them briefly.
-2. **Study Recommendations**: What key areas should the student focus on while watching this video?
-3. **Glossary of Expected Terms**: Standard technical terms and definitions relevant to this topic.
-4. **Practice Exercises**: Suggested tasks to try.
+Please generate a comprehensive, structured Markdown revision guide and topic-by-topic notes based *only* on the video title.
 
-Note: Begin with a friendly, subtle banner stating: "*Note: This study guide was generated based on the video title because video captions were not available.*"
+DO NOT include timestamps. Ensure maximum clarity, code examples, and structured layout.
+
+# 🎓 AI Complete Video Notes: ${videoTitle}
+*(Generated based on topic & video title)*
+
+## 📌 1. Executive Summary & Core Objectives
+- Overview of expected concepts for "${videoTitle}".
+
+## 🎯 2. Essential Key Takeaways & Core Rules
+- Key principles and foundational concepts to master.
+
+## 📋 3. Comprehensive Topic-by-Topic Breakdown
+- ### Topic: Foundational Setup & Architecture
+  Detailed explanations and best practices.
+- ### Topic: Core Implementation & Key Concepts
+  Full explanation and sample code blocks.
+- ### Topic: Advanced Techniques & Pitfalls
+  Common errors and how to avoid them.
+
+## 💡 4. Technical Terms & Revision Cheat Sheet
+- Technical definitions and quick reference terms.
+
+## 🛠️ 5. Hands-on Practice & Code Exercises
+- Practice exercise with step-by-step instructions.
+
+## ❓ 6. Active Recall & Self-Check Questions
+- 4 self-assessment revision questions with answers.
 `;
   }
 
