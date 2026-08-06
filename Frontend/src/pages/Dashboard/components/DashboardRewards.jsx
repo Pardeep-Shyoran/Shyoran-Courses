@@ -310,6 +310,41 @@ const DashboardRewards = ({ user, courses, streak }) => {
     { day: 365, icon: "🌌", name: "365 Days" },
   ];
 
+  // Accurately map current streak days to milestone node positions on the timeline
+  const getTimelineProgressPct = (currentStreak, milestones) => {
+    if (!milestones || milestones.length === 0) return 0;
+    const total = milestones.length;
+    if (currentStreak >= milestones[total - 1].day) return 100;
+    if (currentStreak <= 0) return 0;
+
+    // If streak is less than the first milestone (3 days)
+    if (currentStreak < milestones[0].day) {
+      const ratio = currentStreak / milestones[0].day;
+      return (ratio / (total - 1)) * 100;
+    }
+
+    // Find highest milestone index where currentStreak >= milestone.day
+    let index = 0;
+    for (let i = 0; i < total; i++) {
+      if (currentStreak >= milestones[i].day) {
+        index = i;
+      } else {
+        break;
+      }
+    }
+
+    if (index === total - 1) return 100;
+
+    const d1 = milestones[index].day;
+    const d2 = milestones[index + 1].day;
+    const ratio = (currentStreak - d1) / (d2 - d1);
+
+    const stepPct = 100 / (total - 1);
+    return Math.min(100, Math.max(0, (index + ratio) * stepPct));
+  };
+
+  const timelineFillPct = getTimelineProgressPct(streak, streakMilestones);
+
   // Filter badges based on selected category tab
   const filteredBadges = badges.filter((b) => {
     if (activeCategory === "all") return true;
@@ -389,14 +424,14 @@ const DashboardRewards = ({ user, courses, streak }) => {
         </div>
 
         <div className={styles.timelineWrapper}>
-          <div className={styles.timelineTrack}>
-            <div
-              className={styles.timelineProgressFill}
-              style={{ width: `${Math.min(100, Math.max(2, (streak / 365) * 100))}%` }}
-            ></div>
-          </div>
-
           <div className={styles.nodesContainer}>
+            <div className={styles.timelineTrack}>
+              <div
+                className={styles.timelineProgressFill}
+                style={{ width: `${timelineFillPct}%` }}
+              ></div>
+            </div>
+
             {streakMilestones.map((m) => {
               const isUnlocked = streak >= m.day;
               const isNextTarget = !isUnlocked && streak < m.day && (streakMilestones.find(item => item.day > streak)?.day === m.day);

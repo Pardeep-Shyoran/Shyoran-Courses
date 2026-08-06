@@ -16,6 +16,16 @@ function sanitizeUser(user) {
     email: user.email,
     role: user.role,
     xp: user.xp || 0,
+    bio: user.bio || "",
+    avatarColor: user.avatarColor || "#6366f1",
+    dailyGoal: user.dailyGoal ?? 30,
+    interests: user.interests || [],
+    preferences: {
+      autoplay: user.preferences?.autoplay ?? true,
+      playbackSpeed: user.preferences?.playbackSpeed ?? 1,
+      emailReminders: user.preferences?.emailReminders ?? true,
+      streakAlerts: user.preferences?.streakAlerts ?? true,
+    },
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
@@ -88,13 +98,25 @@ export function logout(_req, res) {
 
 export async function updateProfile(req, res) {
   try {
-    const { name, email, currentPassword, newPassword } = req.body;
+    const { name, email, currentPassword, newPassword, bio, avatarColor, dailyGoal, interests, preferences } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (name) user.name = name;
+    if (name !== undefined) user.name = name;
+    if (bio !== undefined) user.bio = bio;
+    if (avatarColor !== undefined) user.avatarColor = avatarColor;
+    if (dailyGoal !== undefined) user.dailyGoal = Number(dailyGoal);
+    if (interests !== undefined && Array.isArray(interests)) user.interests = interests;
+
+    if (preferences && typeof preferences === "object") {
+      user.preferences = {
+        ...user.preferences,
+        ...preferences,
+      };
+    }
+
     if (email && email !== user.email) {
       const existing = await User.findOne({ email });
       if (existing) {

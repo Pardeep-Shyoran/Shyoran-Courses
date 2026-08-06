@@ -517,21 +517,30 @@
 
 .timelineWrapper {
   position: relative;
-  padding: 20px 10px 10px 10px;
+  padding: 10px 0;
   overflow-x: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
 
+.nodesContainer {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  min-width: 900px;
+  gap: 12px;
+  padding: 10px 0;
+}
+
 .timelineTrack {
   position: absolute;
-  top: 42px;
-  left: 30px;
-  right: 30px;
+  top: 31px; /* 48px circle height / 2 (24px) + 10px container top padding - 3px line height half = 31px */
+  left: 24px; /* Center of 1st node circle (48px / 2 = 24px) */
+  right: 24px; /* Center of last node circle (48px / 2 = 24px) */
   height: 6px;
   background: var(--border-color);
   border-radius: 99px;
-  z-index: 1;
+  z-index: 0;
 }
 
 .timelineProgressFill {
@@ -542,16 +551,9 @@
   box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
 }
 
-.nodesContainer {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  min-width: 900px;
-  gap: 12px;
-}
-
 .milestoneNode {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

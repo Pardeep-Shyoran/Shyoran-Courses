@@ -599,6 +599,7 @@ const CoursePlayer = () => {
                 handleToggleWatched={handleToggleWatched}
                 handleEnroll={handleEnroll}
                 iframeRef={playerIframeRef}
+                playbackSpeed={user?.preferences?.playbackSpeed || 1}
               />
 
               {/* Workstation Tab Headers */}
