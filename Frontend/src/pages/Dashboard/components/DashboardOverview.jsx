@@ -32,7 +32,11 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }
     .toUpperCase()
 
   const handleQuickImportSelect = (url) => {
-    navigate('/courses?tab=add')
+    if (url) {
+      navigate(`/courses?tab=add&playlistUrl=${encodeURIComponent(url)}`)
+    } else {
+      navigate('/courses?tab=add')
+    }
   }
 
   // Milestone calculation for 365-Day Year Streak System

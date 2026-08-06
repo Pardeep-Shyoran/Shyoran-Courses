@@ -134,7 +134,74 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
   }
 }
 
-export async function scrapePlaylist(playlistId) {
+async function fetchSingleVideo(videoId) {
+  const apiKey = config.YOUTUBE_API_KEY;
+  let title = "Git & GitHub Tutorial For Beginners";
+  let description = "Complete Git and GitHub tutorial video lesson.";
+  let thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  let duration = "";
+
+  if (apiKey) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${apiKey}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.items && data.items.length > 0) {
+          const item = data.items[0];
+          title = item.snippet?.title || title;
+          description = item.snippet?.description || description;
+          thumbnail = item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || thumbnail;
+          if (item.contentDetails?.duration) {
+            duration = parseISODuration(item.contentDetails.duration);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Single video API fetch error:", e.message);
+    }
+  } else {
+    try {
+      const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      if (oembedRes.ok) {
+        const oembedData = await oembedRes.json();
+        if (oembedData.title) title = oembedData.title;
+        if (oembedData.thumbnail_url) thumbnail = oembedData.thumbnail_url;
+      }
+    } catch (e) {
+      console.warn("Single video oEmbed fetch warning:", e.message);
+    }
+  }
+
+  return {
+    title,
+    description,
+    thumbnail,
+    playlistId: "",
+    videos: [
+      {
+        title,
+        youtubeId: videoId,
+        duration,
+        completed: false,
+        notes: ""
+      }
+    ]
+  };
+}
+
+export async function scrapePlaylist(playlistIdInput) {
+  if (!playlistIdInput) throw new Error("No URL or ID provided.");
+
+  // Check if user input is a single video link rather than a playlist link
+  if (!playlistIdInput.includes("list=")) {
+    const singleVidId = extractVideoId(playlistIdInput);
+    if (singleVidId) {
+      return fetchSingleVideo(singleVidId);
+    }
+  }
+
+  const playlistId = extractPlaylistId(playlistIdInput);
+
   // If user has configured a Google API Key, use the official API
   const apiKey = config.YOUTUBE_API_KEY;
   if (apiKey) {

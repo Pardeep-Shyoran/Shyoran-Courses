@@ -1,88 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../../context/AuthContext'
+import { QUICK_IMPORT_PRESETS } from '../../../../data/quickImportPresets'
 import styles from './StartersSection.module.css'
 
 const categories = [
   { id: 'all', label: 'All Tracks' },
   { id: 'webdev', label: 'Web Dev' },
   { id: 'programming', label: 'Programming' },
-  { id: 'cs', label: 'Computer Science' }
-]
-
-const startersData = [
-  {
-    id: 'html-css',
-    title: 'HTML & CSS Foundations',
-    author: 'Net Ninja',
-    videosCount: 15,
-    duration: '6.5 hrs',
-    emoji: '🎯',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9ivBEEkowgQnPEpHHCIPgIp',
-    level: 'Beginner',
-    tag: 'Web Development',
-    category: 'webdev'
-  },
-  {
-    id: 'modern-js',
-    title: 'Modern JavaScript Bootcamp',
-    author: 'Net Ninja',
-    videosCount: 24,
-    duration: '11.2 hrs',
-    emoji: '💻',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9i9Ae2D9GoMYSpMkc4_1ui9',
-    level: 'Beginner - Inter',
-    tag: 'Programming',
-    category: 'programming'
-  },
-  {
-    id: 'react-hooks',
-    title: 'React & Hooks Masterclass',
-    author: 'Net Ninja',
-    videosCount: 30,
-    duration: '14.8 hrs',
-    emoji: '⚛️',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PL4cUxeGkcC9gZD-TkyM96M367ZoZoNmDX',
-    level: 'Intermediate',
-    tag: 'Frontend Eng',
-    category: 'webdev'
-  },
-  {
-    id: 'dsa',
-    title: 'Data Structures & Algorithms',
-    author: 'mycodeschool',
-    videosCount: 45,
-    duration: '18.5 hrs',
-    emoji: '📊',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PL2_aWCzGMAwI3W_yfNzCOIZ7Mx5oMaUtX',
-    level: 'All Levels',
-    tag: 'Computer Science',
-    category: 'cs'
-  },
-  {
-    id: 'nodejs-express',
-    title: 'Node.js & Express API',
-    author: 'Traversy Media',
-    videosCount: 22,
-    duration: '9.4 hrs',
-    emoji: '🟢',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PLillGF-RqqbdEw5zC3Yp4k-7O2D9c-j7d',
-    level: 'Intermediate',
-    tag: 'Backend Systems',
-    category: 'programming'
-  },
-  {
-    id: 'python-basics',
-    title: 'Python Core & Scripting',
-    author: 'Programming with Mosh',
-    videosCount: 28,
-    duration: '8.2 hrs',
-    emoji: '🐍',
-    playlistUrl: 'https://www.youtube.com/playlist?list=PLTjRvDozrdlxj5wgH4qkvwSOdHLOC6V1f',
-    level: 'Beginner',
-    tag: 'Programming',
-    category: 'programming'
-  }
+  { id: 'cs', label: 'Computer Science' },
+  { id: 'backend', label: 'Backend & AI' }
 ]
 
 const StartersSection = () => {
@@ -91,8 +18,8 @@ const StartersSection = () => {
   const [activeCategory, setActiveCategory] = useState('all')
 
   const filteredPlaylists = activeCategory === 'all' 
-    ? startersData 
-    : startersData.filter(item => item.category === activeCategory)
+    ? QUICK_IMPORT_PRESETS 
+    : QUICK_IMPORT_PRESETS.filter(item => item.category === activeCategory)
 
   const handleImport = (playlistUrl) => {
     if (token) {

@@ -741,6 +741,7 @@ const CoursePlayer = () => {
                 {activeTab === 'about' && (
                   <PlayerAboutTab 
                     course={course}
+                    activeVideo={activeVideo}
                   />
                 )}
 

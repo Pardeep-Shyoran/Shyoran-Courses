@@ -267,7 +267,7 @@ const PlayerAiTab = ({
             {summaryLoading && (
               <div className={styles.summaryLoadingState}>
                 <div className={styles.spinner}></div>
-                <p>Analyzing video content & generating clean topic-by-topic complete video notes with Gemini...</p>
+                <p>Analyzing video content & generating clean topic-by-topic complete video notes with Shyoran AI Tutor...</p>
               </div>
             )}
 
