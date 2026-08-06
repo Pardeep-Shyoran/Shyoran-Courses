@@ -88,7 +88,7 @@ const CommandPalette = ({ isOpen, setIsOpen }) => {
       category: 'Quick Links',
       title: 'Import New Playlist',
       subtitle: 'Convert a YouTube playlist link into an interactive course',
-      url: '/dashboard?tab=add-course',
+      url: '/courses?tab=add',
       type: 'link',
       badge: 'Action'
     },

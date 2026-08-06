@@ -3,6 +3,23 @@ import User from "../models/user.model.js";
 import Enrollment from "../models/enrollment.model.js";
 import StudyActivity from "../models/studyActivity.model.js";
 import Certificate from "../models/certificate.model.js";
+
+// Helpers for Indian Standard Time (IST - Asia/Kolkata) date string formatting
+function getISTDateStr(date = new Date()) {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(d);
+}
+
+function getPrevISTDateStr(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const prev = new Date(Date.UTC(y, m - 1, d - 1));
+  return prev.toISOString().split('T')[0];
+}
 import { extractPlaylistId, scrapePlaylist } from "../utils/youtubeScraper.js";
 
 // Helper function to merge enrollment progress and notes into a course object
@@ -275,7 +292,7 @@ export async function toggleVideoCompleted(req, res) {
       await enrollment.save();
 
       // Log study activity
-      const dateStr = new Date().toISOString().split('T')[0];
+      const dateStr = getISTDateStr();
       if (isCompletedNow) {
         await StudyActivity.findOneAndUpdate(
           { user: userId, course: courseId, type: "video_completed", videoId, dateStr },
@@ -344,7 +361,7 @@ export async function toggleVideoCompleted(req, res) {
     await course.save();
 
     // Log study activity
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = getISTDateStr();
     if (isCompletedNow) {
       await StudyActivity.findOneAndUpdate(
         { user: userId, course: courseId, type: "video_completed", videoId, dateStr },
@@ -436,7 +453,7 @@ export async function updateVideoNotes(req, res) {
 
       // Log study activity
       if (notes && notes.trim().length > 0) {
-        const dateStr = new Date().toISOString().split('T')[0];
+        const dateStr = getISTDateStr();
         await StudyActivity.findOneAndUpdate(
           { user: userId, course: courseId, type: "notes_updated", videoId, dateStr },
           { timestamp: new Date() },
@@ -464,7 +481,7 @@ export async function updateVideoNotes(req, res) {
 
     // Log study activity
     if (notes && notes.trim().length > 0) {
-      const dateStr = new Date().toISOString().split('T')[0];
+      const dateStr = getISTDateStr();
       await StudyActivity.findOneAndUpdate(
         { user: userId, course: courseId, type: "notes_updated", videoId, dateStr },
         { timestamp: new Date() },
@@ -625,7 +642,7 @@ export async function refreshCoursePlaylist(req, res) {
 export async function getStudyTrackerStats(req, res) {
   try {
     const userId = req.user._id;
-    const clientTodayStr = req.query.today || new Date().toISOString().split('T')[0];
+    const clientTodayStr = req.query.today || getISTDateStr();
 
     // 1. Dynamic backfill if user has 0 activities but has completed videos
     const count = await StudyActivity.countDocuments({ user: userId });
@@ -636,7 +653,7 @@ export async function getStudyTrackerStats(req, res) {
       for (const enrollment of enrollments) {
         for (const vp of enrollment.videoProgress || []) {
           if (vp.completed && vp.watchedAt) {
-            const dateStr = new Date(vp.watchedAt).toISOString().split('T')[0];
+            const dateStr = getISTDateStr(vp.watchedAt);
             activitiesToCreate.push({
               user: userId,
               course: enrollment.course,
@@ -653,7 +670,7 @@ export async function getStudyTrackerStats(req, res) {
       for (const course of ownedCourses) {
         for (const video of course.videos || []) {
           if (video.completed && video.watchedAt) {
-            const dateStr = new Date(video.watchedAt).toISOString().split('T')[0];
+            const dateStr = getISTDateStr(video.watchedAt);
             activitiesToCreate.push({
               user: userId,
               course: course._id,
@@ -712,23 +729,15 @@ export async function getStudyTrackerStats(req, res) {
     }
     longestStreak = Math.max(longestStreak, currentRun);
 
-    // Current streak relative to clientTodayStr
-    const clientToday = new Date(clientTodayStr);
-    const clientYesterday = new Date(clientToday);
-    clientYesterday.setDate(clientYesterday.getDate() - 1);
-    const clientYesterdayStr = clientYesterday.toISOString().split('T')[0];
+    // Current streak relative to clientTodayStr (IST midnight boundaries)
+    const clientYesterdayStr = getPrevISTDateStr(clientTodayStr);
 
     let currentStreak = 0;
     if (activeDatesSet.has(clientTodayStr) || activeDatesSet.has(clientYesterdayStr)) {
-      let checkDate = activeDatesSet.has(clientTodayStr) ? clientToday : clientYesterday;
-      while (true) {
-        const checkStr = checkDate.toISOString().split('T')[0];
-        if (activeDatesSet.has(checkStr)) {
-          currentStreak++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else {
-          break;
-        }
+      let checkStr = activeDatesSet.has(clientTodayStr) ? clientTodayStr : clientYesterdayStr;
+      while (activeDatesSet.has(checkStr)) {
+        currentStreak++;
+        checkStr = getPrevISTDateStr(checkStr);
       }
     }
 

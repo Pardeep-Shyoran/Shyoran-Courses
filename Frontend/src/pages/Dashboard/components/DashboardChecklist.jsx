@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getTodos, createTodo, toggleTodo, deleteTodo } from '../../../services/api'
+import { getISTDateStr } from '../../../utils/dateUtils'
 import DashboardTimetable from './DashboardTimetable'
 import styles from '../Dashboard.module.css'
 
@@ -73,7 +74,7 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
 
     const curDate = new Date(startDate)
     while (curDate <= today) {
-      const dateStr = curDate.toISOString().split('T')[0]
+      const dateStr = getISTDateStr(curDate)
       days.push({
         date: new Date(curDate),
         dateStr,

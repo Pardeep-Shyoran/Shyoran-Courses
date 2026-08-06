@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getCourses, deleteCourse, enrollInCourse } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
@@ -9,6 +9,7 @@ import CoursesHeader from './components/CoursesHeader'
 import CoursesTabs from './components/CoursesTabs'
 import CoursesToolbar from './components/CoursesToolbar'
 import CoursesCatalog from './components/CoursesCatalog'
+import CoursesAddTab from './components/CoursesAddTab'
 import styles from './Courses.module.css'
 
 const Courses = () => {
@@ -16,10 +17,31 @@ const Courses = () => {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const location = useLocation()
   
-  // Tabs: 'library' or 'explore'
-  const [activeMainTab, setActiveMainTab] = useState('explore')
+  // Tabs: 'library', 'explore', or 'add'
+  const [activeMainTab, setActiveMainTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')
+    if (tabParam === 'add' || tabParam === 'add-course') return 'add'
+    if (tabParam === 'library' || tabParam === 'courses') return 'library'
+    if (tabParam === 'explore') return 'explore'
+    return 'library'
+  })
   
+  // Sync tab with URL search params changes
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const tabParam = params.get('tab')
+    if (tabParam === 'add' || tabParam === 'add-course') {
+      setActiveMainTab('add')
+    } else if (tabParam === 'library' || tabParam === 'courses') {
+      setActiveMainTab('library')
+    } else if (tabParam === 'explore') {
+      setActiveMainTab('explore')
+    }
+  }, [location.search])
+
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'in-progress', 'completed'
@@ -37,7 +59,7 @@ const Courses = () => {
     const playlistUrlParam = params.get('playlistUrl')
     if (playlistUrlParam) {
       setInitialImportUrl(playlistUrlParam)
-      setShowImportModal(true)
+      setActiveMainTab('add')
       // Clear the url parameter to avoid popping up on manual page reload
       window.history.replaceState({}, document.title, window.location.pathname)
     }
@@ -84,7 +106,7 @@ const Courses = () => {
   }
 
   // Main Tabs Separation
-  const currentUserId = user?._id || user?.id;
+  const currentUserId = user?._id || user?.id
   const libraryCourses = courses.filter(course => course.user?._id === currentUserId)
   const exploreCourses = courses.filter(course => 
     course.user?._id !== currentUserId && 
@@ -120,6 +142,8 @@ const Courses = () => {
   return (
     <div className={styles.container}>
       <CoursesHeader 
+        activeMainTab={activeMainTab}
+        setActiveMainTab={setActiveMainTab}
         setShowImportModal={setShowImportModal}
         setShowCreateModal={setShowCreateModal}
       />
@@ -132,25 +156,35 @@ const Courses = () => {
         exploreCount={exploreCourses.length}
       />
 
-      <CoursesToolbar 
-        activeMainTab={activeMainTab}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filterType={filterType}
-        setFilterType={setFilterType}
-      />
+      {activeMainTab === 'add' ? (
+        <CoursesAddTab 
+          fetchCoursesList={fetchCoursesList}
+          setActiveMainTab={setActiveMainTab}
+          initialPresetUrl={initialImportUrl}
+        />
+      ) : (
+        <>
+          <CoursesToolbar 
+            activeMainTab={activeMainTab}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filterType={filterType}
+            setFilterType={setFilterType}
+          />
 
-      <CoursesCatalog 
-        loading={loading}
-        error={error}
-        filteredCourses={filteredCourses}
-        courses={courses}
-        currentUserId={currentUserId}
-        handleDeleteCourse={handleDeleteCourse}
-        handleEnrollCourse={handleEnrollCourse}
-        activeMainTab={activeMainTab}
-        setShowImportModal={setShowImportModal}
-      />
+          <CoursesCatalog 
+            loading={loading}
+            error={error}
+            filteredCourses={filteredCourses}
+            courses={courses}
+            currentUserId={currentUserId}
+            handleDeleteCourse={handleDeleteCourse}
+            handleEnrollCourse={handleEnrollCourse}
+            activeMainTab={activeMainTab}
+            setShowImportModal={() => setActiveMainTab('add')}
+          />
+        </>
+      )}
 
       {/* IMPORT YT PLAYLIST MODAL */}
       <Modal
@@ -164,6 +198,7 @@ const Courses = () => {
             setShowImportModal(false)
             setInitialImportUrl('')
             fetchCoursesList()
+            setActiveMainTab('library')
           }}
           onCancel={() => {
             setShowImportModal(false)
@@ -182,6 +217,7 @@ const Courses = () => {
           onSuccess={() => {
             setShowCreateModal(false)
             fetchCoursesList()
+            setActiveMainTab('library')
           }}
           onCancel={() => setShowCreateModal(false)}
         />
@@ -191,3 +227,4 @@ const Courses = () => {
 }
 
 export default Courses
+

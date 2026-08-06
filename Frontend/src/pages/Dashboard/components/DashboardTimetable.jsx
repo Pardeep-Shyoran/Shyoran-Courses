@@ -6,6 +6,7 @@ import {
   deleteTimetableSlot, 
   toggleTimetableSlotDate 
 } from '../../../services/api'
+import { getISTDateStr } from '../../../utils/dateUtils'
 import styles from './DashboardTimetable.module.css'
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -169,7 +170,7 @@ const DashboardTimetable = () => {
   }
 
   const handleToggleSlotCompletedToday = async (slotId) => {
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getISTDateStr()
     try {
       const updated = await toggleTimetableSlotDate(slotId, todayStr)
       setTimetableSlots(timetableSlots.map(s => s._id === slotId ? updated : s))
@@ -189,7 +190,7 @@ const DashboardTimetable = () => {
 
   // --- Helper Calculations ---
   const todayDayName = DAY_NAMES[now.getDay()]
-  const todayDateStr = now.toISOString().split('T')[0]
+  const todayDateStr = getISTDateStr(now)
 
   const isSlotActiveNow = (slot) => {
     if (!slot.daysOfWeek.includes(todayDayName)) return false

@@ -1,7 +1,8 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import styles from '../Dashboard.module.css'
 
-const DashboardHeader = ({ user, setActiveTab }) => {
+const DashboardHeader = ({ user }) => {
   if (!user) return null
 
   const initials = user.name
@@ -70,13 +71,13 @@ const DashboardHeader = ({ user, setActiveTab }) => {
           </div>
         </div>
         <div className={styles.headerActions}>
-          <button onClick={() => setActiveTab('add-course')} className={styles.btnPrimary}>
+          <Link to="/courses?tab=add" className={styles.btnPrimary}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             <span>Add Course</span>
-          </button>
+          </Link>
         </div>
       </div>
     </header>
@@ -84,3 +85,4 @@ const DashboardHeader = ({ user, setActiveTab }) => {
 }
 
 export default DashboardHeader
+

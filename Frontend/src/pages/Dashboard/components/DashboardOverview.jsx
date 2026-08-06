@@ -1,9 +1,10 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import QuickImportGrid from '../../../components/QuickImportGrid/QuickImportGrid'
 import styles from '../Dashboard.module.css'
 
-const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, handleLogout }) => {
+const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }) => {
+  const navigate = useNavigate()
   if (!user) return null
 
   // Calculate statistics
@@ -31,7 +32,7 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
     .toUpperCase()
 
   const handleQuickImportSelect = (url) => {
-    setActiveTab('add-course')
+    navigate('/courses?tab=add')
   }
 
   return (
@@ -132,9 +133,9 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
               <h2 className={styles.sectionTitle}>Ready to Study</h2>
               <div className={styles.emptyCourses}>
                 <p>Ready to start? Import a course or custom track to begin tracking your progress!</p>
-                <button onClick={() => setActiveTab('add-course')} className={styles.createCourseBtn}>
+                <Link to="/courses?tab=add" className={styles.createCourseBtn}>
                   ⚡ Quick Import a Course
-                </button>
+                </Link>
               </div>
             </section>
           )}
@@ -147,9 +148,9 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
             <section className={styles.recentSection}>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>Recent Course Progress</h2>
-                <button onClick={() => setActiveTab('courses')} className={styles.viewAllLink}>
+                <Link to="/courses?tab=library" className={styles.viewAllLink}>
                   View All Courses →
-                </button>
+                </Link>
               </div>
               
               <div className={styles.progressList}>
@@ -234,3 +235,4 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, setActiveTab, 
 }
 
 export default DashboardOverview
+

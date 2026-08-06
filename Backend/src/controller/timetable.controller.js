@@ -83,6 +83,16 @@ export const deleteTimetableSlot = async (req, res) => {
   }
 };
 
+function getISTDateStr(date = new Date()) {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(d);
+}
+
 // @desc    Toggle completion for a specific date (defaults to today 'YYYY-MM-DD')
 // @route   PATCH /api/timetable/:id/toggle
 export const toggleTimetableSlotDate = async (req, res) => {
@@ -90,7 +100,7 @@ export const toggleTimetableSlotDate = async (req, res) => {
     const { id } = req.params;
     const { dateStr } = req.body; // e.g. "2026-07-28"
 
-    const targetDateStr = dateStr || new Date().toISOString().split("T")[0];
+    const targetDateStr = dateStr || getISTDateStr();
 
     const slot = await Timetable.findOne({ _id: id, user: req.user._id });
     if (!slot) {

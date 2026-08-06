@@ -1,8 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import styles from '../Courses.module.css'
 
-const CoursesHeader = ({ setShowImportModal, setShowCreateModal }) => {
+const CoursesHeader = ({ activeMainTab, setActiveMainTab, setShowImportModal, setShowCreateModal }) => {
   return (
     <header className={styles.header}>
       {/* Subtle Torana Line Model Background */}
@@ -58,7 +57,10 @@ const CoursesHeader = ({ setShowImportModal, setShowCreateModal }) => {
           <p className={styles.pageSubtitle}>Import playlists, structure custom courses, and watch your skills grow.</p>
         </div>
         <div className={styles.actionBtns}>
-          <Link to="/dashboard?tab=courses" className={styles.myCoursesLinkBtn}>
+          <button 
+            className={`${styles.myCoursesLinkBtn} ${activeMainTab === 'library' ? styles.activeHeaderBtn : ''}`}
+            onClick={() => setActiveMainTab('library')}
+          >
             <svg
               width="16"
               height="16"
@@ -73,8 +75,8 @@ const CoursesHeader = ({ setShowImportModal, setShowCreateModal }) => {
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
             </svg>
             <span>My Enrolled Courses</span>
-          </Link>
-          <button className={styles.importBtn} onClick={() => setShowImportModal(true)}>
+          </button>
+          <button className={styles.importBtn} onClick={() => setActiveMainTab('add')}>
             <svg
               width="16"
               height="16"
@@ -114,3 +116,4 @@ const CoursesHeader = ({ setShowImportModal, setShowCreateModal }) => {
 }
 
 export default CoursesHeader
+

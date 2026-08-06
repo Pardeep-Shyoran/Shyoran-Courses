@@ -414,6 +414,74 @@
   gap: 24px;
 }
 
+/* Add & Import Course Container & Sub-tabs */
+.addCourseContainer {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  margin-top: 10px;
+}
+
+.paneHeader {
+  margin-bottom: 1.5rem;
+}
+
+.paneTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.paneSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.addCourseTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.addCourseTabBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+[data-theme="light"] .addCourseTabBtn {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.addCourseTabBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.activeAddCourseTab {
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 4px 12px rgba(226, 88, 62, 0.3);
+}
+
+.formWrapper {
+  margin-top: 1rem;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
@@ -432,4 +500,8 @@
   .searchWrapper {
     max-width: 100%;
   }
+  .addCourseTabs {
+    flex-direction: column;
+  }
 }
+

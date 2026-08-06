@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCourses, deleteCourse, getStudyTrackerStats } from '../../services/api'
+import { getISTDateStr, getPrevISTDateStr } from '../../utils/dateUtils'
 import { useAuth } from '../../context/AuthContext'
 import DashboardHeader from './components/DashboardHeader'
 import DashboardOverview from './components/DashboardOverview'
 import DashboardChecklist from './components/DashboardChecklist'
-import DashboardCourses from './components/DashboardCourses'
-import DashboardAddCourse from './components/DashboardAddCourse'
 import DashboardProfile from './components/DashboardProfile'
 import DashboardRewards from './components/DashboardRewards'
 import styles from './Dashboard.module.css'
@@ -22,19 +21,32 @@ const Dashboard = () => {
 
   const userId = authUser?._id || authUser?.id
 
-  // Tab State: 'overview', 'courses', 'checklist', 'rewards', 'add-course', 'profile'
+  // Tab State: 'overview', 'checklist', 'rewards', 'profile'
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search)
-    return params.get('tab') || 'overview'
+    const tabParam = params.get('tab')
+    if (tabParam === 'courses') {
+      navigate('/courses?tab=library', { replace: true })
+      return 'overview'
+    }
+    if (tabParam === 'add-course') {
+      navigate('/courses?tab=add', { replace: true })
+      return 'overview'
+    }
+    return tabParam || 'overview'
   })
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const tab = params.get('tab')
-    if (tab && ['overview', 'courses', 'checklist', 'rewards', 'add-course', 'profile'].includes(tab)) {
+    if (tab === 'courses') {
+      navigate('/courses?tab=library', { replace: true })
+    } else if (tab === 'add-course') {
+      navigate('/courses?tab=add', { replace: true })
+    } else if (tab && ['overview', 'checklist', 'rewards', 'profile'].includes(tab)) {
       setActiveTab(tab)
     }
-  }, [location.search])
+  }, [location.search, navigate])
 
   // Consistency Tracker state
   const [trackerStats, setTrackerStats] = useState(null)
@@ -50,7 +62,7 @@ const Dashboard = () => {
       setCourses(myCourses)
       
       setTrackerLoading(true)
-      const todayStr = new Date().toISOString().split('T')[0]
+      const todayStr = getISTDateStr()
       const trackerData = await getStudyTrackerStats(todayStr)
       setTrackerStats(trackerData)
     } catch (err) {
@@ -81,48 +93,28 @@ const Dashboard = () => {
     )
   }
 
-  // Calculate Study Streak
+  // Calculate Study Streak (using IST midnight boundaries)
   const calculateStreak = () => {
-    const watchDates = []
+    const watchDates = new Set()
     courses.forEach(course => {
       course.videos.forEach(v => {
         if (v.completed && v.watchedAt) {
-          const dateStr = new Date(v.watchedAt).toDateString()
-          if (!watchDates.includes(dateStr)) {
-            watchDates.push(dateStr)
-          }
+          watchDates.add(getISTDateStr(v.watchedAt))
         }
       })
     })
 
-    if (watchDates.length === 0) return 0
+    if (watchDates.size === 0) return 0
 
-    const parsedDates = watchDates.map(d => new Date(d)).sort((a, b) => b - a)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
+    const todayStr = getISTDateStr()
+    const yesterdayStr = getPrevISTDateStr(todayStr)
 
-    const latestDate = parsedDates[0]
-    latestDate.setHours(0, 0, 0, 0)
-
-    if (latestDate < yesterday) return 0
-
-    let streak = 1
-    let currentDate = latestDate
-
-    for (let i = 1; i < parsedDates.length; i++) {
-      const nextDate = parsedDates[i]
-      nextDate.setHours(0, 0, 0, 0)
-      
-      const diffTime = Math.abs(currentDate - nextDate)
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-      if (diffDays === 1) {
+    let streak = 0
+    if (watchDates.has(todayStr) || watchDates.has(yesterdayStr)) {
+      let checkStr = watchDates.has(todayStr) ? todayStr : yesterdayStr
+      while (watchDates.has(checkStr)) {
         streak++
-        currentDate = nextDate
-      } else if (diffDays > 1) {
-        break
+        checkStr = getPrevISTDateStr(checkStr)
       }
     }
 
@@ -178,22 +170,9 @@ const Dashboard = () => {
 
   const resumeTarget = getResumeTarget()
 
-  // Delete Course
-  const handleDeleteCourse = async (id, title) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"? All progress and notes will be permanently lost.`)) {
-      return
-    }
-    try {
-      await deleteCourse(id)
-      setCourses(courses.filter(c => c._id !== id))
-    } catch (err) {
-      alert(err.message || 'Failed to delete course.')
-    }
-  }
-
   return (
     <div className={styles.container}>
-      <DashboardHeader user={user} setActiveTab={setActiveTab} />
+      <DashboardHeader user={user} />
 
       {/* Dashboard Sub-Tabs Navbar */}
       <div className={styles.tabNavbarWrapper}>
@@ -209,18 +188,6 @@ const Dashboard = () => {
               <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
             <span>Overview</span>
-          </button>
-          
-          <button 
-            className={`${styles.tabBtn} ${activeTab === 'courses' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('courses')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-            <span>My Courses</span>
-            <span className={styles.tabCountBadge}>{courses.length}</span>
           </button>
 
           <button 
@@ -243,17 +210,6 @@ const Dashboard = () => {
               <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
             </svg>
             <span>Rewards & Certificates</span>
-          </button>
-
-          <button 
-            className={`${styles.tabBtn} ${activeTab === 'add-course' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('add-course')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span>Add Course</span>
           </button>
 
           <button 
@@ -285,7 +241,6 @@ const Dashboard = () => {
                 courses={courses}
                 streak={streak}
                 resumeTarget={resumeTarget}
-                setActiveTab={setActiveTab}
                 handleLogout={handleLogout}
               />
             )}
@@ -306,21 +261,6 @@ const Dashboard = () => {
               />
             )}
 
-            {activeTab === 'courses' && (
-              <DashboardCourses
-                courses={courses}
-                handleDeleteCourse={handleDeleteCourse}
-                setActiveTab={setActiveTab}
-              />
-            )}
-
-            {activeTab === 'add-course' && (
-              <DashboardAddCourse
-                fetchDashboardData={fetchDashboardData}
-                setActiveTab={setActiveTab}
-              />
-            )}
-
             {activeTab === 'profile' && (
               <DashboardProfile
                 user={user}
@@ -335,3 +275,4 @@ const Dashboard = () => {
 }
 
 export default Dashboard
+
