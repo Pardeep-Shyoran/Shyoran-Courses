@@ -180,3 +180,13 @@ export function toggleTimetableSlotDate(id, dateStr) {
   return request(`/timetable/${id}/toggle`, { method: 'PATCH', body: { dateStr } })
 }
 
+// Analytics & Insights endpoints
+export function getLearningAnalytics() {
+  return request('/analytics')
+}
+
+export function getAIStudyInsights() {
+  return request('/analytics/ai-insights')
+}
+
+

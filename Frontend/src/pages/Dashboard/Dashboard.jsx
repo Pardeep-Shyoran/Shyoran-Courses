@@ -5,6 +5,7 @@ import { getISTDateStr, getPrevISTDateStr } from '../../utils/dateUtils'
 import { useAuth } from '../../context/AuthContext'
 import DashboardHeader from './components/DashboardHeader'
 import DashboardOverview from './components/DashboardOverview'
+import DashboardAnalytics from './components/DashboardAnalytics'
 import DashboardChecklist from './components/DashboardChecklist'
 import DashboardProfile from './components/DashboardProfile'
 import DashboardRewards from './components/DashboardRewards'
@@ -43,7 +44,7 @@ const Dashboard = () => {
       navigate('/courses?tab=library', { replace: true })
     } else if (tab === 'add-course') {
       navigate('/courses?tab=add', { replace: true })
-    } else if (tab && ['overview', 'checklist', 'rewards', 'profile'].includes(tab)) {
+    } else if (tab && ['overview', 'analytics', 'checklist', 'rewards', 'profile'].includes(tab)) {
       setActiveTab(tab)
     }
   }, [location.search, navigate])
@@ -191,6 +192,18 @@ const Dashboard = () => {
           </button>
 
           <button 
+            className={`${styles.tabBtn} ${activeTab === 'analytics' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Learning Analytics</span>
+          </button>
+
+          <button 
             className={`${styles.tabBtn} ${activeTab === 'checklist' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('checklist')}
           >
@@ -243,6 +256,10 @@ const Dashboard = () => {
                 resumeTarget={resumeTarget}
                 handleLogout={handleLogout}
               />
+            )}
+
+            {activeTab === 'analytics' && (
+              <DashboardAnalytics />
             )}
 
             {activeTab === 'checklist' && (

@@ -270,3 +270,62 @@ ${transcriptText || "[No transcript available, base quiz on title]"}
   }
 }
 
+/**
+ * Generates personalized AI study insights based on user learning analytics.
+ * @param {object} analyticsData
+ * @returns {Promise<object>}
+ */
+export async function generateAIStudyInsights(analyticsData) {
+  if (!genAI) {
+    // Fallback if Gemini key is missing
+    const peak = analyticsData.peakTimeSlot || "Evening";
+    const topCat = analyticsData.topCategory || "General";
+    return {
+      headline: `⚡ Peak Performance Learner (${peak})`,
+      peakWindow: peak,
+      insightsText: `You show highest productivity during ${peak} hours. You've made solid progress in "${topCat}". Keep up your steady momentum!`,
+      recommendation: `Schedule your hardest topics during ${peak} to maximize comprehension and retention.`
+    };
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-3.1-flash-lite",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const prompt = `
+You are an expert AI Learning Coach. Analyze this student's learning analytics data and return personalized, encouraging study insights.
+
+Student Analytics Data:
+- Weekly Completed Lessons: ${analyticsData.currentWeekCompletions} (Vs Last Week: ${analyticsData.previousWeekCompletions})
+- Learning Velocity Trend: ${analyticsData.velocityChangePercent}%
+- Peak Study Window: ${analyticsData.peakTimeSlot}
+- Top Category Studied: ${analyticsData.topCategory}
+- Goal Adherence Rate: ${analyticsData.goalCompletionRate}%
+
+Return a JSON object with EXACTLY these keys:
+- "headline": Short catchy banner title (e.g. "⚡ Night Owl Deep Work Specialist!")
+- "peakWindow": Short string summarizing peak time (e.g. "Evening (6 PM - 10 PM)")
+- "insightsText": 2-3 sentence personalized evaluation of their weekly study velocity, habits, and momentum.
+- "recommendation": 1 actionable tip for their next study session.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    return JSON.parse(text);
+  } catch (err) {
+    console.warn("AI Study Insights fallback triggered:", err.message);
+    const peak = analyticsData.peakTimeSlot || "Evening";
+    const topCat = analyticsData.topCategory || "General";
+    return {
+      headline: `⚡ Consistent Momentum Learner`,
+      peakWindow: peak,
+      insightsText: `Your study data indicates peak learning activity during ${peak}. You have completed ${analyticsData.currentWeekCompletions} lessons recently, focusing on ${topCat}.`,
+      recommendation: `Keep breaking complex modules into 25-minute focused bursts during your ${peak} window.`
+    };
+  }
+}
+
+
