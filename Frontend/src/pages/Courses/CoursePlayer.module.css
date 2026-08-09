@@ -349,15 +349,17 @@
   align-items: center;
   background: var(--bg-tertiary);
   padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .viewModeBtns {
   display: flex;
   background: var(--bg-primary);
   padding: 3px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
 }
 
@@ -369,7 +371,7 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: var(--transition);
 }
 
@@ -381,12 +383,33 @@
   background: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
 .saveActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.notesActionBtn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.notesActionBtn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--primary-light);
 }
 
 .saveSuccessMsg {
@@ -408,7 +431,7 @@
   color: #111827;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
@@ -417,11 +440,51 @@
 
 .saveNotesBtn:hover {
   background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .saveNotesBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Editor Format Toolbar */
+.editorFormatBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.formatLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-right: 4px;
+}
+
+.editorFormatBar button {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.editorFormatBar button:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .editorWrapper {
@@ -430,20 +493,92 @@
 
 .notesTextarea {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-primary);
-  font-size: 0.885rem;
+  font-size: 0.9rem;
   font-family: inherit;
-  line-height: 1.6;
+  line-height: 1.65;
   resize: vertical;
+  min-height: 220px;
 }
 
 .notesTextarea:focus {
   border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15);
+}
+
+.markdownPreviewWrapper {
+  padding: 18px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  min-height: 220px;
+}
+
+/* Split Side-by-Side View */
+.splitViewContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-height: 380px;
+}
+
+@media (max-width: 900px) {
+  .splitViewContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.splitColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.splitHeader {
+  font-size: 0.8rem;
+  font-weight: 750;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.splitTextarea {
+  height: 100%;
+  min-height: 340px;
+}
+
+.splitPreviewWrapper {
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  height: 100%;
+  min-height: 340px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Stats Footer */
+.notesStatsFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+.statsDot {
+  opacity: 0.4;
 }
 
 /* Shared Markdown Rendering Styles */

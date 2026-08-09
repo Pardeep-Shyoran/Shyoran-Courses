@@ -31,13 +31,16 @@ export async function generateSummary(videoTitle, transcriptText) {
   let prompt = "";
   if (transcriptText && transcriptText.trim().length > 0) {
     prompt = `
-You are an elite educational AI assistant and expert note-taker. 
-Your task is to transform the provided YouTube video transcript into **AI Complete Step-by-Step Video Notes**. 
+You are an elite educational AI tutor and expert note-taker. 
+Your task is to transform the provided YouTube video transcript into **Simple, Easy-to-Understand Detailed Sequential Notes**. 
 
 CRITICAL DIRECTIVES:
-1. DO NOT INCLUDE timestamps (such as [01:23] or [MM:SS]). Focus purely on textbook-quality content, clean explanations, and structured layout.
-2. Ensure EVERY single topic and concept discussed in the video is fully covered topic-by-topic so a student can completely revise the video using these notes alone.
-3. Use clean Markdown with clear headings, bullet points, bold key terms, blockquotes for important tips, and syntax-highlighted code blocks.
+1. STRICT CONTENT FOCUS: Focus ONLY on creating comprehensive, detailed notes of the actual video content. DO NOT include extraneous meta information about the video (such as target audience overviews, executive summaries, reviews of the video, active recall quiz questions, or invented practice assignments).
+2. SIMPLE & EASY TO UNDERSTAND: Write in crystal-clear, beginner-friendly, simple language. Avoid dense academic jargon or overly complicated phrasing. Break down complex ideas into simple step-by-step explanations, bite-sized bullet points, and plain-English logic so anyone can master the material effortlessly.
+3. STRICT SEQUENCE: Present the notes in the EXACT chronological sequence that the concepts, steps, and topics are taught in the video transcript from beginning to end.
+4. NO TIMESTAMPS: Do NOT include timestamps (such as [01:23] or [MM:SS]). Focus purely on clean, highly readable layout.
+5. THOROUGH & COMPLETE: Ensure EVERY single concept, rule, formula, code snippet, or command discussed in the video is fully explained in simple terms step-by-step in sequence so a student can learn and revise the lesson using these notes alone.
+6. FORMATTING: Use clean Markdown with clear section headers, bullet points, bold key terms, blockquotes (> 💡 **Simple Takeaway:** ...), and syntax-highlighted code blocks with helpful comments.
 
 Video Title: "${videoTitle}"
 
@@ -46,70 +49,48 @@ Transcript text:
 ${transcriptText}
 """
 
-Please format your response strictly using Markdown with the following exact section headers (so automated section filtering works seamlessly):
+Please format your response strictly using Markdown with the following structured sequential layout:
 
-# 🎓 AI Complete Video Notes: ${videoTitle}
+# 🎓 Detailed Video Notes: ${videoTitle}
 
-## 📌 1. Executive Summary & Core Objectives
-- Write a 3-4 sentence comprehensive overview explaining the core theme, target audience, and key goals of this lesson.
-- List 3 primary learning outcomes.
+## 📋 1. Chronological Topic-by-Topic Detailed Notes
+Break down the video content into clear, logical sections strictly following the exact sequence of presentation from beginning to end.
+For EACH topic or step presented in the video, in exact chronological order:
+- Use a clear header: ### Section [Number]: [Topic Name]
+- Provide a simple, easy-to-understand, step-by-step detailed explanation of what was taught.
+- Include complete code snippets with clear comments, terminal commands, or structured bullet points as presented.
+- Use blockquotes (> 💡 **Simple Rule / Key Takeaway:** ...) highlighting essential rules in plain English.
 
-## 🎯 2. Essential Key Takeaways & Core Rules
-- Provide 4-6 high-impact bullet points summarizing the most critical rules, concepts, or formulas taught in this video.
+## 💡 2. Technical Terms & Definitions Glossary
+- Provide a clean Markdown table or definition list defining every technical term, command, function, or framework taught in the video using simple, beginner-friendly definitions in the order introduced.
 
-## 📋 3. Comprehensive Topic-by-Topic Breakdown
-Break down the video content into distinct, logical topics in sequential order. 
-For EACH topic discussed in the video:
-- Use a clear header: ### Topic: [Name of Topic]
-- Provide a thorough, step-by-step detailed explanation of what was taught under this topic.
-- Include complete code snippets, terminal commands, or structured bullet points.
-- Add a blockquote (> 💡 **Pro-Tip / Key Note:** ...) highlighting best practices or common pitfalls for this topic.
-
-## 💡 4. Technical Terms & Revision Cheat Sheet
-- Create a Markdown table or definition list defining every technical term, command, function, or framework mentioned in the video.
-
-## 🛠️ 5. Hands-on Practice & Code Exercises
-- Provide a practical hands-on challenge, code exercise, or self-directed project based directly on the video contents. Include complete code solutions or starter templates.
-
-## ❓ 6. Active Recall & Self-Check Questions
-- Provide 4 test-your-knowledge questions with answers to help students test their memory during revision.
-
-Tone: Clear, encouraging, textbook-quality, and extremely comprehensive.
+Tone: Simple, crystal-clear, encouraging, and strictly focused on the detailed video notes in exact sequence.
 `;
   } else {
     // Fallback if transcript isn't available
     prompt = `
-You are an expert educational AI tutor. The student requested complete video notes for "${videoTitle}", but video captions were not directly available.
+You are an expert educational AI tutor. The student requested detailed video notes for "${videoTitle}", but video captions were not directly available.
 
-Please generate a comprehensive, structured Markdown revision guide and topic-by-topic notes based *only* on the video title.
+Please generate simple, easy-to-understand, topic-by-topic sequential notes based *only* on the video title.
 
-DO NOT include timestamps. Ensure maximum clarity, code examples, and structured layout.
+STRICT DIRECTIVES:
+1. Focus strictly on simple, clear detailed notes for "${videoTitle}". Do NOT include self-check quizzes, video reviews, or invented assignments.
+2. Present the notes in a logical, step-by-step sequential learning order using simple language.
+3. DO NOT include timestamps. Ensure maximum clarity, code examples, and structured layout.
 
-# 🎓 AI Complete Video Notes: ${videoTitle}
+# 🎓 Detailed Video Notes: ${videoTitle}
 *(Generated based on topic & video title)*
 
-## 📌 1. Executive Summary & Core Objectives
-- Overview of expected concepts for "${videoTitle}".
+## 📋 1. Chronological Topic-by-Topic Detailed Notes
+- ### Section 1: Core Fundamentals & Setup
+  Simple explanations, key principles, and structured notes in plain English.
+- ### Section 2: Core Concepts & Step-by-Step Implementation
+  Clear explanations, commented code snippets, and key formulas.
+- ### Section 3: Advanced Concepts, Best Practices & Common Pitfalls
+  Easy-to-digest notes on advanced techniques and edge cases.
 
-## 🎯 2. Essential Key Takeaways & Core Rules
-- Key principles and foundational concepts to master.
-
-## 📋 3. Comprehensive Topic-by-Topic Breakdown
-- ### Topic: Foundational Setup & Architecture
-  Detailed explanations and best practices.
-- ### Topic: Core Implementation & Key Concepts
-  Full explanation and sample code blocks.
-- ### Topic: Advanced Techniques & Pitfalls
-  Common errors and how to avoid them.
-
-## 💡 4. Technical Terms & Revision Cheat Sheet
-- Technical definitions and quick reference terms.
-
-## 🛠️ 5. Hands-on Practice & Code Exercises
-- Practice exercise with step-by-step instructions.
-
-## ❓ 6. Active Recall & Self-Check Questions
-- 4 self-assessment revision questions with answers.
+## 💡 2. Technical Terms & Definitions Glossary
+- Simple technical definitions and quick reference glossary.
 `;
   }
 
