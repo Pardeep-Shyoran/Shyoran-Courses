@@ -621,11 +621,18 @@ const CoursePlayer = () => {
             <>
               <PlayerVideoSection 
                 activeVideo={activeVideo}
+                courseId={course?._id}
+                currentIndex={(() => {
+                  const idx = localVideos.findIndex(v => v._id === activeVideo?._id)
+                  return idx >= 0 ? idx + 1 : 1
+                })()}
+                totalVideos={localVideos.length || course?.videos?.length || 0}
                 isOwner={isOwner}
                 handleToggleWatched={handleToggleWatched}
                 handleEnroll={handleEnroll}
                 iframeRef={playerIframeRef}
                 playbackSpeed={user?.preferences?.playbackSpeed || 1}
+                handleSeek={handleSeek}
               />
 
               {/* Workstation Tab Headers */}

@@ -20,7 +20,7 @@ function getPrevISTDateStr(dateStr) {
   const prev = new Date(Date.UTC(y, m - 1, d - 1));
   return prev.toISOString().split('T')[0];
 }
-import { extractPlaylistId, scrapePlaylist } from "../utils/youtubeScraper.js";
+import { extractPlaylistId, scrapePlaylist, fetchVideoMeta } from "../utils/youtubeScraper.js";
 
 // Helper function to merge enrollment progress and notes into a course object
 function mergeEnrollmentProgress(course, enrollment, userId, user) {
@@ -602,6 +602,10 @@ export async function refreshCoursePlaylist(req, res) {
         // Update details but keep subdocument object & progress
         existing.title = sv.title;
         existing.duration = sv.duration;
+        if (sv.publishedAt) existing.publishedAt = sv.publishedAt;
+        if (sv.channelTitle) existing.channelTitle = sv.channelTitle;
+        if (sv.viewCount) existing.viewCount = sv.viewCount;
+        if (sv.description) existing.description = sv.description;
         updatedVideos.push(existing);
       } else {
         // New video found in the playlist
@@ -609,6 +613,10 @@ export async function refreshCoursePlaylist(req, res) {
           title: sv.title,
           youtubeId: sv.youtubeId,
           duration: sv.duration,
+          publishedAt: sv.publishedAt || null,
+          channelTitle: sv.channelTitle || "",
+          viewCount: sv.viewCount || "",
+          description: sv.description || "",
           completed: false,
           notes: ""
         });
@@ -749,6 +757,44 @@ export async function getStudyTrackerStats(req, res) {
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to load study tracker stats", error: error.message });
+  }
+}
+
+// Fetch single video details (upload date, channel, views, description, etc.) on demand
+export async function getVideoDetails(req, res) {
+  try {
+    const { youtubeId } = req.params;
+    if (!youtubeId) {
+      return res.status(400).json({ message: "YouTube video ID is required" });
+    }
+
+    const meta = await fetchVideoMeta(youtubeId);
+    if (!meta) {
+      return res.status(404).json({ message: "Video metadata not found" });
+    }
+
+    // Proactively persist details if user is viewing a course with this video and fields are missing
+    const { courseId } = req.query;
+    if (courseId && (meta.publishedAt || meta.channelTitle)) {
+      try {
+        const updateFields = {};
+        if (meta.publishedAt) updateFields["videos.$.publishedAt"] = meta.publishedAt;
+        if (meta.channelTitle) updateFields["videos.$.channelTitle"] = meta.channelTitle;
+        if (meta.viewCount) updateFields["videos.$.viewCount"] = meta.viewCount;
+        if (meta.description) updateFields["videos.$.description"] = meta.description;
+
+        await Course.updateOne(
+          { _id: courseId, "videos.youtubeId": youtubeId },
+          { $set: updateFields }
+        );
+      } catch (err) {
+        // Non-blocking update failure
+      }
+    }
+
+    res.json(meta);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch video details", error: error.message });
   }
 }
 

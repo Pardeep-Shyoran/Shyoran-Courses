@@ -79,40 +79,59 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
 
         const youtubeId = vSnippet.resourceId.videoId;
         let duration = vDetails?.duration ? parseISODuration(vDetails.duration) : "";
+        let publishedAt = vDetails?.videoPublishedAt || vSnippet?.publishedAt || null;
+        let channelTitle = vSnippet?.videoOwnerChannelTitle || playlistSnippet.channelTitle || "";
+        let description = vSnippet?.description || "";
 
         pageVideoIds.push(youtubeId);
         pageVideos.push({
           title: vTitle,
           youtubeId,
           duration,
+          publishedAt,
+          channelTitle,
+          viewCount: "",
+          description,
           completed: false,
           notes: ""
         });
       }
 
-      // If durations are missing (playlistItems API does not provide ISO duration), batch query videos API
-      const missingDurationIds = pageVideos.filter(v => !v.duration).map(v => v.youtubeId);
-      if (missingDurationIds.length > 0) {
+      // Batch query videos API for durations, upload dates, channel, views and descriptions
+      if (pageVideoIds.length > 0) {
         try {
-          const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${missingDurationIds.join(',')}&key=${apiKey}`);
+          const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${pageVideoIds.join(',')}&key=${apiKey}`);
           if (videoRes.ok) {
             const videoData = await videoRes.json();
-            const durationMap = new Map();
+            const videoMap = new Map();
             if (videoData.items) {
               for (const vItem of videoData.items) {
-                if (vItem.contentDetails?.duration) {
-                  durationMap.set(vItem.id, parseISODuration(vItem.contentDetails.duration));
-                }
+                videoMap.set(vItem.id, vItem);
               }
             }
             for (const v of pageVideos) {
-              if (!v.duration && durationMap.has(v.youtubeId)) {
-                v.duration = durationMap.get(v.youtubeId);
+              const vInfo = videoMap.get(v.youtubeId);
+              if (vInfo) {
+                if (vInfo.contentDetails?.duration) {
+                  v.duration = parseISODuration(vInfo.contentDetails.duration);
+                }
+                if (vInfo.snippet?.publishedAt) {
+                  v.publishedAt = vInfo.snippet.publishedAt;
+                }
+                if (vInfo.snippet?.channelTitle) {
+                  v.channelTitle = vInfo.snippet.channelTitle;
+                }
+                if (vInfo.snippet?.description) {
+                  v.description = vInfo.snippet.description;
+                }
+                if (vInfo.statistics?.viewCount) {
+                  v.viewCount = vInfo.statistics.viewCount;
+                }
               }
             }
           }
         } catch (err) {
-          console.warn("Batch video duration fetch warning:", err.message);
+          console.warn("Batch video details fetch warning:", err.message);
         }
       }
 
@@ -134,43 +153,125 @@ async function fetchFromOfficialApi(playlistId, apiKey) {
   }
 }
 
-async function fetchSingleVideo(videoId) {
+const videoMetaCache = new Map();
+
+export async function fetchVideoMeta(videoId) {
+  if (!videoId) return null;
+  if (videoMetaCache.has(videoId)) {
+    return videoMetaCache.get(videoId);
+  }
+
   const apiKey = config.YOUTUBE_API_KEY;
-  let title = "Git & GitHub Tutorial For Beginners";
-  let description = "Complete Git and GitHub tutorial video lesson.";
-  let thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-  let duration = "";
+  let meta = {
+    youtubeId: videoId,
+    title: "",
+    duration: "",
+    publishedAt: null,
+    channelTitle: "",
+    viewCount: "",
+    description: "",
+    thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+  };
 
   if (apiKey) {
     try {
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${apiKey}`);
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`);
       if (res.ok) {
         const data = await res.json();
         if (data.items && data.items.length > 0) {
           const item = data.items[0];
-          title = item.snippet?.title || title;
-          description = item.snippet?.description || description;
-          thumbnail = item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url || thumbnail;
+          meta.title = item.snippet?.title || "";
+          meta.publishedAt = item.snippet?.publishedAt || null;
+          meta.channelTitle = item.snippet?.channelTitle || "";
+          meta.description = item.snippet?.description || "";
+          meta.viewCount = item.statistics?.viewCount || "";
           if (item.contentDetails?.duration) {
-            duration = parseISODuration(item.contentDetails.duration);
+            meta.duration = parseISODuration(item.contentDetails.duration);
+          }
+          if (item.snippet?.thumbnails) {
+            meta.thumbnail = item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || meta.thumbnail;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("fetchVideoMeta API error:", err.message);
+    }
+  }
+
+  // Fallback to oEmbed if title or channelTitle are missing
+  if (!meta.title || !meta.channelTitle) {
+    try {
+      const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+      if (oembedRes.ok) {
+        const oData = await oembedRes.json();
+        if (!meta.title && oData.title) meta.title = oData.title;
+        if (!meta.channelTitle && oData.author_name) meta.channelTitle = oData.author_name;
+        if (oData.thumbnail_url) meta.thumbnail = oData.thumbnail_url;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Fallback to public YouTube watch page if publishedAt, viewCount or duration are still missing
+  if (!meta.publishedAt || !meta.duration || !meta.viewCount) {
+    try {
+      const pageRes = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept-Language": "en-US,en;q=0.9"
+        }
+      });
+      if (pageRes.ok) {
+        const html = await pageRes.text();
+        const dateMatch = html.match(/"datePublished":\s*"([^"]+)"/) || html.match(/"uploadDate":\s*"([^"]+)"/);
+        if (dateMatch && !meta.publishedAt) {
+          meta.publishedAt = dateMatch[1];
+        }
+        const channelMatch = html.match(/"ownerChannelName":\s*"([^"]+)"/) || html.match(/"author":\s*"([^"]+)"/);
+        if (channelMatch && !meta.channelTitle) {
+          meta.channelTitle = channelMatch[1];
+        }
+        const viewMatch = html.match(/"viewCount":\s*"(\d+)"/);
+        if (viewMatch && !meta.viewCount) {
+          meta.viewCount = viewMatch[1];
+        }
+        const lengthMatch = html.match(/"lengthSeconds":\s*"(\d+)"/);
+        if (lengthMatch && !meta.duration) {
+          const totalSec = parseInt(lengthMatch[1]);
+          const h = Math.floor(totalSec / 3600);
+          const m = Math.floor((totalSec % 3600) / 60);
+          const s = totalSec % 60;
+          if (h > 0) {
+            meta.duration = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+          } else {
+            meta.duration = `${m}:${s.toString().padStart(2, '0')}`;
+          }
+        }
+        const descMatch = html.match(/"shortDescription":\s*"((?:\\.|[^"\\])*)"/);
+        if (descMatch && !meta.description) {
+          try {
+            meta.description = JSON.parse(`"${descMatch[1]}"`);
+          } catch (e) {
+            meta.description = descMatch[1].replace(/\\n/g, '\n');
           }
         }
       }
     } catch (e) {
-      console.warn("Single video API fetch error:", e.message);
-    }
-  } else {
-    try {
-      const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
-      if (oembedRes.ok) {
-        const oembedData = await oembedRes.json();
-        if (oembedData.title) title = oembedData.title;
-        if (oembedData.thumbnail_url) thumbnail = oembedData.thumbnail_url;
-      }
-    } catch (e) {
-      console.warn("Single video oEmbed fetch warning:", e.message);
+      // ignore
     }
   }
+
+  videoMetaCache.set(videoId, meta);
+  return meta;
+}
+
+async function fetchSingleVideo(videoId) {
+  const meta = await fetchVideoMeta(videoId);
+  const title = meta.title || "Git & GitHub Tutorial For Beginners";
+  const description = meta.description || "Complete Git and GitHub tutorial video lesson.";
+  const thumbnail = meta.thumbnail || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  const duration = meta.duration || "";
 
   return {
     title,
@@ -182,6 +283,10 @@ async function fetchSingleVideo(videoId) {
         title,
         youtubeId: videoId,
         duration,
+        publishedAt: meta.publishedAt,
+        channelTitle: meta.channelTitle,
+        viewCount: meta.viewCount,
+        description: meta.description,
         completed: false,
         notes: ""
       }
@@ -284,11 +389,17 @@ export async function scrapePlaylist(playlistIdInput) {
         if (vTitle === "Private video" || vTitle === "Deleted video") continue;
         const youtubeId = v.videoId;
         const duration = v.lengthText?.simpleText || v.lengthText?.runs?.[0]?.text || "";
+        const channelTitle = v.shortBylineText?.runs?.[0]?.text || "";
+        const viewCount = v.videoInfo?.runs?.[0]?.text || "";
         
         videos.push({
           title: vTitle,
           youtubeId,
           duration,
+          publishedAt: null,
+          channelTitle,
+          viewCount,
+          description: "",
           completed: false,
           notes: ""
         });
@@ -350,11 +461,17 @@ export async function scrapePlaylist(playlistIdInput) {
             if (vTitle === "Private video" || vTitle === "Deleted video") continue;
             const youtubeId = v.videoId;
             const duration = v.lengthText?.simpleText || v.lengthText?.runs?.[0]?.text || "";
+            const channelTitle = v.shortBylineText?.runs?.[0]?.text || "";
+            const viewCount = v.videoInfo?.runs?.[0]?.text || "";
 
             videos.push({
               title: vTitle,
               youtubeId,
               duration,
+              publishedAt: null,
+              channelTitle,
+              viewCount,
+              description: "",
               completed: false,
               notes: ""
             });

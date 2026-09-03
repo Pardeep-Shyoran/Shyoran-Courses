@@ -1,14 +1,143 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getVideoDetails } from '../../../services/api'
 import styles from '../CoursePlayer.module.css'
+
+function formatDate(dateStr) {
+  if (!dateStr) return null
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return null
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  } catch {
+    return null
+  }
+}
+
+function formatViews(views) {
+  if (!views) return null
+  const num = typeof views === 'string' ? parseInt(views.replace(/,/g, ''), 10) : views
+  if (isNaN(num)) return views
+  if (num >= 1_000_000) {
+    return `${(num / 1_000_000).toFixed(1)}M`
+  }
+  if (num >= 1_000) {
+    return `${(num / 1_000).toFixed(1)}K`
+  }
+  return num.toLocaleString()
+}
+
+// Function to convert URLs and timestamps into interactive clickable elements
+function renderFormattedDescription(text, handleSeek, styles) {
+  if (!text) return null
+
+  // Regex to match URLs (http, https, www) or YouTube timestamps (hh:mm:ss or mm:ss)
+  const tokenRegex = /(https?:\/\/[^\s<>()]+|www\.[^\s<>()]+|\b(?:\d{1,2}:)?\d{1,2}:\d{2}\b)/gi
+  const lines = text.split('\n')
+
+  return lines.map((line, lineIdx) => {
+    const parts = []
+    let lastIndex = 0
+    let match
+
+    tokenRegex.lastIndex = 0
+
+    while ((match = tokenRegex.exec(line)) !== null) {
+      const matchText = match[0]
+      const matchStart = match.index
+
+      if (matchStart > lastIndex) {
+        parts.push(line.substring(lastIndex, matchStart))
+      }
+
+      // Check if URL
+      if (matchText.startsWith('http://') || matchText.startsWith('https://') || matchText.startsWith('www.')) {
+        let cleanUrl = matchText.replace(/[.,;)]+$/, '')
+        const trailingPunct = matchText.slice(cleanUrl.length)
+        const href = cleanUrl.startsWith('www.') ? `https://${cleanUrl}` : cleanUrl
+
+        parts.push(
+          <a
+            key={`link-${lineIdx}-${matchStart}`}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.descLink}
+            onClick={(e) => e.stopPropagation()}
+            title={href}
+          >
+            <span>{cleanUrl}</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '3px', display: 'inline-block', verticalAlign: 'middle' }}>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+        )
+        if (trailingPunct) {
+          parts.push(trailingPunct)
+        }
+      } 
+      // Check if timestamp (e.g. 02:15 or 1:12:30)
+      else if (handleSeek && /^(?:\d{1,2}:)?\d{1,2}:\d{2}$/.test(matchText)) {
+        const timeParts = matchText.split(':').map(Number)
+        let seconds = 0
+        if (timeParts.length === 3) {
+          seconds = timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2]
+        } else if (timeParts.length === 2) {
+          seconds = timeParts[0] * 60 + timeParts[1]
+        }
+
+        parts.push(
+          <button
+            key={`time-${lineIdx}-${matchStart}`}
+            type="button"
+            className={styles.timestampBtn}
+            onClick={() => handleSeek(seconds)}
+            title={`Jump to ${matchText}`}
+          >
+            ⏱️ {matchText}
+          </button>
+        )
+      } else {
+        parts.push(matchText)
+      }
+
+      lastIndex = tokenRegex.lastIndex
+    }
+
+    if (lastIndex < line.length) {
+      parts.push(line.substring(lastIndex))
+    }
+
+    return (
+      <div key={`line-${lineIdx}`} className={styles.descLine}>
+        {parts.length > 0 ? parts : <br />}
+      </div>
+    )
+  })
+}
 
 const PlayerVideoSection = ({ 
   activeVideo, 
+  courseId,
+  currentIndex,
+  totalVideos,
   isOwner, 
   handleToggleWatched, 
   handleEnroll, 
   iframeRef,
-  playbackSpeed = 1 
+  playbackSpeed = 1,
+  handleSeek
 }) => {
+  const [extraDetails, setExtraDetails] = useState(null)
+  const [loadingDetails, setLoadingDetails] = useState(false)
+  const [showDescription, setShowDescription] = useState(false)
+
+  // Manage iframe playback speed
   useEffect(() => {
     if (!iframeRef?.current || !activeVideo) return
 
@@ -38,6 +167,48 @@ const PlayerVideoSection = ({
     }
   }, [activeVideo, playbackSpeed, iframeRef])
 
+  // Fetch or sync video details (publishedAt, channelTitle, views, description)
+  useEffect(() => {
+    if (!activeVideo?.youtubeId) return
+
+    // Reset description toggle on video switch
+    setShowDescription(false)
+
+    // If activeVideo already has uploaded date or channel, initialize with it
+    const hasInitialMeta = Boolean(activeVideo.publishedAt || activeVideo.channelTitle)
+    if (hasInitialMeta) {
+      setExtraDetails({
+        publishedAt: activeVideo.publishedAt,
+        channelTitle: activeVideo.channelTitle,
+        viewCount: activeVideo.viewCount || '',
+        description: activeVideo.description || '',
+        duration: activeVideo.duration || ''
+      })
+    }
+
+    // Always attempt on-demand enrichment if missing publishedAt or channelTitle
+    if (!activeVideo.publishedAt || !activeVideo.channelTitle) {
+      let isCurrent = true
+      setLoadingDetails(true)
+      getVideoDetails(activeVideo.youtubeId, courseId)
+        .then(data => {
+          if (isCurrent && data) {
+            setExtraDetails(data)
+          }
+        })
+        .catch(err => {
+          console.warn("Video details enrichment warning:", err.message)
+        })
+        .finally(() => {
+          if (isCurrent) setLoadingDetails(false)
+        })
+
+      return () => {
+        isCurrent = false
+      }
+    }
+  }, [activeVideo?.youtubeId, activeVideo?.publishedAt, activeVideo?.channelTitle, courseId])
+
   if (!activeVideo) return null
 
   const handleIframeLoad = () => {
@@ -54,6 +225,15 @@ const PlayerVideoSection = ({
     }
   }
 
+  // Combined video metadata
+  const duration = extraDetails?.duration || activeVideo.duration || ''
+  const publishedAt = extraDetails?.publishedAt || activeVideo.publishedAt
+  const formattedDate = formatDate(publishedAt)
+  const channelTitle = extraDetails?.channelTitle || activeVideo.channelTitle
+  const viewCount = extraDetails?.viewCount || activeVideo.viewCount
+  const formattedViews = formatViews(viewCount)
+  const videoDescription = extraDetails?.description || activeVideo.description || ''
+
   return (
     <>
       {/* Iframe Video Player */}
@@ -69,28 +249,126 @@ const PlayerVideoSection = ({
         ></iframe>
       </div>
 
-      {/* Video Header & Quick Actions */}
+      {/* Video Header & Rich Metadata */}
       <div className={styles.videoHeader}>
-        <div>
+        <div className={styles.videoHeaderInfo}>
           <h1 className={styles.videoTitle}>{activeVideo.title}</h1>
-          <span className={styles.videoDurationBadge}>⏱️ Duration: {activeVideo.duration || 'N/A'}</span>
+          
+          {/* Metadata Chips Row */}
+          <div className={styles.videoMetaRow}>
+            {currentIndex != null && totalVideos != null && (
+              <span className={`${styles.metaChip} ${styles.metaChipLesson}`} title="Lesson order in course">
+                <span className={styles.metaChipIcon}>📚</span>
+                <span>Lesson {currentIndex} of {totalVideos}</span>
+              </span>
+            )}
+
+            {duration && (
+              <span className={`${styles.metaChip} ${styles.metaChipDuration}`} title="Duration">
+                <span className={styles.metaChipIcon}>⏱️</span>
+                <span>{duration}</span>
+              </span>
+            )}
+
+            {formattedDate && (
+              <span className={`${styles.metaChip} ${styles.metaChipDate}`} title={`Uploaded on ${formattedDate}`}>
+                <span className={styles.metaChipIcon}>📅</span>
+                <span>Uploaded {formattedDate}</span>
+              </span>
+            )}
+
+            {channelTitle && (
+              <span className={`${styles.metaChip} ${styles.metaChipChannel}`} title={`Creator: ${channelTitle}`}>
+                <span className={styles.metaChipIcon}>👤</span>
+                <span>{channelTitle}</span>
+              </span>
+            )}
+
+            {formattedViews && (
+              <span className={`${styles.metaChip} ${styles.metaChipViews}`} title="YouTube Views">
+                <span className={styles.metaChipIcon}>👁️</span>
+                <span>{formattedViews} views</span>
+              </span>
+            )}
+
+            {loadingDetails && !formattedDate && (
+              <span className={`${styles.metaChip} ${styles.metaChipLoading}`}>
+                <span className={styles.metaChipSpinner}>⏳</span>
+                <span>Loading video info...</span>
+              </span>
+            )}
+
+            {/* External YouTube Watch Link */}
+            <a 
+              href={`https://www.youtube.com/watch?v=${activeVideo.youtubeId}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={`${styles.metaChip} ${styles.metaChipYoutube}`}
+              title="Watch on YouTube"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+              <span>YouTube</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </a>
+
+            {/* Description toggle if video has description */}
+            {videoDescription && videoDescription.trim().length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowDescription(prev => !prev)}
+                className={`${styles.metaChip} ${styles.metaChipToggle} ${showDescription ? styles.activeToggle : ''}`}
+                title="Toggle video overview and description"
+              >
+                <span>📖 {showDescription ? 'Hide Overview' : 'Video Overview'}</span>
+                <span className={`${styles.accordionArrow} ${showDescription ? styles.arrowUp : ''}`}>▾</span>
+              </button>
+            )}
+          </div>
         </div>
-        {isOwner ? (
-          <button
-            onClick={(e) => handleToggleWatched(e, activeVideo._id)}
-            className={`${styles.toggleCompleteBtn} ${activeVideo.completed ? styles.completed : ''}`}
-          >
-            {activeVideo.completed ? '✅ Completed' : '⭕ Mark Completed'}
-          </button>
-        ) : (
-          <button
-            onClick={handleEnroll}
-            className={styles.toggleCompleteBtn}
-          >
-            🚀 Enroll to Track Progress
-          </button>
-        )}
+
+        {/* Completion / Enrollment Action */}
+        <div className={styles.videoHeaderActions}>
+          {isOwner ? (
+            <button
+              onClick={(e) => handleToggleWatched(e, activeVideo._id)}
+              className={`${styles.toggleCompleteBtn} ${activeVideo.completed ? styles.completed : ''}`}
+            >
+              {activeVideo.completed ? '✅ Completed' : '⭕ Mark Completed'}
+            </button>
+          ) : (
+            <button
+              onClick={handleEnroll}
+              className={styles.toggleCompleteBtn}
+            >
+              🚀 Enroll to Track Progress
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Collapsible Video Description / Overview Drawer */}
+      {showDescription && videoDescription && (
+        <div className={styles.videoDescDrawer}>
+          <div className={styles.videoDescHeader}>
+            <h5>Video Overview & Description</h5>
+            <button 
+              type="button" 
+              className={styles.closeDescBtn}
+              onClick={() => setShowDescription(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className={styles.videoDescContent}>
+            {renderFormattedDescription(videoDescription, handleSeek, styles)}
+          </div>
+        </div>
+      )}
     </>
   )
 }

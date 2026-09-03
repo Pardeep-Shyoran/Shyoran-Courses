@@ -46,11 +46,11 @@ function getLinkIcon(url) {
 const PlayerAboutTab = ({ course, activeVideo }) => {
   if (!course) return null
 
-  // Collect all links from course description & active video notes/description
+  // Collect all links from course description, active video description & notes
   const allExtractedLinks = useMemo(() => {
-    const combinedText = `${course.description || ''} ${activeVideo?.notes || ''}`
+    const combinedText = `${course.description || ''} ${activeVideo?.description || ''} ${activeVideo?.notes || ''}`
     return extractUrls(combinedText)
-  }, [course.description, activeVideo?.notes])
+  }, [course.description, activeVideo?.description, activeVideo?.notes])
 
   return (
     <div className={styles.aboutContainer}>
@@ -106,7 +106,19 @@ const PlayerAboutTab = ({ course, activeVideo }) => {
             <h4 className={styles.sectionSubtitle}>
               🎬 Current Section / Video Details
             </h4>
-            <span className={styles.activeVideoDurationBadge}>⏱️ {activeVideo.duration || 'N/A'}</span>
+            <div className={styles.activeVideoBadgesRow}>
+              <span className={styles.activeVideoDurationBadge}>⏱️ {activeVideo.duration || 'N/A'}</span>
+              {activeVideo.publishedAt && (
+                <span className={styles.activeVideoDateBadge}>
+                  📅 {new Date(activeVideo.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+              )}
+              {activeVideo.channelTitle && (
+                <span className={styles.activeVideoChannelBadge}>
+                  👤 {activeVideo.channelTitle}
+                </span>
+              )}
+            </div>
           </div>
           <h5 className={styles.activeVideoTitle}>{activeVideo.title}</h5>
           
@@ -123,6 +135,42 @@ const PlayerAboutTab = ({ course, activeVideo }) => {
               <span>Watch on YouTube</span>
             </a>
           </div>
+
+          {activeVideo.description && activeVideo.description.trim() && (
+            <div className={styles.activeVideoNotesContainer}>
+              <h6>Video Description:</h6>
+              <div className={styles.aboutMarkdown}>
+                <p style={{ whiteSpace: 'pre-line', margin: 0, fontSize: '0.85rem', lineHeight: '1.6' }}>
+                  {activeVideo.description.split(/(https?:\/\/[^\s<>()]+|www\.[^\s<>()]+)/gi).map((part, i) => {
+                    if (part.startsWith('http://') || part.startsWith('https://') || part.startsWith('www.')) {
+                      const cleanUrl = part.replace(/[.,;)]+$/, '')
+                      const trailingPunct = part.slice(cleanUrl.length)
+                      const href = cleanUrl.startsWith('www.') ? `https://${cleanUrl}` : cleanUrl
+                      return (
+                        <React.Fragment key={i}>
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.aboutLink}
+                          >
+                            <span>{cleanUrl}</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', display: 'inline-block', verticalAlign: 'middle' }}>
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                              <polyline points="15 3 21 3 21 9"></polyline>
+                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                          </a>
+                          {trailingPunct}
+                        </React.Fragment>
+                      )
+                    }
+                    return part
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
 
           {activeVideo.notes && activeVideo.notes.trim() && (
             <div className={styles.activeVideoNotesContainer}>

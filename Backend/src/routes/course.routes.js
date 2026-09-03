@@ -12,7 +12,8 @@ import {
   getPublicCourses,
   enrollCourse,
   getStudyTrackerStats,
-  refreshCoursePlaylist
+  refreshCoursePlaylist,
+  getVideoDetails
 } from "../controller/course.controller.js";
 
 const router = Router();
@@ -29,6 +30,9 @@ router.route("/")
 
 router.route("/import-playlist")
   .post(importPlaylistPreview);
+
+router.route("/video-details/:youtubeId")
+  .get(getVideoDetails);
 
 router.route("/stats/study-tracker")
   .get(getStudyTrackerStats);

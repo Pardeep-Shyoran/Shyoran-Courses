@@ -99,6 +99,11 @@ export function toggleVideoCompleted(courseId, videoId) {
   return request(`/courses/${courseId}/videos/${videoId}/toggle`, { method: 'PATCH' })
 }
 
+export function getVideoDetails(youtubeId, courseId = '') {
+  const query = courseId ? `?courseId=${courseId}` : ''
+  return request(`/courses/video-details/${youtubeId}${query}`)
+}
+
 export function updateVideoNotes(courseId, videoId, notes) {
   return request(`/courses/${courseId}/videos/${videoId}/notes`, { method: 'PATCH', body: { notes } })
 }
