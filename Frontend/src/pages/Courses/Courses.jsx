@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCourses, deleteCourse, enrollInCourse } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
@@ -10,6 +10,7 @@ import CoursesTabs from './components/CoursesTabs'
 import CoursesToolbar from './components/CoursesToolbar'
 import CoursesCatalog from './components/CoursesCatalog'
 import CoursesAddTab from './components/CoursesAddTab'
+import CoursesHeroResume from './components/CoursesHeroResume'
 import styles from './Courses.module.css'
 
 const Courses = () => {
@@ -42,10 +43,17 @@ const Courses = () => {
     }
   }, [location.search])
 
-  // Search, Filter & Sort state
+  // Search, Filter, Tag & Sort state
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'in-progress', 'completed', 'not-started'
   const [sortBy, setSortBy] = useState('newest') // 'newest', 'oldest', 'title-asc', 'title-desc', 'progress-desc', 'progress-asc', 'videos-desc', 'updated'
+  const [selectedTag, setSelectedTag] = useState('all')
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('courses_view_mode') || 'grid')
+
+  const handleSetViewMode = (mode) => {
+    setViewMode(mode)
+    localStorage.setItem('courses_view_mode', mode)
+  }
 
   // Modals state
   const [showImportModal, setShowImportModal] = useState(false)
@@ -106,13 +114,6 @@ const Courses = () => {
     }
   }
 
-  // Reset all filters & sorting
-  const handleResetFilters = () => {
-    setSearchQuery('')
-    setFilterType('all')
-    setSortBy('newest')
-  }
-
   // Main Tabs Separation
   const currentUserId = user?._id || user?.id
   const libraryCourses = courses.filter(course => course.user?._id === currentUserId)
@@ -123,8 +124,41 @@ const Courses = () => {
 
   const activeCoursesSet = activeMainTab === 'library' ? libraryCourses : exploreCourses
 
+  // Available topic tags across active courses
+  const availableTags = useMemo(() => {
+    const tagSet = new Set()
+    activeCoursesSet.forEach(c => {
+      if (Array.isArray(c.tags)) {
+        c.tags.forEach(t => {
+          if (t && t.trim()) tagSet.add(t.trim())
+        })
+      }
+      if (c.category && c.category.trim()) {
+        tagSet.add(c.category.trim())
+      }
+    })
+    return Array.from(tagSet)
+  }, [activeCoursesSet])
+
+  // Reset all filters, tags & sorting
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setFilterType('all')
+    setSortBy('newest')
+    setSelectedTag('all')
+  }
+
   // Filter computation
   const filteredCourses = activeCoursesSet.filter(course => {
+    // Topic tag filter
+    if (selectedTag !== 'all') {
+      const tagLower = selectedTag.toLowerCase()
+      const matchesTag = 
+        (course.tags && course.tags.some(t => t.toLowerCase() === tagLower)) ||
+        (course.category && course.category.toLowerCase() === tagLower)
+      if (!matchesTag) return false
+    }
+
     const q = searchQuery.trim().toLowerCase()
     const matchesSearch = 
       !q ||
@@ -189,7 +223,7 @@ const Courses = () => {
     }
   })
 
-  const hasActiveFilters = searchQuery.trim() !== '' || filterType !== 'all' || sortBy !== 'newest'
+  const hasActiveFilters = searchQuery.trim() !== '' || filterType !== 'all' || sortBy !== 'newest' || selectedTag !== 'all'
 
   return (
     <div className={styles.container}>
@@ -216,6 +250,10 @@ const Courses = () => {
         />
       ) : (
         <>
+          {activeMainTab === 'library' && (
+            <CoursesHeroResume libraryCourses={libraryCourses} />
+          )}
+
           <CoursesToolbar 
             activeMainTab={activeMainTab}
             searchQuery={searchQuery}
@@ -228,6 +266,11 @@ const Courses = () => {
             totalCount={activeCoursesSet.length}
             hasActiveFilters={hasActiveFilters}
             onResetFilters={handleResetFilters}
+            availableTags={availableTags}
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            viewMode={viewMode}
+            setViewMode={handleSetViewMode}
           />
 
           <CoursesCatalog 
@@ -242,6 +285,7 @@ const Courses = () => {
             setShowImportModal={() => setActiveMainTab('add')}
             hasActiveFilters={hasActiveFilters}
             onResetFilters={handleResetFilters}
+            viewMode={viewMode}
           />
         </>
       )}

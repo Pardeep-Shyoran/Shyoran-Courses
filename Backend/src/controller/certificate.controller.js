@@ -7,7 +7,7 @@ export async function getCertificates(req, res) {
     const certificates = await Certificate.find({ user: userId })
       .populate({
         path: "course",
-        select: "title thumbnail description videos",
+        select: "title thumbnail description videos channelTitle playlistId user",
       })
       .sort({ completedAt: -1 });
 
@@ -25,7 +25,7 @@ export async function getCertificateById(req, res) {
     // Search by certificateId first, then fallback to Mongoose ID
     let certificate = await Certificate.findOne({ certificateId: id })
       .populate("user", "name")
-      .populate("course", "title thumbnail description videos");
+      .populate("course", "title thumbnail description videos channelTitle playlistId user");
 
     if (!certificate) {
       // Check if it's a valid ObjectId

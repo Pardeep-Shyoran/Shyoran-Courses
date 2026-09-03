@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { 
   getCourseById, 
@@ -23,7 +23,9 @@ import PlayerAboutTab from './components/PlayerAboutTab'
 import PlayerSettingsTab from './components/PlayerSettingsTab'
 import styles from './CoursePlayer.module.css'
 import { launchConfetti } from '../../utils/confetti'
+import { calculateCourseDurations } from '../../utils/duration'
 import CertificateViewer from '../../components/Certificate/CertificateViewer'
+import KeyboardShortcutsModal from '../../components/KeyboardShortcutsModal/KeyboardShortcutsModal'
 
 const CoursePlayer = () => {
   const { user } = useAuth()
@@ -39,6 +41,43 @@ const CoursePlayer = () => {
   const [isReordering, setIsReordering] = useState(false)
   const [localVideos, setLocalVideos] = useState([])
   const [isReversed, setIsReversed] = useState(localStorage.getItem(`course_reversed_${id}`) === 'true')
+
+  // Theatre / Focus Mode
+  const [theatreMode, setTheatreMode] = useState(() => {
+    return localStorage.getItem('player_theatre_mode') === 'true'
+  })
+
+  const handleToggleTheatre = useCallback(() => {
+    setTheatreMode(prev => {
+      const nextVal = !prev
+      localStorage.setItem('player_theatre_mode', String(nextVal))
+      return nextVal
+    })
+  }, [])
+
+  // Autoplay Next
+  const [autoplayEnabled, setAutoplayEnabled] = useState(() => {
+    return localStorage.getItem('player_autoplay') !== 'false'
+  })
+
+  const handleToggleAutoplay = useCallback(() => {
+    setAutoplayEnabled(prev => {
+      const nextVal = !prev
+      localStorage.setItem('player_autoplay', String(nextVal))
+      return nextVal
+    })
+  }, [])
+
+  // Shortcuts modal
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false)
+
+  // Autoplay countdown state
+  const [countdownState, setCountdownState] = useState({
+    active: false,
+    secondsLeft: 5,
+    nextTitle: '',
+    targetVideo: null
+  })
 
   const getOrderedVideos = useCallback((rawVideos) => {
     if (!rawVideos) return []
@@ -176,22 +215,7 @@ const CoursePlayer = () => {
   const playerIframeRef = useRef(null)
   const [playerTime, setPlayerTime] = useState(0)
 
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (typeof event.data === 'string') {
-        try {
-          const data = JSON.parse(event.data)
-          if (data.event === 'infoDelivery' && data.info && typeof data.info.currentTime === 'number') {
-            setPlayerTime(data.info.currentTime)
-          }
-        } catch {
-          // Ignore
-        }
-      }
-    }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [])
+
 
   const handleSeek = (seconds) => {
     if (playerIframeRef.current && playerIframeRef.current.contentWindow) {
@@ -292,8 +316,38 @@ const CoursePlayer = () => {
     }
   }, [chatMessages, chatLoading])
 
+  // Toggle Video Watched status
+  const handleToggleWatched = useCallback(async (e, targetVideoId, forceCompleted = false) => {
+    if (e && e.stopPropagation) e.stopPropagation()
+    const targetVid = course?.videos?.find(v => v._id === targetVideoId)
+    if (forceCompleted && targetVid?.completed) {
+      return
+    }
+    try {
+      const updatedCourse = await toggleVideoCompleted(course._id, targetVideoId)
+      setCourse(updatedCourse)
+
+      // Update active video if it matches the toggled video
+      if (activeVideo && activeVideo._id === targetVideoId) {
+        const updatedVideo = updatedCourse.videos.find(v => v._id === targetVideoId)
+        setActiveVideo(updatedVideo)
+      }
+
+      // Check if a certificate was earned
+      if (updatedCourse?.earnedCertificate) {
+        setEarnedCert(updatedCourse.earnedCertificate)
+        launchConfetti()
+      }
+    } catch (err) {
+      console.error(err)
+      if (!forceCompleted) {
+        alert('Failed to update completion status.')
+      }
+    }
+  }, [course, activeVideo])
+
   // Handle active video selection
-  const selectVideo = (video, currentCourse) => {
+  const selectVideo = useCallback((video, currentCourse) => {
     setActiveVideo(video)
     setNoteContent(video.notes || '')
     setNoteSuccess(false)
@@ -317,7 +371,180 @@ const CoursePlayer = () => {
 
     // Update query params without reloading
     setSearchParams({ videoId: video._id })
-  }
+  }, [course, setSearchParams])
+
+  // Lesson Navigation: Prev / Next
+  const currentVideoIndex = activeVideo ? localVideos.findIndex(v => v._id === activeVideo._id) : -1
+  const hasPrev = currentVideoIndex > 0
+  const hasNext = currentVideoIndex >= 0 && currentVideoIndex < localVideos.length - 1
+
+  const handlePrevVideo = useCallback(() => {
+    if (hasPrev) {
+      selectVideo(localVideos[currentVideoIndex - 1], course)
+    }
+  }, [hasPrev, currentVideoIndex, localVideos, course, selectVideo])
+
+  const handleNextVideo = useCallback(() => {
+    if (hasNext) {
+      selectVideo(localVideos[currentVideoIndex + 1], course)
+    }
+  }, [hasNext, currentVideoIndex, localVideos, course, selectVideo])
+
+  // Autoplay Countdown handlers
+  const handleCancelCountdown = useCallback(() => {
+    setCountdownState({
+      active: false,
+      secondsLeft: 5,
+      nextTitle: '',
+      targetVideo: null
+    })
+  }, [])
+
+  const handleConfirmPlayNext = useCallback(() => {
+    if (countdownState.targetVideo) {
+      selectVideo(countdownState.targetVideo, course)
+    }
+    handleCancelCountdown()
+  }, [countdownState.targetVideo, course, selectVideo, handleCancelCountdown])
+
+  useEffect(() => {
+    if (!countdownState.active) return
+
+    if (countdownState.secondsLeft <= 0) {
+      handleConfirmPlayNext()
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setCountdownState(prev => ({
+        ...prev,
+        secondsLeft: prev.secondsLeft - 1
+      }))
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdownState.active, countdownState.secondsLeft, handleConfirmPlayNext])
+
+  // Cancel countdown when active video changes
+  useEffect(() => {
+    handleCancelCountdown()
+  }, [activeVideo?._id, handleCancelCountdown])
+
+  // Video Finished Trigger (from YouTube postMessage)
+  const handleVideoFinished = useCallback(() => {
+    if (!activeVideo) return
+    if (isOwner && !activeVideo.completed) {
+      handleToggleWatched(null, activeVideo._id, true)
+    }
+    if (autoplayEnabled && hasNext) {
+      const nextVid = localVideos[currentVideoIndex + 1]
+      setCountdownState({
+        active: true,
+        secondsLeft: 5,
+        nextTitle: nextVid.title,
+        targetVideo: nextVid
+      })
+    }
+  }, [activeVideo, isOwner, handleToggleWatched, autoplayEnabled, hasNext, localVideos, currentVideoIndex])
+
+  // YouTube Iframe PostMessage Listener for Time & Video End
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (typeof event.data === 'string') {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.event === 'infoDelivery' && data.info) {
+            if (typeof data.info.currentTime === 'number') {
+              setPlayerTime(data.info.currentTime)
+            }
+            if (data.info.playerState === 0) {
+              handleVideoFinished()
+            }
+          }
+          if (data.event === 'onStateChange' && data.info === 0) {
+            handleVideoFinished()
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [handleVideoFinished])
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const tag = e.target.tagName?.toUpperCase()
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
+        return
+      }
+
+      // '?' -> Toggle Shortcuts Guide
+      if (e.key === '?') {
+        e.preventDefault()
+        setShowShortcutsModal(prev => !prev)
+        return
+      }
+
+      // 'Shift + N' -> Next video
+      if (e.shiftKey && (e.key === 'N' || e.key === 'n')) {
+        e.preventDefault()
+        handleNextVideo()
+        return
+      }
+
+      // 'Shift + P' -> Previous video
+      if (e.shiftKey && (e.key === 'P' || e.key === 'p')) {
+        e.preventDefault()
+        handlePrevVideo()
+        return
+      }
+
+      // 'M' or 'm' -> Toggle watched
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'm' || e.key === 'M')) {
+        if (activeVideo && isOwner) {
+          e.preventDefault()
+          handleToggleWatched(null, activeVideo._id)
+        }
+        return
+      }
+
+      // 'F' or 'f' -> Toggle Focus / Theatre Mode
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault()
+        handleToggleTheatre()
+        return
+      }
+
+      // 'T' or 't' -> Jump to Notes
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 't' || e.key === 'T')) {
+        e.preventDefault()
+        setActiveTab('notes')
+        setTimeout(() => {
+          if (notesTextareaRef.current) {
+            notesTextareaRef.current.focus()
+          }
+        }, 100)
+        return
+      }
+
+      // 'Escape' -> Cancel Countdown & Close Modals
+      if (e.key === 'Escape') {
+        handleCancelCountdown()
+        setShowShortcutsModal(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleNextVideo, handlePrevVideo, activeVideo, isOwner, handleToggleWatched, handleToggleTheatre, handleCancelCountdown])
+
+  // Total and Remaining Course Duration Metrics
+  const courseDurations = useMemo(() => {
+    return calculateCourseDurations(course?.videos || [])
+  }, [course?.videos])
 
   // Get Video Summary using Gemini
   const handleGetSummary = async () => {
@@ -483,29 +710,7 @@ const CoursePlayer = () => {
     }
   }
 
-  // Toggle Video Watched status
-  const handleToggleWatched = async (e, targetVideoId) => {
-    e.stopPropagation() // Don't trigger play selection
-    try {
-      const updatedCourse = await toggleVideoCompleted(course._id, targetVideoId)
-      setCourse(updatedCourse)
 
-      // Update active video if it matches the toggled video
-      if (activeVideo && activeVideo._id === targetVideoId) {
-        const updatedVideo = updatedCourse.videos.find(v => v._id === targetVideoId)
-        setActiveVideo(updatedVideo)
-      }
-
-      // Check if a certificate was earned
-      if (updatedCourse?.earnedCertificate) {
-        setEarnedCert(updatedCourse.earnedCertificate)
-        launchConfetti()
-      }
-    } catch (err) {
-      console.error(err)
-      alert('Failed to update completion status.')
-    }
-  }
 
   // Save Notes handler
   const handleSaveNotes = async () => {
@@ -612,9 +817,12 @@ const CoursePlayer = () => {
         completedCount={completedCount}
         totalCount={totalCount}
         completionPercentage={completionPercentage}
+        totalDurationFormatted={courseDurations.totalFormatted}
+        remainingDurationFormatted={courseDurations.remainingFormatted}
+        onOpenShortcuts={() => setShowShortcutsModal(true)}
       />
 
-      <div className={styles.workspaceGrid}>
+      <div className={theatreMode ? styles.theatreWorkspaceGrid : styles.workspaceGrid}>
         {/* LEFT COLUMN: Player & Tabs Workstation */}
         <div className={styles.mainWorkstation}>
           {activeVideo ? (
@@ -622,10 +830,7 @@ const CoursePlayer = () => {
               <PlayerVideoSection 
                 activeVideo={activeVideo}
                 courseId={course?._id}
-                currentIndex={(() => {
-                  const idx = localVideos.findIndex(v => v._id === activeVideo?._id)
-                  return idx >= 0 ? idx + 1 : 1
-                })()}
+                currentIndex={currentVideoIndex >= 0 ? currentVideoIndex + 1 : 1}
                 totalVideos={localVideos.length || course?.videos?.length || 0}
                 isOwner={isOwner}
                 handleToggleWatched={handleToggleWatched}
@@ -633,6 +838,17 @@ const CoursePlayer = () => {
                 iframeRef={playerIframeRef}
                 playbackSpeed={user?.preferences?.playbackSpeed || 1}
                 handleSeek={handleSeek}
+                hasNext={hasNext}
+                hasPrev={hasPrev}
+                onNextVideo={handleNextVideo}
+                onPrevVideo={handlePrevVideo}
+                theatreMode={theatreMode}
+                onToggleTheatre={handleToggleTheatre}
+                autoplayEnabled={autoplayEnabled}
+                onToggleAutoplay={handleToggleAutoplay}
+                countdownState={countdownState}
+                onCancelCountdown={handleCancelCountdown}
+                onConfirmPlayNext={handleConfirmPlayNext}
               />
 
               {/* Workstation Tab Headers */}
@@ -796,6 +1012,8 @@ const CoursePlayer = () => {
           handleCancelReordering={handleCancelReordering}
           handleMoveVideo={handleMoveVideo}
           handleShowCertificate={handleShowCertificate}
+          totalDurationFormatted={courseDurations.totalFormatted}
+          remainingDurationFormatted={courseDurations.remainingFormatted}
         />
       </div>
 
@@ -806,6 +1024,11 @@ const CoursePlayer = () => {
           onClose={() => setEarnedCert(null)}
         />
       )}
+
+      <KeyboardShortcutsModal 
+        isOpen={showShortcutsModal}
+        onClose={() => setShowShortcutsModal(false)}
+      />
     </div>
   )
 }

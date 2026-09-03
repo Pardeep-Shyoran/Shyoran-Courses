@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styles from '../CoursePlayer.module.css'
 
 const PlayerSidebar = ({
@@ -20,12 +20,45 @@ const PlayerSidebar = ({
   handleSaveOrder,
   handleCancelReordering,
   handleMoveVideo,
-  handleShowCertificate
+  handleShowCertificate,
+  totalDurationFormatted = '',
+  remainingDurationFormatted = ''
 }) => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all') // 'all', 'unwatched', 'completed', 'notes'
+
+  const unwatchedCount = Math.max(0, totalCount - completedCount)
+  const notesCount = localVideos.filter(v => v.notes && v.notes.trim().length > 0).length
+
   const videosWithOriginalIndex = localVideos.map((vid, idx) => ({ ...vid, originalIndex: idx }))
-  const displayedVideos = isReversed && !isReordering 
+  
+  // Apply reverse if enabled
+  const orderedVideos = isReversed && !isReordering 
     ? [...videosWithOriginalIndex].reverse() 
     : videosWithOriginalIndex
+
+  // Apply search query and status filter
+  const displayedVideos = orderedVideos.filter(vid => {
+    // Search query match
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      const matchesTitle = vid.title.toLowerCase().includes(q)
+      const matchesIndex = (vid.originalIndex + 1).toString().includes(q)
+      if (!matchesTitle && !matchesIndex) return false
+    }
+
+    // Status filter match
+    if (statusFilter === 'unwatched') {
+      return !vid.completed
+    }
+    if (statusFilter === 'completed') {
+      return vid.completed
+    }
+    if (statusFilter === 'notes') {
+      return vid.notes && vid.notes.trim().length > 0
+    }
+    return true
+  })
 
   return (
     <aside className={styles.sidebarDirectory}>
@@ -58,6 +91,15 @@ const PlayerSidebar = ({
             <span>{completionPercentage}% Complete</span>
             <span>{completedCount}/{totalCount} videos</span>
           </div>
+
+          {totalDurationFormatted && (
+            <div className={styles.sidebarDurationRow}>
+              <span>Total: <strong>{totalDurationFormatted}</strong></span>
+              {remainingDurationFormatted && remainingDurationFormatted !== '0m' && (
+                <span>Left: <strong>{remainingDurationFormatted}</strong></span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Certificate Card */}
@@ -128,11 +170,98 @@ const PlayerSidebar = ({
             </div>
           )}
         </div>
+
+        {/* Search & Quick Filter (when not reordering) */}
+        {!isReordering && (
+          <>
+            <div className={styles.sidebarSearchWrap}>
+              <span className={styles.sidebarSearchIcon}>🔍</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search lessons..."
+                className={styles.sidebarSearchInput}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className={styles.sidebarSearchClear}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className={styles.sidebarFilterTabs}>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('all')}
+                className={`${styles.sidebarFilterPill} ${statusFilter === 'all' ? styles.activeFilterPill : ''}`}
+              >
+                <span>All</span>
+                <span className={styles.pillCount}>({totalCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('unwatched')}
+                className={`${styles.sidebarFilterPill} ${statusFilter === 'unwatched' ? styles.activeFilterPill : ''}`}
+              >
+                <span>Unwatched</span>
+                <span className={styles.pillCount}>({unwatchedCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('completed')}
+                className={`${styles.sidebarFilterPill} ${statusFilter === 'completed' ? styles.activeFilterPill : ''}`}
+              >
+                <span>Done</span>
+                <span className={styles.pillCount}>({completedCount})</span>
+              </button>
+              {notesCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('notes')}
+                  className={`${styles.sidebarFilterPill} ${statusFilter === 'notes' ? styles.activeFilterPill : ''}`}
+                >
+                  <span>Notes</span>
+                  <span className={styles.pillCount}>({notesCount})</span>
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className={styles.videoListWrapper}>
-        <ul className={`${styles.videoList} ${isReordering ? styles.reorderingList : ''}`}>
-          {displayedVideos.map((vid) => {
+        {displayedVideos.length === 0 ? (
+          <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.84rem' }}>
+            <p>No lessons match your current filter.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('')
+                setStatusFilter('all')
+              }}
+              style={{
+                marginTop: '8px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--primary-color)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                cursor: 'pointer'
+              }}
+            >
+              Reset Filter
+            </button>
+          </div>
+        ) : (
+          <ul className={`${styles.videoList} ${isReordering ? styles.reorderingList : ''}`}>
+            {displayedVideos.map((vid) => {
             const isActive = activeVideo && activeVideo._id === vid._id
             const hasNotes = vid.notes && vid.notes.trim().length > 0
 
@@ -211,6 +340,7 @@ const PlayerSidebar = ({
             )
           })}
         </ul>
+        )}
       </div>
     </aside>
   )

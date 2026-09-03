@@ -131,7 +131,18 @@ const PlayerVideoSection = ({
   handleEnroll, 
   iframeRef,
   playbackSpeed = 1,
-  handleSeek
+  handleSeek,
+  hasNext = false,
+  hasPrev = false,
+  onNextVideo,
+  onPrevVideo,
+  theatreMode = false,
+  onToggleTheatre,
+  autoplayEnabled = true,
+  onToggleAutoplay,
+  countdownState = null,
+  onCancelCountdown,
+  onConfirmPlayNext
 }) => {
   const [extraDetails, setExtraDetails] = useState(null)
   const [loadingDetails, setLoadingDetails] = useState(false)
@@ -331,25 +342,114 @@ const PlayerVideoSection = ({
           </div>
         </div>
 
-        {/* Completion / Enrollment Action */}
+        {/* Actions & Navigation Toolbar */}
         <div className={styles.videoHeaderActions}>
-          {isOwner ? (
-            <button
-              onClick={(e) => handleToggleWatched(e, activeVideo._id)}
-              className={`${styles.toggleCompleteBtn} ${activeVideo.completed ? styles.completed : ''}`}
-            >
-              {activeVideo.completed ? '✅ Completed' : '⭕ Mark Completed'}
-            </button>
-          ) : (
-            <button
-              onClick={handleEnroll}
-              className={styles.toggleCompleteBtn}
-            >
-              🚀 Enroll to Track Progress
-            </button>
-          )}
+          {/* Main Action Row: Prev, Complete, Next */}
+          <div className={styles.actionControlsRow}>
+            {onPrevVideo && (
+              <button
+                type="button"
+                onClick={onPrevVideo}
+                disabled={!hasPrev}
+                className={styles.lessonNavBtn}
+                title="Previous video lesson (Shift + P)"
+              >
+                <span>⏮</span>
+                <span>Prev</span>
+              </button>
+            )}
+
+            {isOwner ? (
+              <button
+                onClick={(e) => handleToggleWatched(e, activeVideo._id)}
+                className={`${styles.toggleCompleteBtn} ${activeVideo.completed ? styles.completed : ''}`}
+                title="Mark video as completed (M)"
+              >
+                {activeVideo.completed ? '✅ Completed' : '⭕ Mark Completed'}
+              </button>
+            ) : (
+              <button
+                onClick={handleEnroll}
+                className={styles.toggleCompleteBtn}
+              >
+                🚀 Enroll to Track
+              </button>
+            )}
+
+            {onNextVideo && (
+              <button
+                type="button"
+                onClick={onNextVideo}
+                disabled={!hasNext}
+                className={`${styles.lessonNavBtn} ${hasNext ? styles.lessonNavBtnPrimary : ''}`}
+                title="Next video lesson (Shift + N)"
+              >
+                <span>Next</span>
+                <span>⏭</span>
+              </button>
+            )}
+          </div>
+
+          {/* Secondary Controls: Autoplay switch & Focus Mode */}
+          <div className={styles.actionControlsRow}>
+            {onToggleAutoplay && (
+              <label 
+                className={styles.autoplaySwitchLabel} 
+                title="Automatically advance to the next lesson when video ends"
+                onClick={(e) => {
+                  e.preventDefault()
+                  onToggleAutoplay()
+                }}
+              >
+                <span>Autoplay</span>
+                <div className={`${styles.switchTrack} ${autoplayEnabled ? styles.switchTrackActive : ''}`}>
+                  <div className={styles.switchThumb} />
+                </div>
+              </label>
+            )}
+
+            {onToggleTheatre && (
+              <button
+                type="button"
+                onClick={onToggleTheatre}
+                className={`${styles.iconControlBtn} ${theatreMode ? styles.activeControl : ''}`}
+                title="Toggle Focus / Theatre Mode (F)"
+              >
+                <span>{theatreMode ? '🗗 Standard' : '🎭 Focus Mode'}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Autoplay Next Countdown Banner */}
+      {countdownState?.active && (
+        <div className={styles.autoplayCountdownBanner}>
+          <div className={styles.autoplayCountdownInfo}>
+            <span className={styles.countdownSpinner}>{countdownState.secondsLeft}</span>
+            <div>
+              <span>Next lesson starting in <strong>{countdownState.secondsLeft}s</strong>:</span>
+              <div className={styles.countdownNextTitle}>{countdownState.nextTitle}</div>
+            </div>
+          </div>
+          <div className={styles.autoplayActions}>
+            <button 
+              type="button" 
+              onClick={onCancelCountdown} 
+              className={styles.cancelCountdownBtn}
+            >
+              Cancel
+            </button>
+            <button 
+              type="button" 
+              onClick={onConfirmPlayNext} 
+              className={styles.playNextNowBtn}
+            >
+              Play Now ⏭
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Collapsible Video Description / Overview Drawer */}
       {showDescription && videoDescription && (

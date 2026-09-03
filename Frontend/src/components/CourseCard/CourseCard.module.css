@@ -245,3 +245,161 @@
   border-color: #ef4444;
   color: #ffffff;
 }
+
+/* Secondary Action Icon Buttons (Share & Export) */
+.actionIconBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionIconBtn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.copiedToast {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease;
+}
+
+/* Course Tags Row */
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.cardTag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  padding: 2px 7px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+/* List Mode Layout (Horizontal Row) */
+.cardListMode {
+  flex-direction: row;
+  align-items: center;
+  padding: 14px 18px;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .cardListMode {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+  }
+}
+
+.listThumbnailWrapper {
+  position: relative;
+  width: 180px;
+  height: 101px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+}
+
+@media (max-width: 768px) {
+  .listThumbnailWrapper {
+    width: 100%;
+    height: 180px;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+.listThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .listContent {
+    padding: 16px;
+  }
+}
+
+.listTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listDescription {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.listFooter {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 990px) {
+  .listFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.listProgressWrap {
+  width: 160px;
+}
+
+@media (max-width: 768px) {
+  .listProgressWrap {
+    width: 100%;
+  }
+}

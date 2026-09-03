@@ -13,7 +13,8 @@ const CoursesCatalog = ({
   activeMainTab,
   setShowImportModal,
   hasActiveFilters,
-  onResetFilters
+  onResetFilters,
+  viewMode = 'grid'
 }) => {
   if (loading && courses.length === 0) {
     return (
@@ -84,7 +85,7 @@ const CoursesCatalog = ({
   }
 
   return (
-    <div className={styles.coursesGrid}>
+    <div className={viewMode === 'list' ? styles.coursesList : styles.coursesGrid}>
       {filteredCourses.map(course => {
         // Check if student is already enrolled in this explore course
         const enrolledCourseId = courses.find(c => 
@@ -101,6 +102,7 @@ const CoursesCatalog = ({
             enrolledCourseId={enrolledCourseId}
             onDelete={handleDeleteCourse}
             onEnroll={handleEnrollCourse}
+            viewMode={viewMode}
           />
         )
       })}

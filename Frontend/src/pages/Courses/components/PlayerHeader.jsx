@@ -8,7 +8,10 @@ const PlayerHeader = ({
   handleEnroll, 
   completedCount = 0, 
   totalCount = 0, 
-  completionPercentage = 0 
+  completionPercentage = 0,
+  totalDurationFormatted = '',
+  remainingDurationFormatted = '',
+  onOpenShortcuts
 }) => {
   const navigate = useNavigate()
   if (!course) return null
@@ -44,6 +47,18 @@ const PlayerHeader = ({
           </svg>
           <span className={styles.playerBreadcrumbCurrent}>{course.title}</span>
         </nav>
+
+        {onOpenShortcuts && (
+          <button
+            onClick={onOpenShortcuts}
+            className={styles.iconControlBtn}
+            style={{ marginLeft: 'auto' }}
+            title="View keyboard shortcuts (?)"
+          >
+            <span>⌨️</span>
+            <span>Shortcuts</span>
+          </button>
+        )}
       </div>
 
       {/* Course Context & Progress Bar Header */}
@@ -53,6 +68,12 @@ const PlayerHeader = ({
           <div className={styles.playerBadges}>
             {course.category && (
               <span className={styles.categoryTag}>{course.category}</span>
+            )}
+            {totalDurationFormatted && (
+              <span className={styles.courseDurationPill} title="Total course duration">
+                <span>⏱️</span>
+                <span>{totalDurationFormatted} total</span>
+              </span>
             )}
             {isFullyCompleted && (
               <span className={styles.completedCertBadge}>
@@ -66,7 +87,10 @@ const PlayerHeader = ({
         <div className={styles.playerProgressBox}>
           <div className={styles.progressLabelRow}>
             <span className={styles.progressStatsText}>
-              <strong>{completedCount}</strong> of <strong>{totalCount}</strong> Lessons Completed
+              <strong>{completedCount}</strong> of <strong>{totalCount}</strong> Lessons
+              {remainingDurationFormatted && remainingDurationFormatted !== '0m' && (
+                <span> ({remainingDurationFormatted} left)</span>
+              )}
             </span>
             <span className={styles.progressPercentNum}>{completionPercentage}%</span>
           </div>

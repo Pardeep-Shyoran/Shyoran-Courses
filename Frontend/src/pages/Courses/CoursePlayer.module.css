@@ -200,6 +200,14 @@
   grid-template-columns: minmax(0, 1fr) 390px;
   gap: 32px;
   align-items: start;
+  transition: all 0.3s ease;
+}
+
+.theatreWorkspaceGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
 }
 
 .mainWorkstation {
@@ -245,8 +253,347 @@
 }
 
 .videoHeaderActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
   flex-shrink: 0;
-  margin-top: 2px;
+}
+
+.actionControlsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.lessonNavBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.lessonNavBtn:hover:not(:disabled) {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.lessonNavBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lessonNavBtnPrimary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.lessonNavBtnPrimary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #ffffff;
+}
+
+.iconControlBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 11px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.iconControlBtn:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.iconControlBtn.activeControl {
+  background: rgba(226, 88, 62, 0.14);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Autoplay toggle switch */
+.autoplaySwitchLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.switchTrack {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  transition: var(--transition);
+}
+
+[data-theme="light"] .switchTrack {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.switchTrack.switchTrackActive {
+  background: var(--primary-color);
+}
+
+.switchThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.switchTrackActive .switchThumb {
+  transform: translateX(14px);
+}
+
+/* Autoplay countdown banner */
+.autoplayCountdownBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(226, 88, 62, 0.18) 0%, rgba(234, 158, 36, 0.12) 100%);
+  border: 1px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin: 14px 24px 0 24px;
+  gap: 16px;
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.autoplayCountdownInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.countdownSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.88rem;
+  box-shadow: 0 0 12px rgba(226, 88, 62, 0.6);
+  flex-shrink: 0;
+}
+
+.countdownNextTitle {
+  font-weight: 700;
+  color: var(--warning);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.autoplayActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cancelCountdownBtn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cancelCountdownBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.playNextNowBtn {
+  background: var(--primary-color);
+  border: none;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.playNextNowBtn:hover {
+  background: var(--primary-hover);
+}
+
+/* Sidebar Search and Filter controls */
+.sidebarSearchWrap {
+  position: relative;
+  margin-top: 14px;
+  margin-bottom: 10px;
+}
+
+.sidebarSearchInput {
+  width: 100%;
+  padding: 8px 30px 8px 30px;
+  font-size: 0.82rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  transition: var(--transition);
+  font-family: var(--font-sans);
+}
+
+.sidebarSearchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15);
+}
+
+.sidebarSearchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+.sidebarSearchClear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.sidebarSearchClear:hover {
+  color: var(--text-primary);
+}
+
+.sidebarFilterTabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+
+.sidebarFilterTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebarFilterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.sidebarFilterPill:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.sidebarFilterPill.activeFilterPill {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.pillCount {
+  opacity: 0.8;
+  font-size: 0.7rem;
+}
+
+/* Course Duration Pills */
+.courseDurationPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  background: rgba(234, 158, 36, 0.12);
+  border: 1px solid rgba(234, 158, 36, 0.3);
+  color: var(--warning);
+}
+
+.sidebarDurationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-color);
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+}
+
+.sidebarDurationRow strong {
+  color: var(--text-primary);
 }
 
 .videoTitle {

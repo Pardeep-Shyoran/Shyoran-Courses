@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
+import { exportCourseSyllabus } from '../../../utils/syllabusExport'
 import styles from '../CoursePlayer.module.css'
 
 // Helper function to extract valid URLs from markdown/raw text
@@ -56,12 +57,25 @@ const PlayerAboutTab = ({ course, activeVideo }) => {
     <div className={styles.aboutContainer}>
       {/* Course Header & Title */}
       <div className={styles.aboutHeaderSection}>
-        <h3 className={styles.aboutTitle}>{course.title}</h3>
-        {course.user && (
-          <p className={styles.aboutAuthorInfo}>
-            👤 Created by <strong>{course.user.name || 'Instructor'}</strong>
-          </p>
-        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
+          <div>
+            <h3 className={styles.aboutTitle}>{course.title}</h3>
+            {course.user && (
+              <p className={styles.aboutAuthorInfo}>
+                👤 Created by <strong>{course.user.name || 'Instructor'}</strong>
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => exportCourseSyllabus(course)}
+            className={styles.lessonNavBtn}
+            title="Download Course Syllabus as PDF"
+          >
+            <span>📥</span>
+            <span>Download Syllabus (PDF)</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Course Description with Full Markdown & Link Formatting */}

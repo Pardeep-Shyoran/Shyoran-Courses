@@ -411,12 +411,19 @@
   color: var(--text-primary);
 }
 
-.viewCertBtn {
+.certBtnGroup {
   margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.viewCertBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   padding: 0.65rem;
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -432,6 +439,28 @@
   background-color: var(--primary-color);
   color: #ffffff;
   border-color: var(--primary-color);
+}
+
+.downloadCertCardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.65rem 0.9rem;
+  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+  color: #131627;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.2);
+}
+
+.downloadCertCardBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.35);
 }
 
 /* Empty gallery state */

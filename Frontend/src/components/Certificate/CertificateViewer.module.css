@@ -18,11 +18,11 @@
 .modalContent {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 30px;
+  border-radius: 16px;
+  padding: 24px;
   width: 100%;
-  max-width: 900px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  max-width: 960px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -40,225 +40,477 @@
   }
 }
 
-/* Certificate Layout Frame */
+/* Certificate Layout Frame - Authentic Luxury Parchment Document */
 .certificateFrame {
   position: relative;
-  background: var(--bg-primary);
-  border: 12px double #d4af37; /* Elegant double golden border */
-  border-radius: 8px;
-  padding: 50px 60px;
+  background: #fdfcf9;
+  border: 4px solid #d4af37;
+  border-radius: 4px;
+  padding: 5px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.3);
   text-align: center;
-  box-shadow: inset 0 0 40px rgba(212, 175, 55, 0.15), var(--shadow-sm);
-  color: var(--text-primary);
   font-family: var(--font-sans);
+  color: #0f172a;
+}
+
+.innerNavyBorder {
+  border: 1px solid #0f172a;
+  padding: 4px;
+  border-radius: 2px;
+}
+
+.innerGoldBorder {
+  position: relative;
+  border: 1.5px solid #b48e26;
+  background: #ffffff;
+  padding: 36px 42px 28px 42px;
+  border-radius: 2px;
   overflow: hidden;
 }
 
-/* Suryodaya Motif Background Glow */
-.certificateFrame::before {
-  content: "";
+/* Corner Diamond Ornaments */
+.cornerDiamond {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(226, 88, 62, 0.04) 0%, rgba(234, 158, 36, 0.02) 50%, transparent 70%);
-  z-index: 0;
-  pointer-events: none;
+  width: 9px;
+  height: 9px;
+  background: #d4af37;
+  border: 1px solid #0f172a;
+  transform: rotate(45deg);
+  z-index: 3;
 }
 
+.cornerTopLeft {
+  top: -5px;
+  left: -5px;
+}
+
+.cornerTopRight {
+  top: -5px;
+  right: -5px;
+}
+
+.cornerBottomLeft {
+  bottom: -5px;
+  left: -5px;
+}
+
+.cornerBottomRight {
+  bottom: -5px;
+  right: -5px;
+}
+
+/* Header Area */
 .certHeader {
   position: relative;
   z-index: 1;
+  margin-bottom: 22px;
 }
 
-.certMotif {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #d4af37;
-  filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+.academyBrand {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #aa7c11;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+}
+
+/* Vector Ornamental Divider */
+.ornamentDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 auto 14px auto;
+}
+
+.dividerLine {
+  width: 32px;
+  height: 1px;
+  background-color: #d4af37;
+}
+
+.dividerDiamond {
+  width: 6px;
+  height: 6px;
+  background-color: #d4af37;
+  transform: rotate(45deg);
+}
+
+.dividerDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #d4af37;
+}
+
+.dividerDotSmall {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background-color: #d4af37;
 }
 
 .certTitle {
   font-family: var(--font-serif);
-  font-size: 2.2rem;
-  letter-spacing: 0.05em;
-  font-weight: 700;
+  font-size: 2.25rem;
+  letter-spacing: 0.04em;
+  font-weight: 800;
   text-transform: uppercase;
-  color: var(--text-primary);
-  margin: 0 0 5px 0;
-  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0f172a;
+  margin: 0 0 6px 0;
 }
 
-.certSubtitle {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--text-secondary);
-  margin-bottom: 30px;
-  font-weight: 500;
+.titleUnderline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 auto;
 }
 
+.titleLine {
+  width: 44px;
+  height: 1.5px;
+  background-color: #d4af37;
+}
+
+.titleDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #d4af37;
+}
+
+/* Certificate Body */
 .certBody {
   position: relative;
   z-index: 1;
-  margin-bottom: 35px;
+  margin-bottom: 24px;
 }
 
 .presentedTo {
-  font-size: 1.1rem;
-  font-style: italic;
-  color: var(--text-secondary);
-  margin-bottom: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #64748b;
+  text-transform: uppercase;
+  margin: 0 0 10px 0;
+}
+
+.studentNameWrapper {
+  display: inline-block;
+  margin-bottom: 14px;
 }
 
 .studentName {
   font-family: var(--font-serif);
-  font-size: 2.8rem;
-  font-weight: 600;
-  color: var(--primary-color);
-  margin: 0 0 20px 0;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-  display: inline-block;
-  padding-bottom: 5px;
-  min-width: 300px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #131627;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.nameUnderline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 5px auto 0 auto;
+  max-width: 240px;
+}
+
+.nameLine {
+  flex: 1;
+  height: 1px;
+  background-color: #d4af37;
+}
+
+.nameDiamond {
+  width: 5px;
+  height: 5px;
+  background-color: #d4af37;
+  transform: rotate(45deg);
 }
 
 .completionText {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #475569;
   max-width: 600px;
-  margin: 0 auto 25px auto;
+  margin: 0 auto 10px auto;
 }
 
 .courseTitle {
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 8px 0;
+  font-family: var(--font-sans);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #e2583e;
+  margin: 0 0 8px 0;
+  line-height: 1.35;
 }
 
+.channelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  padding: 4px 14px;
+  background: #fef8ee;
+  border: 1px solid #f5d399;
+  border-radius: 16px;
+  color: #aa7c11;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ytPlayIcon {
+  color: #ff0000;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.masteryText {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* Signatures & Seal Section */
 .certFooter {
   position: relative;
   z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px dashed var(--border-color);
+  margin-top: 24px;
+  padding: 0 10px;
 }
 
 .footerCol {
   flex: 1;
-  text-align: left;
+  text-align: center;
 }
 
 .footerColCenter {
-  flex: 1;
+  flex: 0 0 120px;
   text-align: center;
 }
 
 .footerColRight {
   flex: 1;
-  text-align: right;
+  text-align: center;
+}
+
+.signatureScript {
+  font-family: 'Brush Script MT', 'Dancing Script', 'Caveat', cursive, italic;
+  font-size: 1.4rem;
+  color: #334155;
+  margin-bottom: 2px;
 }
 
 .signatureLine {
-  width: 140px;
+  width: 120px;
   height: 1px;
-  background-color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.footerColRight .signatureLine {
-  margin-left: auto;
+  background-color: #94a3b8;
+  margin: 0 auto 5px auto;
 }
 
 .signText {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 .signTitle {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  letter-spacing: 0.05em;
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: #0f172a;
 }
 
+.signSub {
+  display: block;
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* Official Verified Seal with Ribbons */
 .sealWrapper {
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  margin-bottom: -6px;
+}
+
+.sealRibbons {
+  position: absolute;
+  top: 36px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ribbonLeft,
+.ribbonRight {
+  width: 12px;
+  height: 24px;
+  background: linear-gradient(135deg, #d4af37, #aa7c11);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
 }
 
 .verifiedSeal {
-  width: 70px;
-  height: 70px;
+  position: relative;
+  z-index: 2;
+  width: 66px;
+  height: 66px;
   border-radius: 50%;
-  border: 2px dashed #d4af37;
+  background: radial-gradient(circle, #fffdf8 0%, #fcf3db 100%);
+  border: 2px solid #d4af37;
+  box-shadow: 0 3px 10px rgba(212, 175, 55, 0.35);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #d4af37;
-  text-transform: uppercase;
-  transform: rotate(-10deg);
-  background-color: rgba(212, 175, 55, 0.05);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
-  margin-bottom: 5px;
+  line-height: 1;
 }
 
+.sealStars {
+  color: #aa7c11;
+  font-size: 0.42rem;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+.sealVerified {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.05em;
+}
+
+.sealProgram {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: #aa7c11;
+  letter-spacing: 0.05em;
+  margin: 1px 0;
+}
+
+.sealHub {
+  font-size: 0.42rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Verification Metadata Bar */
 .metaInfo {
-  margin-top: 25px;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   display: flex;
-  justify-content: center;
-  gap: 30px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 15px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.metaItem span {
+  color: #64748b;
 }
 
 .metaItem strong {
-  color: var(--text-primary);
+  color: #0f172a;
+  margin-left: 4px;
+}
+
+.statusActive {
+  color: #10b981 !important;
+}
+
+.statusDraft {
+  color: #e2583e !important;
 }
 
 /* Actions panel */
 .actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 1.4rem;
+  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+  color: #131627;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+}
+
+.downloadBtn:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+}
+
+.downloadBtn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(19, 22, 39, 0.25);
+  border-top-color: #131627;
+  border-radius: 50%;
+  animation: certSpin 0.6s linear infinite;
+}
+
+@keyframes certSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .printBtn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0.65rem 1.4rem;
-  background: linear-gradient(to bottom, #d4af37 0%, #aa7c11 100%);
-  color: #131627;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.65rem 1.1rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
 }
 
 .printBtn:hover {
-  transform: translateY(-1.5px);
-  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.35);
+  border-color: #d4af37;
+  color: #d4af37;
+  background-color: rgba(212, 175, 55, 0.08);
 }
 
 .closeBtn {

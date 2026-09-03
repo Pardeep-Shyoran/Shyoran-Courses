@@ -6,7 +6,8 @@ const VideoSchema = new mongoose.Schema({
   duration: { type: String, default: "" },
   completed: { type: Boolean, default: false },
   watchedAt: { type: Date },
-  notes: { type: String, default: "" } // Video-specific markdown notes
+  notes: { type: String, default: "" }, // Video-specific markdown notes
+  channelTitle: { type: String, default: "" }
 });
 
 const CourseSchema = new mongoose.Schema({
@@ -15,6 +16,7 @@ const CourseSchema = new mongoose.Schema({
   description: { type: String, default: "" },
   playlistId: { type: String, default: "" },
   thumbnail: { type: String, default: "" },
+  channelTitle: { type: String, default: "" },
   videos: [VideoSchema],
   tags: [{ type: String }],
   notes: { type: String, default: "" } // Course-wide notes
