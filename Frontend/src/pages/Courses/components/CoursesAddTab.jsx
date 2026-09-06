@@ -28,31 +28,37 @@ const CoursesAddTab = ({ fetchCoursesList, setActiveMainTab, initialPresetUrl = 
   return (
     <div className={styles.addCourseContainer}>
       <div className={styles.paneHeader}>
+        <div className={styles.headerBadge} style={{ marginBottom: '0.75rem' }}>
+          ✦ COURSE BUILDER • IMPORT ENGINE
+        </div>
         <div>
           <h2 className={styles.paneTitle}>Add & Import Courses</h2>
-          <p className={styles.paneSubtitle}>Select a 1-Click starter preset, paste a YouTube playlist URL, or craft a custom learning track.</p>
+          <p className={styles.paneSubtitle}>Select a 1-Click starter preset, paste a YouTube playlist URL, or craft a custom learning track from scratch.</p>
         </div>
       </div>
 
       {/* Sub-mode Selector Tabs */}
       <div className={styles.addCourseTabs}>
         <button 
+          type="button"
           className={`${styles.addCourseTabBtn} ${addCourseMode === 'quick' ? styles.activeAddCourseTab : ''}`}
           onClick={() => setAddCourseMode('quick')}
         >
-          ⚡ 1-Click Presets
+          <span>⚡ 1-Click Presets</span>
         </button>
         <button 
+          type="button"
           className={`${styles.addCourseTabBtn} ${addCourseMode === 'import' ? styles.activeAddCourseTab : ''}`}
           onClick={() => setAddCourseMode('import')}
         >
-          📥 YouTube Link Import
+          <span>📥 YouTube Link Import</span>
         </button>
         <button 
+          type="button"
           className={`${styles.addCourseTabBtn} ${addCourseMode === 'custom' ? styles.activeAddCourseTab : ''}`}
           onClick={() => setAddCourseMode('custom')}
         >
-          ➕ Build Custom Course
+          <span>➕ Build Custom Course</span>
         </button>
       </div>
 

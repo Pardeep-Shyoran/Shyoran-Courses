@@ -1,23 +1,27 @@
-/* Custom animations for Suryodaya spectrum glows */
+/* ==========================================================================
+   AUTHENTICATION MODULE STYLES (Login & Register)
+   Shyoran Courses Modern Design System
+   ========================================================================== */
+
 @keyframes pulseGlow {
   0%, 100% {
     transform: scale(1) translate(0, 0);
-    opacity: 0.15;
+    opacity: 0.18;
   }
   50% {
-    transform: scale(1.1) translate(3%, 5%);
-    opacity: 0.25;
+    transform: scale(1.1) translate(3%, 4%);
+    opacity: 0.28;
   }
 }
 
 @keyframes pulseGlowReverse {
   0%, 100% {
     transform: scale(1) translate(0, 0);
-    opacity: 0.12;
+    opacity: 0.14;
   }
   50% {
-    transform: scale(1.15) translate(-3%, -5%);
-    opacity: 0.22;
+    transform: scale(1.15) translate(-3%, -4%);
+    opacity: 0.24;
   }
 }
 
@@ -27,150 +31,146 @@
   }
 }
 
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
 .container {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-primary);
-  padding: 3rem 1.5rem;
+  background-color: transparent;
+  padding: 3.5rem 1.5rem;
   overflow: hidden;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif);
 }
 
-/* Ambient glow blobs styled in Saffron and Marigold colors */
-.decorations {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.glowBlob1 {
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  max-width: 600px;
-  background: radial-gradient(circle, rgba(226, 88, 62, 0.15) 0%, rgba(234, 158, 36, 0.04) 50%, transparent 80%);
-  filter: blur(80px);
-  border-radius: 50%;
-  animation: pulseGlow 15s infinite ease-in-out;
-}
-
-:global([data-theme="light"]) .glowBlob1 {
-  background: radial-gradient(circle, rgba(216, 79, 51, 0.08) 0%, rgba(217, 130, 20, 0.03) 50%, transparent 80%);
-}
-
-.glowBlob2 {
-  position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 50vw;
-  height: 50vw;
-  max-width: 600px;
-  background: radial-gradient(circle, rgba(234, 158, 36, 0.12) 0%, rgba(226, 88, 62, 0.03) 50%, transparent 80%);
-  filter: blur(90px);
-  border-radius: 50%;
-  animation: pulseGlowReverse 18s infinite ease-in-out;
-}
-
-:global([data-theme="light"]) .glowBlob2 {
-  background: radial-gradient(circle, rgba(217, 130, 20, 0.06) 0%, rgba(216, 79, 51, 0.02) 50%, transparent 80%);
-}
-
-/* Background Torana motif SVG placement */
-.authMotif {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 1200px;
-  height: 1200px;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.8;
-}
-
-.motifSvg {
-  width: 100%;
-  height: 100%;
-  color: rgba(226, 88, 62, 0.22);
-}
-
-:global([data-theme="light"]) .motifSvg {
-  color: rgba(216, 79, 51, 0.12);
-}
-
-/* Glassmorphic Auth Card (Deep Indigo matched) */
+/* ==========================================================================
+   Modern Glassmorphic Auth Card
+   ========================================================================== */
 .card {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 440px;
-  background: rgba(18, 21, 38, 0.4);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
-  padding: 3rem 2.5rem;
-  box-shadow: var(--shadow-lg), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  max-width: 460px;
+  background: rgba(16, 20, 36, 0.68);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 28px;
+  padding: 2.75rem 2.5rem;
+  box-shadow: 
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
               border-color 0.4s ease, 
               box-shadow 0.4s ease;
 }
 
 :global([data-theme="light"]) .card {
-  background: rgba(253, 251, 247, 0.65);
-  border: 1px solid rgba(15, 18, 29, 0.05);
-  box-shadow: var(--shadow-md), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(15, 18, 29, 0.08);
+  box-shadow: 
+    0 24px 48px -12px rgba(15, 18, 29, 0.08),
+    0 0 0 1px rgba(15, 18, 29, 0.04),
+    inset 0 1px 1px #ffffff;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(226, 88, 62, 0.25);
-  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  border-color: rgba(226, 88, 62, 0.28);
+  box-shadow: 
+    0 32px 64px -16px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(226, 88, 62, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 :global([data-theme="light"]) .card:hover {
-  border-color: rgba(216, 79, 51, 0.2);
-  box-shadow: 0 24px 48px -12px rgba(15, 18, 29, 0.1), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  border-color: rgba(216, 79, 51, 0.25);
+  box-shadow: 
+    0 32px 64px -16px rgba(15, 18, 29, 0.12),
+    0 0 0 1px rgba(216, 79, 51, 0.1),
+    inset 0 1px 1px #ffffff;
 }
 
-/* Header section styling */
+/* ==========================================================================
+   Header Elements
+   ========================================================================== */
 .header {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(226, 88, 62, 0.1);
+  border: 1px solid rgba(226, 88, 62, 0.25);
+  margin-bottom: 1.25rem;
+}
+
+:global([data-theme="light"]) .badge {
+  background: rgba(216, 79, 51, 0.08);
+  border-color: rgba(216, 79, 51, 0.2);
+}
+
+.badgePulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  box-shadow: 0 0 8px var(--primary-color);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+.badgeText {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary-color);
 }
 
 .logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
+  text-decoration: none;
   font-size: 1.35rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
+  transition: transform 0.25s ease;
+}
+
+.logo:hover {
+  transform: scale(1.02);
 }
 
 .logoIcon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   color: var(--text-primary);
-  filter: drop-shadow(0 2px 8px rgba(226, 88, 62, 0.3));
+  filter: drop-shadow(0 2px 8px rgba(226, 88, 62, 0.4));
 }
 
 .logoTextHighlight {
@@ -182,22 +182,148 @@
 
 .title {
   margin: 0;
-  font-family: var(--font-serif);
   font-size: 1.85rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
+  line-height: 1.25;
 }
 
 .subtitle {
-  margin: 0.4rem 0 0 0;
+  margin: 0.45rem 0 0 0;
   font-size: 0.95rem;
   color: var(--text-secondary);
   font-weight: 400;
   line-height: 1.5;
+  max-width: 360px;
 }
 
-/* Form inputs & labeling */
+/* ==========================================================================
+   Quick Demo Login Pill
+   ========================================================================== */
+.demoBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: rgba(226, 88, 62, 0.06);
+  border: 1px dashed rgba(226, 88, 62, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+:global([data-theme="light"]) .demoBanner {
+  background: rgba(216, 79, 51, 0.05);
+  border: 1px dashed rgba(216, 79, 51, 0.25);
+}
+
+.demoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.demoBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary-color);
+}
+
+.demoLabel {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+}
+
+.demoButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.demoButton:hover {
+  background: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(226, 88, 62, 0.25);
+}
+
+.demoIcon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ==========================================================================
+   Role Selector (Register Page)
+   ========================================================================== */
+.roleSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  background: rgba(10, 12, 22, 0.4);
+  padding: 0.3rem;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+}
+
+:global([data-theme="light"]) .roleSelector {
+  background: rgba(15, 18, 29, 0.04);
+}
+
+.roleOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.roleOption:hover {
+  color: var(--text-primary);
+}
+
+.roleOption.roleActive {
+  background: var(--bg-secondary);
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(226, 88, 62, 0.3);
+}
+
+:global([data-theme="light"]) .roleOption.roleActive {
+  background: #ffffff;
+  border: 1px solid rgba(216, 79, 51, 0.25);
+  box-shadow: 0 2px 8px rgba(15, 18, 29, 0.06);
+}
+
+.roleIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================================
+   Form Fields & Modern Inputs
+   ========================================================================== */
 .form {
   display: flex;
   flex-direction: column;
@@ -207,14 +333,20 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--text-tertiary);
-  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -237,134 +369,216 @@
 .input {
   width: 100%;
   padding: 0.85rem 1rem 0.85rem 2.75rem;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border-color);
-  background-color: rgba(10, 12, 22, 0.5);
+  background-color: rgba(10, 12, 22, 0.45);
   color: var(--text-primary);
   font-size: 0.95rem;
   font-family: inherit;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :global([data-theme="light"]) .input {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 18, 29, 0.12);
 }
 
 .input::placeholder {
   color: var(--text-tertiary);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary-color);
   background-color: rgba(10, 12, 22, 0.7);
-  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.15);
+  box-shadow: 0 0 0 3px rgba(226, 88, 62, 0.18);
 }
 
 :global([data-theme="light"]) .input:focus {
   background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(216, 79, 51, 0.12);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(216, 79, 51, 0.15);
 }
 
-/* Icon hover/active focus */
 .inputWrapper:focus-within .inputIcon {
   color: var(--primary-color);
 }
 
-/* Error message component styles */
-.error {
+.inputWithToggle {
+  padding-right: 2.85rem;
+}
+
+/* ==========================================================================
+   Password Visibility Toggle
+   ========================================================================== */
+.passwordToggle {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background-color: rgba(239, 68, 68, 0.08);
-  color: var(--error);
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.passwordToggle:hover {
+  color: var(--text-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.toggleIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ==========================================================================
+   Password Strength Meter
+   ========================================================================== */
+.strengthContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.strengthBars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  height: 4px;
+}
+
+.strengthBar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+.strengthLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   Alerts & Notifications
+   ========================================================================== */
+.noticeBox {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning, #f59e0b);
+  border: 1px solid rgba(245, 158, 11, 0.25);
   padding: 0.85rem 1rem;
   border-radius: 12px;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   line-height: 1.4;
 }
 
-:global([data-theme="light"]) .error {
-  background-color: rgba(239, 68, 68, 0.05);
-  color: var(--error);
-  border: 1px solid rgba(239, 68, 68, 0.1);
+.noticeIcon {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .errorIcon {
   flex-shrink: 0;
   width: 1.15rem;
   height: 1.15rem;
-  color: currentColor;
 }
 
-/* Pill-shaped Premium CTA Button */
+/* ==========================================================================
+   Primary Action CTA Button
+   ========================================================================== */
 .submit {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.6rem;
   width: 100%;
-  padding: 0.9rem;
-  margin-top: 1rem;
-  background: linear-gradient(to bottom, #303550 0%, #131627 100%);
+  padding: 0.95rem 1.5rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #ea580c 100%);
   color: #ffffff;
   font-size: 1rem;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 4px 16px rgba(226, 88, 62, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .submit:hover:not(:disabled) {
-  transform: translateY(-2.5px);
-  border-color: var(--primary-color);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 8px 24px rgba(226, 88, 62, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(226, 88, 62, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .submit:active:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(226, 88, 62, 0.15);
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 12px rgba(226, 88, 62, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
   box-shadow: none;
 }
 
-:global([data-theme="light"]) .submit {
-  background: linear-gradient(to bottom, #ffffff 0%, #f4f1e8 100%);
-  color: #131627;
-  border-color: rgba(19, 22, 39, 0.15);
-  box-shadow: 0 4px 12px rgba(15, 18, 29, 0.05);
+.submitArrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s ease;
 }
 
-:global([data-theme="light"]) .submit:hover:not(:disabled) {
-  border-color: var(--primary-color);
-  box-shadow: 0 8px 24px rgba(216, 79, 51, 0.15);
+.submit:hover:not(:disabled) .submitArrow {
+  transform: translateX(3px);
 }
 
-/* Spinner indicators */
 .spinner {
   width: 1.25rem;
   height: 1.25rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-:global([data-theme="light"]) .spinner {
-  border: 2px solid rgba(19, 22, 39, 0.2);
-  border-top-color: #131627;
-}
-
-/* Login/register switcher navigations */
+/* ==========================================================================
+   Navigation Links & Trust Footer
+   ========================================================================== */
 .switch {
   margin-top: 1.75rem;
   text-align: center;
@@ -375,12 +589,64 @@
 .link {
   color: var(--primary-color);
   text-decoration: none;
-  font-weight: 600;
-  margin-left: 0.25rem;
-  transition: color 0.2s ease;
+  font-weight: 700;
+  margin-left: 0.35rem;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .link:hover {
-  color: var(--primary-hover);
+  color: var(--primary-hover, #ff7157);
   text-decoration: underline;
 }
+
+.trustBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+:global([data-theme="light"]) .trustBanner {
+  border-top-color: rgba(15, 18, 29, 0.08);
+}
+
+.trustIcon {
+  width: 14px;
+  height: 14px;
+  color: var(--success, #10b981);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Mobile Responsiveness
+   ========================================================================== */
+@media (max-width: 640px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  .card {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .demoBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .demoButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

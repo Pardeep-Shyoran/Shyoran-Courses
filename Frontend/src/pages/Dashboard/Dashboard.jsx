@@ -32,9 +32,9 @@ const Dashboard = () => {
     }
     if (tabParam === 'add-course') {
       navigate('/courses?tab=add', { replace: true })
-      return 'overview'
+      return authUser?.preferences?.defaultTab || 'overview'
     }
-    return tabParam || 'overview'
+    return tabParam || authUser?.preferences?.defaultTab || 'overview'
   })
 
   useEffect(() => {

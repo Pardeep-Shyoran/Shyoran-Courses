@@ -19,6 +19,12 @@ const UserSchema = new mongoose.Schema(
       playbackSpeed: { type: Number, default: 1 },
       emailReminders: { type: Boolean, default: true },
       streakAlerts: { type: Boolean, default: true },
+      reminderTime: { type: String, default: "20:00" },
+      soundEffects: { type: Boolean, default: true },
+      defaultTab: { type: String, default: "overview" },
+      autoMarkThreshold: { type: Number, default: 90 },
+      studyDaysSchedule: { type: String, default: "all" },
+      theme: { type: String, default: "dark" },
     },
   },
   { timestamps: true }

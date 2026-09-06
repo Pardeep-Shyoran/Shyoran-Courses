@@ -26,9 +26,10 @@
 }
 
 .paneTitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 750;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   margin: 0 0 6px 0;
 }
@@ -124,8 +125,10 @@
 }
 
 .xpTitle {
-  font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
   margin: 0;
   color: var(--text-primary);
 }
@@ -212,8 +215,10 @@
 
 /* Badges section */
 .sectionTitle {
-  font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-family: var(--font-sans);
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   margin: 10px 0 20px 0;
   display: flex;
@@ -391,11 +396,12 @@
 }
 
 .certCourseTitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   color: var(--text-primary);
   margin: 0;
-  font-weight: 700;
+  font-weight: 750;
+  letter-spacing: -0.015em;
   line-height: 1.3;
 }
 
@@ -484,8 +490,9 @@
 }
 
 .emptyGrid h3 {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.25rem;
+  font-weight: 750;
   color: var(--text-primary);
   margin: 0 0 6px 0;
 }
@@ -524,9 +531,10 @@
 }
 
 .roadmapTitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 750;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   margin: 0;
   display: flex;

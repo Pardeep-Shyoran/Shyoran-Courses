@@ -354,7 +354,10 @@ const PlayerVideoSection = ({
                 className={styles.lessonNavBtn}
                 title="Previous video lesson (Shift + P)"
               >
-                <span>⏮</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                  <line x1="5" y1="19" x2="5" y2="5"></line>
+                </svg>
                 <span>Prev</span>
               </button>
             )}
@@ -365,14 +368,32 @@ const PlayerVideoSection = ({
                 className={`${styles.toggleCompleteBtn} ${activeVideo.completed ? styles.completed : ''}`}
                 title="Mark video as completed (M)"
               >
-                {activeVideo.completed ? '✅ Completed' : '⭕ Mark Completed'}
+                {activeVideo.completed ? (
+                  <>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Completed</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    <span>Mark Complete</span>
+                  </>
+                )}
               </button>
             ) : (
               <button
                 onClick={handleEnroll}
-                className={styles.toggleCompleteBtn}
+                className={`${styles.toggleCompleteBtn} ${styles.enrollCtaBtn}`}
               >
-                🚀 Enroll to Track
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                  <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                </svg>
+                <span>Enroll to Track</span>
               </button>
             )}
 
@@ -385,7 +406,10 @@ const PlayerVideoSection = ({
                 title="Next video lesson (Shift + N)"
               >
                 <span>Next</span>
-                <span>⏭</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                  <line x1="19" y1="5" x2="19" y2="19"></line>
+                </svg>
               </button>
             )}
           </div>
@@ -401,6 +425,9 @@ const PlayerVideoSection = ({
                   onToggleAutoplay()
                 }}
               >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
                 <span>Autoplay</span>
                 <div className={`${styles.switchTrack} ${autoplayEnabled ? styles.switchTrackActive : ''}`}>
                   <div className={styles.switchThumb} />
@@ -415,7 +442,22 @@ const PlayerVideoSection = ({
                 className={`${styles.iconControlBtn} ${theatreMode ? styles.activeControl : ''}`}
                 title="Toggle Focus / Theatre Mode (F)"
               >
-                <span>{theatreMode ? '🗗 Standard' : '🎭 Focus Mode'}</span>
+                {theatreMode ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <path d="M15 3v18" />
+                    </svg>
+                    <span>Standard</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                    </svg>
+                    <span>Focus Mode</span>
+                  </>
+                )}
               </button>
             )}
           </div>

@@ -4,6 +4,8 @@ import styles from './Layout.module.css'
 import GatewayLogo from '../GatewayLogo/GatewayLogo'
 import CommandPalette from '../CommandPalette/CommandPalette'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
+import Footer from '../Footer/Footer'
+import AtmosphericBackground from '../AtmosphericBackground/AtmosphericBackground'
 import { useAuth } from '../../context/AuthContext'
 
 const Layout = ({ children }) => {
@@ -12,9 +14,20 @@ const Layout = ({ children }) => {
   const [isNavHidden, setIsNavHidden] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const [activeModal, setActiveModal] = useState(null) // 'privacy', 'terms', 'changelog'
   const profileRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
+
+  const handleHashLinkClick = (e, hashId) => {
+    if (location.pathname === '/') {
+      e.preventDefault()
+      const el = document.getElementById(hashId)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+  }
 
   useEffect(() => {
     let lastScrollY = window.scrollY
@@ -81,6 +94,9 @@ const Layout = ({ children }) => {
 
   return (
     <div className={styles.layout}>
+      {/* Global Atmospheric Background & Seamless Geometric Dot Matrix */}
+      <AtmosphericBackground />
+
       <nav className={`${styles.navbar} ${isNavHidden && !isMenuOpen ? styles.navbarHidden : ''}`}>
         <div className={styles.navContainer}>
           <div className={styles.logo}>
@@ -95,37 +111,45 @@ const Layout = ({ children }) => {
             <ul className={styles.navLinks}>
               <li>
                 <Link to="/" className={`${styles.navLink} ${isActive('/') ? styles.activeLink : ''}`}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
                   <span>Home</span>
                 </Link>
               </li>
-              <li>
-                <Link to="/about" className={`${styles.navLink} ${isActive('/about') ? styles.activeLink : ''}`}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span>About</span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className={`${styles.navLink} ${isActive('/contact') ? styles.activeLink : ''}`}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                  </svg>
-                  <span>Contact</span>
-                </Link>
-              </li>
+
+              {/* About and Contact are only visible when NOT logged in */}
+              {(!token || !user) && (
+                <>
+                  <li>
+                    <Link to="/about" className={`${styles.navLink} ${isActive('/about') ? styles.activeLink : ''}`}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                      <span>About</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact" className={`${styles.navLink} ${isActive('/contact') ? styles.activeLink : ''}`}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                      <span>Contact</span>
+                    </Link>
+                  </li>
+                </>
+              )}
+
+              {/* Dashboard and Courses are visible when logged in */}
               {token && user && (
                 <>
                   <li>
                     <Link to="/dashboard" className={`${styles.navLink} ${isActive('/dashboard') ? styles.activeLink : ''}`}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
                         <rect x="14" y="14" width="7" height="7"></rect>
@@ -136,7 +160,7 @@ const Layout = ({ children }) => {
                   </li>
                   <li>
                     <Link to="/courses" className={`${styles.navLink} ${isActive('/courses') ? styles.activeLink : ''}`}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                       </svg>
@@ -150,6 +174,18 @@ const Layout = ({ children }) => {
 
           {/* Desktop CTA / Profile Actions */}
           <div className={styles.desktopActions}>
+            <button
+              className={styles.desktopSearchBtn}
+              onClick={() => setIsCommandPaletteOpen(true)}
+              aria-label="Quick Search"
+              title="Search (⌘K)"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <kbd className={styles.desktopSearchKbd}>⌘K</kbd>
+            </button>
             {token && user ? (
               <div className={styles.profileDropdownContainer} ref={profileRef}>
                 <button
@@ -178,15 +214,15 @@ const Layout = ({ children }) => {
                 </button>
 
                 {isProfileOpen && (
-                  <div className={styles.dropdownMenu}>
+                  <div className={styles.profileDropdown}>
                     <div className={styles.dropdownHeader}>
                       <div className={styles.dropdownAvatarLarge}>
                         {userInitial}
                       </div>
                       <div className={styles.dropdownUserInfo}>
-                        <div className={styles.dropdownName}>{user.name}</div>
-                        <div className={styles.dropdownEmail}>{user.email || 'Learner Account'}</div>
-                        <span className={styles.roleBadge}>Learner</span>
+                        <span className={styles.dropdownName}>{user.name}</span>
+                        <span className={styles.dropdownEmail}>{user.email}</span>
+                        <span className={styles.roleBadge}>{user.role || 'Learner'}</span>
                       </div>
                     </div>
 
@@ -299,25 +335,33 @@ const Layout = ({ children }) => {
               <span>Home</span>
             </Link>
           </li>
-          <li>
-            <Link to="/about" className={`${styles.mobileNavLink} ${isActive('/about') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>About</span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/contact" className={`${styles.mobileNavLink} ${isActive('/contact') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-              </svg>
-              <span>Contact</span>
-            </Link>
-          </li>
+
+          {/* About and Contact only when NOT logged in */}
+          {(!token || !user) && (
+            <>
+              <li>
+                <Link to="/about" className={`${styles.mobileNavLink} ${isActive('/about') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>About</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className={`${styles.mobileNavLink} ${isActive('/contact') ? styles.mobileActiveLink : ''}`} onClick={() => setIsMenuOpen(false)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <span>Contact</span>
+                </Link>
+              </li>
+            </>
+          )}
+
+          {/* Dashboard and Courses only when logged in */}
           {token && user && (
             <>
               <li>
@@ -378,7 +422,6 @@ const Layout = ({ children }) => {
         </div>
       </div>
 
-      {/* Mobile Drawer Backdrop Overlay */}
       <div
         className={`${styles.drawerOverlay} ${isMenuOpen ? styles.overlayVisible : ''}`}
         onClick={() => setIsMenuOpen(false)}
@@ -391,88 +434,8 @@ const Layout = ({ children }) => {
         {children}
       </main>
 
-      <footer className={styles.footer}>
-        {/* Subtle Torana Line Model Background */}
-        <div className={styles.footerMotif}>
-          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.motifSvg}>
-            {/* Concentric circles representing learning loops */}
-            <circle cx="100" cy="100" r="80" stroke="var(--primary-color)" strokeWidth="0.25" strokeDasharray="3 3" opacity="0.15" />
-            <circle cx="100" cy="100" r="60" stroke="var(--warning)" strokeWidth="0.25" opacity="0.2" />
-            <circle cx="100" cy="100" r="40" stroke="var(--text-tertiary)" strokeWidth="0.5" strokeDasharray="1 5" opacity="0.3" />
-
-            {/* Architectural Gateway Arches (Indian Torana vaults) */}
-            <path d="M60 180V100C60 77.9 77.9 60 100 60s40 17.9 40 40v80" stroke="var(--primary-color)" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-            <path d="M75 180V100C75 86.2 86.2 75 100 75s25 11.2 25 25v80" stroke="var(--warning)" strokeWidth="1" opacity="0.5" />
-            <path d="M90 180v-80c0-5.5 4.5-10 10-10s10 4.5 10 10v80" stroke="var(--text-primary)" strokeWidth="1.5" opacity="0.25" />
-
-            {/* Horizontal beams (Torana lintels) */}
-            <line x1="45" y1="70" x2="155" y2="70" stroke="var(--primary-color)" strokeWidth="1" opacity="0.2" />
-            <line x1="55" y1="85" x2="145" y2="85" stroke="var(--warning)" strokeWidth="0.75" opacity="0.35" />
-
-            {/* Structured nodes */}
-            <g opacity="0.75">
-              <circle cx="60" cy="110" r="4" fill="var(--bg-secondary)" stroke="var(--primary-color)" strokeWidth="1.5" />
-              <line x1="64" y1="110" x2="75" y2="110" stroke="var(--primary-color)" strokeWidth="0.75" />
-            </g>
-            <g opacity="0.75">
-              <circle cx="140" cy="130" r="4" fill="var(--bg-secondary)" stroke="var(--warning)" strokeWidth="1.5" />
-              <line x1="125" y1="130" x2="136" y2="130" stroke="var(--warning)" strokeWidth="0.75" />
-            </g>
-            <g opacity="0.85">
-              <circle cx="100" cy="75" r="5" fill="var(--primary-color)" />
-              <circle cx="100" cy="75" r="8" stroke="var(--primary-color)" strokeWidth="0.5" opacity="0.4" />
-            </g>
-
-            {/* Suryodaya glow filter */}
-            <circle cx="100" cy="100" r="18" fill="url(#sunriseGlowFooter)" opacity="0.3" />
-
-            <defs>
-              <radialGradient id="sunriseGlowFooter" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="var(--warning)" />
-                <stop offset="100%" stopColor="var(--primary-color)" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-          </svg>
-        </div>
-        <div className={styles.footerContainer}>
-          <div className={styles.footerTop}>
-            <div className={styles.footerBrand}>
-              <Link to="/" className={styles.footerLogo}>
-                <GatewayLogo className={styles.logoIcon} />
-                <span className={styles.logoText}>
-                  Shyoran<span className={styles.logoTextHighlight}>Courses</span>
-                </span>
-              </Link>
-              <p className={styles.footerTagline}>
-                Convert YouTube playlists into interactive workspaces. Learn, take notes, and track progress.
-              </p>
-            </div>
-
-            <nav className={styles.footerNav}>
-              <Link to="/" className={styles.footerNavLink}>Home</Link>
-              <Link to="/about" className={styles.footerNavLink}>About</Link>
-              <Link to="/contact" className={styles.footerNavLink}>Contact</Link>
-              {token ? (
-                <Link to="/dashboard" className={styles.footerNavLink}>Dashboard</Link>
-              ) : (
-                <Link to="/login" className={styles.footerNavLink}>Login</Link>
-              )}
-            </nav>
-          </div>
-
-          <div className={styles.footerDivider} />
-
-          <div className={styles.footerBottom}>
-            <p className={styles.copyright}>
-              &copy; {new Date().getFullYear()} Shyoran Courses. All rights reserved.
-            </p>
-            <div className={styles.footerStatus}>
-              <span className={styles.statusDot}></span>
-              <span className={styles.statusText}>All systems operational</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Global Brand Footer */}
+      <Footer onOpenModal={setActiveModal} />
 
       {/* Floating Bottom-Left Quick Search Widget */}
       <button 
@@ -494,6 +457,102 @@ const Layout = ({ children }) => {
         isOpen={isCommandPaletteOpen} 
         setIsOpen={setIsCommandPaletteOpen} 
       />
+
+      {/* Interactive Modal for Privacy, Terms, and Changelog */}
+      {activeModal && (
+        <div className={styles.legalModalOverlay} onClick={() => setActiveModal(null)}>
+          <div className={styles.legalModalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.legalModalHeader}>
+              <div className={styles.legalModalTitleGroup}>
+                <span className={styles.legalModalIcon}>
+                  {activeModal === 'privacy' && '🛡️'}
+                  {activeModal === 'terms' && '📜'}
+                  {activeModal === 'changelog' && '🚀'}
+                </span>
+                <h3 className={styles.legalModalTitle}>
+                  {activeModal === 'privacy' && 'Privacy Policy'}
+                  {activeModal === 'terms' && 'Terms of Service'}
+                  {activeModal === 'changelog' && 'Changelog & Release Notes'}
+                </h3>
+              </div>
+              <button 
+                className={styles.legalModalCloseBtn} 
+                onClick={() => setActiveModal(null)} 
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className={styles.legalModalBody}>
+              {activeModal === 'privacy' && (
+                <div className={styles.modalTextContent}>
+                  <div className={styles.modalBadge}>Privacy First • Zero Telemetry Selling</div>
+                  <p>At <strong>Shyoran Courses</strong>, we prioritize your focus and privacy above everything else. We operate under clear principles:</p>
+                  <ul className={styles.modalList}>
+                    <li><strong>No Algorithmic Tracking:</strong> We never track your cross-site browsing habits, sell data to third-party ad brokers, or analyze your watch patterns for commercial targeting.</li>
+                    <li><strong>Study Workspace Security:</strong> Your notes, course checklists, and study milestones are encrypted and stored in your private database account.</li>
+                    <li><strong>Official YouTube Embeds:</strong> Tutorials stream via YouTube's official player API without injecting unrequested advertisements into your workspace.</li>
+                    <li><strong>Data Sovereignty:</strong> You can completely delete your courses, notes, and profile at any time directly through Account Settings.</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeModal === 'terms' && (
+                <div className={styles.modalTextContent}>
+                  <div className={styles.modalBadge}>Open Educational Workspace</div>
+                  <p>Welcome to <strong>Shyoran Courses</strong>. By utilizing this website, you agree to our fair-use educational guidelines:</p>
+                  <ul className={styles.modalList}>
+                    <li><strong>Free Educational Access:</strong> Shyoran Courses is an educational workspace designed to turn public YouTube playlists into structured self-paced curricula.</li>
+                    <li><strong>Creator Rights:</strong> All video content, audio, and creator branding remain the intellectual property of their original YouTube publishers.</li>
+                    <li><strong>Acceptable Service Use:</strong> You agree not to abuse automated scraping endpoints or violate YouTube's Terms of Service.</li>
+                    <li><strong>Permanent Free Promise:</strong> Core tracking, markdown notes, streak telemetry, and verifiable digital certificate generation are free with zero subscription paywalls.</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeModal === 'changelog' && (
+                <div className={styles.modalTextContent}>
+                  <div className={styles.changelogItem}>
+                    <div className={styles.changelogHeader}>
+                      <span className={styles.changelogVersionBadge}>v2.0 • Latest Release</span>
+                      <span className={styles.changelogDate}>September 2026</span>
+                    </div>
+                    <h4>Modern Minimalist UI & YouTube Study Engine 2.0</h4>
+                    <ul className={styles.modalList}>
+                      <li>Full landing page redesign with ambient saffron-indigo lighting, geometric typography, and Bento Grid features.</li>
+                      <li>Command-bar playlist parser with one-click sample triggers for React Masterclass, Python & DSA, and System Design.</li>
+                      <li>Streamlined floating glass navbar with conditional auth links and quick search shortcut.</li>
+                      <li>Modernized 4-column developer footer with live operational telemetry.</li>
+                    </ul>
+                  </div>
+
+                  <div className={styles.changelogItem}>
+                    <div className={styles.changelogHeader}>
+                      <span className={styles.changelogVersionBadgeSecondary}>v1.5</span>
+                      <span className={styles.changelogDate}>August 2026</span>
+                    </div>
+                    <h4>Verifiable Digital Certificates & jsPDF Engine</h4>
+                    <ul className={styles.modalList}>
+                      <li>Automated high-resolution PDF certificate generation upon completing 100% course syllabus.</li>
+                      <li>Unique verifiable credential hashes suitable for LinkedIn and GitHub portfolios.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.legalModalFooter}>
+              <button 
+                className={styles.legalModalConfirmBtn} 
+                onClick={() => setActiveModal(null)}
+              >
+                Understood
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

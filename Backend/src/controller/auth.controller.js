@@ -25,6 +25,12 @@ function sanitizeUser(user) {
       playbackSpeed: user.preferences?.playbackSpeed ?? 1,
       emailReminders: user.preferences?.emailReminders ?? true,
       streakAlerts: user.preferences?.streakAlerts ?? true,
+      reminderTime: user.preferences?.reminderTime ?? "20:00",
+      soundEffects: user.preferences?.soundEffects ?? true,
+      defaultTab: user.preferences?.defaultTab ?? "overview",
+      autoMarkThreshold: user.preferences?.autoMarkThreshold ?? 90,
+      studyDaysSchedule: user.preferences?.studyDaysSchedule ?? "all",
+      theme: user.preferences?.theme ?? "dark",
     },
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -117,12 +123,8 @@ export async function updateProfile(req, res) {
       };
     }
 
-    if (email && email !== user.email) {
-      const existing = await User.findOne({ email });
-      if (existing) {
-        return res.status(409).json({ message: "Email already registered" });
-      }
-      user.email = email;
+    if (email && email.toLowerCase() !== user.email.toLowerCase()) {
+      return res.status(400).json({ message: "Email address cannot be changed from account settings" });
     }
 
     if (newPassword) {

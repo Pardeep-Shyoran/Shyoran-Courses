@@ -1,148 +1,1011 @@
-.useCases {
-  padding: 8rem 2rem;
-  max-width: 1200px;
+.useCasesSection {
+  padding: 7rem 1.5rem 8rem 1.5rem;
+  max-width: 1240px;
   margin: 0 auto;
   position: relative;
-  border-top: 1px solid var(--border-color);
 }
 
+/* Header */
 .sectionHeader {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 3.5rem;
 }
 
 .sectionHeaderBadge {
   display: inline-block;
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   font-weight: 700;
   color: var(--primary-color);
   margin-bottom: 0.75rem;
 }
 
-.sectionHeader h2 {
+.sectionTitle {
+  font-family: var(--font-serif);
   font-size: 2.75rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  margin-bottom: 0.85rem;
+  line-height: 1.2;
 }
 
-.sectionHeader p {
+.sectionSubtitle {
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  max-width: 600px;
+  font-size: 1.05rem;
+  max-width: 640px;
   margin: 0 auto;
+  line-height: 1.6;
 }
 
-.useCaseGrid {
+/* Bento Grid Container - 12 Columns */
+.bentoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+  position: relative;
 }
 
-.useCaseCard {
-  background: rgba(18, 21, 38, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 0;
-  border-radius: 20px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-sm);
+/* Theme Accents */
+.accentTextPrimary {
+  color: var(--primary-color);
+}
+
+.accentTextGold {
+  color: var(--warning);
+}
+
+/* ========================================================
+   Card 1: Left Tall Hero Card (Spans 4 Cols, 2 Rows)
+   ======================================================== */
+.tallCard {
+  grid-column: span 4;
+  grid-row: span 2;
+  border-radius: 28px;
   overflow: hidden;
+  position: relative;
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
-.useCaseCard:hover {
+.tallCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(226, 88, 62, 0.25);
-  background: rgba(18, 21, 38, 0.4);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(226, 88, 62, 0.35);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
 }
 
-.useCaseHeader {
+.tallCardImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 1;
+}
+
+.tallCardGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 12, 22, 0) 30%,
+    rgba(10, 12, 22, 0.65) 65%,
+    rgba(10, 12, 22, 0.96) 100%
+  );
+  z-index: 2;
+}
+
+.tallCardContent {
+  position: relative;
+  z-index: 3;
+  padding: 2.25rem 2rem;
+}
+
+.tallCardSubhead {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.tallCardTitle {
+  font-family: var(--font-sans);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+/* ========================================================
+   Card 2: Top Right Wide Hero Box (Spans 8 Cols)
+   ======================================================== */
+.headerCard {
+  grid-column: span 8;
+  grid-row: span 1;
+  background: rgba(28, 32, 55, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 28px;
+  padding: 2.5rem 3rem 2.25rem 3rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 270px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(226, 88, 62, 0.22);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.headerCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.38);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+
+.watermarkLetter {
+  position: absolute;
+  right: 1.5rem;
+  top: -3.5rem;
+  font-size: 18rem;
+  font-weight: 900;
+  color: rgba(226, 88, 62, 0.05);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+}
+
+.headerCardContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.headerHeadline {
+  font-family: var(--font-sans);
+  font-size: 2.35rem;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  max-width: 580px;
+  margin-bottom: 1.75rem;
+}
+
+.ctaRow {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
-.useCaseEmoji {
-  font-size: 1.75rem;
-}
-
-.useCaseCard h3 {
-  font-size: 1.25rem;
+.ctaPillBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.65rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #e2583e 0%, #cb462d 100%);
+  color: #ffffff;
+  text-decoration: none;
   font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 16px rgba(226, 88, 62, 0.35);
+  transition: all 0.2s ease;
+}
+
+.ctaPillBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 22px rgba(226, 88, 62, 0.45);
+}
+
+.ctaArrowBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: rgba(226, 88, 62, 0.08);
+}
+
+.ctaArrowBtn:hover {
+  background: var(--primary-color);
+  color: #ffffff;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+.brandRow {
+  margin-top: auto;
+}
+
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.brandMonogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.brandName {
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
 }
 
-.useCaseCard p {
+/* ========================================================
+   Card 3: 98% Stat Card (Spans 4 Cols)
+   ======================================================== */
+.statCard {
+  grid-column: span 4;
+  grid-row: span 1;
+  background: rgba(28, 32, 55, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+  border-radius: 28px;
+  padding: 2rem 2rem 1.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 250px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.statTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.statNumber {
+  font-family: var(--font-sans);
+  font-size: 3.8rem;
+  font-weight: 850;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+.trustBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  font-size: 0.925rem;
-  line-height: 1.6;
-  margin: 0;
+  text-align: right;
+  line-height: 1.3;
 }
 
-/* Light mode adjustments */
-[data-theme="light"] .useCaseCard {
-  background: rgba(253, 251, 247, 0.5);
-  border-color: rgba(15, 18, 29, 0.04);
+.shieldIcon {
+  color: var(--primary-color);
 }
 
-[data-theme="light"] .useCaseCard:hover {
-  background: rgba(253, 251, 247, 0.85);
-  border-color: rgba(216, 79, 51, 0.2);
+/* Floating Card / Credential Pass Graphic */
+.passGraphic {
+  background: linear-gradient(135deg, #e2583e 0%, #a8321e 100%);
+  border-radius: 16px;
+  padding: 1.25rem 1.4rem;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(226, 88, 62, 0.35);
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  transform: rotate(-1deg);
+  transition: transform 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .useCases {
-    padding: 5rem 1rem;
-  }
-  .sectionHeader h2 {
-    font-size: 2.25rem;
-  }
+.statCard:hover .passGraphic {
+  transform: rotate(0deg) scale(1.02);
 }
 
-.cardHeader {
-  background: rgba(255, 255, 255, 0.015);
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+.passHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.passChipSlot {
+  width: 32px;
+  height: 24px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  margin-bottom: 0.85rem;
+}
+
+.passNumber {
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+}
+
+.passFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.passBadge {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ========================================================
+   Card 4: AI Holographic Study Companion Card (Spans 4 Cols)
+   ======================================================== */
+.aiCard {
+  grid-column: span 4;
+  grid-row: span 1;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  min-height: 250px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.aiCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.aiCardImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.glassHud {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  width: 230px;
+  background: rgba(18, 21, 38, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(226, 88, 62, 0.35);
+  border-radius: 18px;
+  padding: 1.15rem;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.hudHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.hudIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(226, 88, 62, 0.25);
+  color: #ff7e67;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.hudTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #ffffff;
+}
+
+.hudSubtitle {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.hudStatus {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  position: relative;
-  z-index: 1;
+  font-size: 0.725rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.75rem;
 }
 
-.dot {
+.pulseDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  display: inline-block;
+  background: var(--primary-color);
+  animation: pulse 1.5s infinite;
 }
 
-.dot:nth-child(1) { background-color: var(--error); opacity: 0.75; }
-.dot:nth-child(2) { background-color: var(--warning); opacity: 0.75; }
-.dot:nth-child(3) { background-color: var(--success); opacity: 0.75; }
-
-.cardTitle {
-  margin-left: 0.6rem;
-  font-size: 0.725rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
 }
 
-.cardBody {
-  padding: 2.25rem 2rem;
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+}
+
+.waveform span {
+  flex: 1;
+  background: linear-gradient(to top, var(--primary-color), #f59e0b);
+  border-radius: 2px;
+  animation: wave 1.2s infinite ease-in-out;
+}
+
+.waveform span:nth-child(even) {
+  animation-delay: 0.2s;
+}
+.waveform span:nth-child(3n) {
+  animation-delay: 0.4s;
+}
+
+@keyframes wave {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
+
+/* ========================================================
+   Card 5: Bottom Wide Brand Card (Spans 6 Cols)
+   ======================================================== */
+.brandCard {
+  grid-column: span 6;
+  background: #121526;
+  border-radius: 28px;
+  padding: 2.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 240px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(226, 88, 62, 0.22);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.brandCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.38);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+
+.largeBrandLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.largeLogoLetter {
+  font-family: var(--font-sans);
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.largeLogoText {
+  font-family: var(--font-sans);
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.featurePillsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.featurePill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 550;
+  line-height: 1.25;
+}
+
+.pillIconWrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(226, 88, 62, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary-color);
+  background: rgba(226, 88, 62, 0.12);
+}
+
+/* ========================================================
+   Card 6: Smartwatch Device Card (Spans 3 Cols)
+   ======================================================== */
+.deviceCard {
+  grid-column: span 3;
+  border-radius: 28px;
+  overflow: hidden;
   position: relative;
-  z-index: 1;
+  min-height: 240px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
-/* Light mode adjustments */
-[data-theme="light"] .cardHeader {
-  background: rgba(15, 18, 29, 0.02);
-  border-bottom-color: rgba(15, 18, 29, 0.05);
+.deviceCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.deviceCardImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.watchScreenOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90px;
+  height: 90px;
+  border-radius: 22px;
+  background: rgba(10, 12, 22, 0.82);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(226, 88, 62, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.watchMonogram {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--primary-color);
+  line-height: 1;
+}
+
+.watchStreak {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--warning);
+}
+
+/* ========================================================
+   Card 7: 3D Vault / Milestone Card (Spans 3 Cols)
+   ======================================================== */
+.vaultCard {
+  grid-column: span 3;
+  background: rgba(28, 32, 55, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+  border-radius: 28px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 240px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.vaultCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(226, 88, 62, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.vaultScene {
+  position: relative;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vaultBox {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #1c2037 0%, #121526 100%);
+  border: 2.5px solid var(--primary-color);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  transform: rotate(-4deg);
+  transition: transform 0.3s ease;
+}
+
+.vaultCard:hover .vaultBox {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.vaultFront {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vaultLogo {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--primary-color);
+}
+
+.vaultDial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--warning);
+  background: rgba(234, 158, 36, 0.2);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.vaultDialHandle {
+  width: 14px;
+  height: 3px;
+  background: var(--warning);
+  border-radius: 2px;
+}
+
+/* Floating Gems / Coins */
+.floatingGem1 {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  animation: float 2.5s infinite ease-in-out;
+}
+
+.floatingGem2 {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 1.4rem;
+  animation: float 3s infinite ease-in-out;
+  animation-delay: 0.5s;
+}
+
+.floatingGem3 {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  font-size: 1.3rem;
+  color: var(--warning);
+  animation: float 2.2s infinite ease-in-out;
+  animation-delay: 1s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.cloudBase {
+  position: absolute;
+  bottom: 0;
+  width: 140px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  filter: blur(4px);
+}
+
+.vaultContent {
+  position: relative;
+  z-index: 2;
+}
+
+.vaultTitle {
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.vaultDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ========================================================
+   Light Mode Theme Adjustments
+   ======================================================== */
+[data-theme="light"] .tallCard {
+  border-color: rgba(15, 18, 29, 0.08);
+  box-shadow: 0 12px 30px rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .tallCardGradient {
+  background: linear-gradient(
+    to bottom,
+    rgba(253, 251, 247, 0) 30%,
+    rgba(253, 251, 247, 0.72) 65%,
+    rgba(253, 251, 247, 0.98) 100%
+  );
+}
+
+[data-theme="light"] .tallCardSubhead {
+  color: var(--primary-color);
+}
+
+[data-theme="light"] .tallCardTitle {
+  color: #0f121d;
+}
+
+[data-theme="light"] .headerCard {
+  background: #ffffff;
+  border-color: rgba(216, 79, 51, 0.22);
+  box-shadow: 0 12px 36px rgba(216, 79, 51, 0.06);
+}
+
+[data-theme="light"] .headerHeadline {
+  color: #0f121d;
+}
+
+[data-theme="light"] .brandBadge {
+  background: rgba(216, 79, 51, 0.08);
+  border-color: rgba(216, 79, 51, 0.2);
+}
+
+[data-theme="light"] .brandName {
+  color: #0f121d;
+}
+
+[data-theme="light"] .statCard {
+  background: #ffffff;
+  border-color: rgba(216, 79, 51, 0.2);
+  box-shadow: 0 10px 26px rgba(216, 79, 51, 0.05);
+}
+
+[data-theme="light"] .statNumber {
+  color: #0f121d;
+}
+
+[data-theme="light"] .trustBadge {
+  color: #4e5369;
+}
+
+[data-theme="light"] .shieldIcon {
+  color: var(--primary-color);
+}
+
+[data-theme="light"] .aiCard {
+  border-color: rgba(15, 18, 29, 0.08);
+  box-shadow: 0 10px 26px rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .glassHud {
+  background: rgba(253, 251, 247, 0.88);
+  border-color: rgba(216, 79, 51, 0.3);
+  box-shadow: 0 12px 28px rgba(15, 18, 29, 0.12);
+}
+
+[data-theme="light"] .hudTitle {
+  color: #0f121d;
+}
+
+[data-theme="light"] .hudSubtitle {
+  color: #555b70;
+}
+
+[data-theme="light"] .hudStatus {
+  color: #1c1e21;
+}
+
+[data-theme="light"] .brandCard {
+  background: #ffffff;
+  border-color: rgba(216, 79, 51, 0.2);
+  box-shadow: 0 10px 26px rgba(216, 79, 51, 0.05);
+}
+
+[data-theme="light"] .largeLogoText {
+  color: #0f121d;
+}
+
+[data-theme="light"] .featurePill {
+  color: #1c1e21;
+}
+
+[data-theme="light"] .pillIconWrapper {
+  background: rgba(216, 79, 51, 0.08);
+  border-color: rgba(216, 79, 51, 0.25);
+  color: var(--primary-color);
+}
+
+[data-theme="light"] .deviceCard {
+  border-color: rgba(15, 18, 29, 0.08);
+  box-shadow: 0 10px 26px rgba(15, 18, 29, 0.05);
+}
+
+[data-theme="light"] .watchScreenOverlay {
+  background: rgba(253, 251, 247, 0.92);
+  border-color: rgba(216, 79, 51, 0.35);
+  color: #0f121d;
+  box-shadow: 0 6px 16px rgba(15, 18, 29, 0.12);
+}
+
+[data-theme="light"] .vaultCard {
+  background: #ffffff;
+  border-color: rgba(216, 79, 51, 0.2);
+  box-shadow: 0 10px 26px rgba(216, 79, 51, 0.05);
+}
+
+[data-theme="light"] .vaultBox {
+  background: linear-gradient(135deg, #ffffff 0%, #fdf5f2 100%);
+  border-color: var(--primary-color);
+  box-shadow: 0 10px 24px rgba(216, 79, 51, 0.12);
+}
+
+[data-theme="light"] .vaultTitle {
+  color: #0f121d;
+}
+
+[data-theme="light"] .vaultDesc {
+  color: #4e5369;
+}
+
+[data-theme="light"] .cloudBase {
+  background: rgba(216, 79, 51, 0.12);
+}
+
+/* ========================================================
+   Responsive Media Queries
+   ======================================================== */
+@media (max-width: 1024px) {
+  .tallCard {
+    grid-column: span 6;
+    grid-row: span 1;
+    min-height: 380px;
+  }
+
+  .headerCard {
+    grid-column: span 6;
+    grid-row: span 1;
+  }
+
+  .statCard {
+    grid-column: span 6;
+  }
+
+  .aiCard {
+    grid-column: span 6;
+  }
+
+  .brandCard {
+    grid-column: span 12;
+  }
+
+  .deviceCard {
+    grid-column: span 6;
+  }
+
+  .vaultCard {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 768px) {
+  .useCasesSection {
+    padding: 4.5rem 1rem 5.5rem 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 2.15rem;
+  }
+
+  .bentoGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .tallCard,
+  .headerCard,
+  .statCard,
+  .aiCard,
+  .brandCard,
+  .deviceCard,
+  .vaultCard {
+    grid-column: span 1;
+    grid-row: auto;
+  }
+
+  .headerHeadline {
+    font-size: 1.85rem;
+  }
+
+  .featurePillsRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
 }

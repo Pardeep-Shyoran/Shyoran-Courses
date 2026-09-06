@@ -80,52 +80,66 @@ const CustomCourseForm = ({ onSuccess, onCancel }) => {
 
   return (
     <form onSubmit={handleSaveCustomCourse} className={styles.form}>
-      <div className={styles.inputGroup}>
-        <label className={styles.label}>Course Title *</label>
-        <input 
-          type="text" 
-          placeholder="e.g. Master React and Vite" 
-          value={customTitle}
-          onChange={(e) => setCustomTitle(e.target.value)}
-          className={styles.input}
-          required
-          disabled={loading}
-        />
+      {/* Step 1: Course Info */}
+      <div className={styles.sectionCard}>
+        <div className={styles.sectionCardHeader}>
+          <span className={styles.stepBadge}>STEP 1</span>
+          <h4 className={styles.sectionCardTitle}>Course Information</h4>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Course Title *</label>
+          <input 
+            type="text" 
+            placeholder="e.g. Master React, TypeScript and Vite" 
+            value={customTitle}
+            onChange={(e) => setCustomTitle(e.target.value)}
+            className={styles.input}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Description</label>
+          <textarea 
+            placeholder="What learning milestones or objectives will this custom track cover?" 
+            value={customDesc}
+            onChange={(e) => setCustomDesc(e.target.value)}
+            className={styles.textarea}
+            rows="3"
+            disabled={loading}
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Cover Thumbnail URL (optional)</label>
+          <input 
+            type="text" 
+            placeholder="https://images.unsplash.com/... or image link" 
+            value={customThumb}
+            onChange={(e) => setCustomThumb(e.target.value)}
+            className={styles.input}
+            disabled={loading}
+          />
+        </div>
       </div>
 
-      <div className={styles.inputGroup}>
-        <label className={styles.label}>Description</label>
-        <textarea 
-          placeholder="What will you learn in this custom study roadmap?" 
-          value={customDesc}
-          onChange={(e) => setCustomDesc(e.target.value)}
-          className={styles.textarea}
-          rows="3"
-          disabled={loading}
-        />
-      </div>
-
-      <div className={styles.inputGroup}>
-        <label className={styles.label}>Course Thumbnail Image URL (optional)</label>
-        <input 
-          type="text" 
-          placeholder="https://images.unsplash.com/..." 
-          value={customThumb}
-          onChange={(e) => setCustomThumb(e.target.value)}
-          className={styles.input}
-          disabled={loading}
-        />
-      </div>
-
-      {/* Add Custom Videos Section */}
-      <div className={styles.customVideosSection}>
-        <h3 className={styles.sectionHeader}>Manage Course Videos ({customVideos.length})</h3>
+      {/* Step 2: Add Custom Videos Section */}
+      <div className={styles.sectionCard}>
+        <div className={styles.sectionCardHeader}>
+          <span className={styles.stepBadge}>STEP 2</span>
+          <div className={styles.sectionTitleRow}>
+            <h4 className={styles.sectionCardTitle}>Add Video Lessons</h4>
+            <span className={styles.counterBadge}>{customVideos.length} lessons added</span>
+          </div>
+        </div>
         
         <div className={styles.addVideoRow}>
           <div className={styles.rowInputGroup}>
             <input 
               type="text" 
-              placeholder="Video Title" 
+              placeholder="Lesson Title (e.g. 01 - Getting Started)" 
               value={newVideoTitle}
               onChange={(e) => setNewVideoTitle(e.target.value)}
               className={styles.rowInput}
@@ -135,7 +149,7 @@ const CustomCourseForm = ({ onSuccess, onCancel }) => {
           <div className={styles.rowInputGroup}>
             <input 
               type="text" 
-              placeholder="YouTube URL or Video ID" 
+              placeholder="YouTube Video URL or 11-char ID" 
               value={newVideoUrl}
               onChange={(e) => setNewVideoUrl(e.target.value)}
               className={styles.rowInput}
@@ -148,32 +162,47 @@ const CustomCourseForm = ({ onSuccess, onCancel }) => {
             className={styles.rowAddBtn}
             disabled={loading || !newVideoTitle || !newVideoUrl}
           >
-            Add
+            <span>+ Add</span>
           </button>
         </div>
 
-        {customVideos.length > 0 && (
+        {customVideos.length > 0 ? (
           <div className={styles.customVideosListWrapper}>
             <ul className={styles.customVideosList}>
               {customVideos.map((v, i) => (
                 <li key={i} className={styles.customVideoItem}>
-                  <span className={styles.customVideoTitle}>📺 {v.title}</span>
-                  <button 
-                    type="button" 
-                    onClick={() => handleRemoveCustomVideo(i)} 
-                    className={styles.removeVideoBtn}
-                    disabled={loading}
-                  >
-                    &times;
-                  </button>
+                  <div className={styles.videoItemLeft}>
+                    <span className={styles.videoItemIdx}>{i + 1}</span>
+                    <span className={styles.customVideoTitle}>{v.title}</span>
+                  </div>
+                  <div className={styles.videoItemRight}>
+                    <span className={styles.ytIdBadge}>{v.youtubeId}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => handleRemoveCustomVideo(i)} 
+                      className={styles.removeVideoBtn}
+                      title="Remove lesson"
+                      disabled={loading}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
+        ) : (
+          <div className={styles.emptyLessonsPlaceholder}>
+            <p>No lessons added yet. Fill in the title and YouTube link above to begin structuring your track.</p>
+          </div>
         )}
       </div>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && (
+        <div className={styles.errorBanner}>
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className={styles.actions}>
         {onCancel && (
@@ -191,7 +220,19 @@ const CustomCourseForm = ({ onSuccess, onCancel }) => {
           className={styles.primaryBtn} 
           disabled={loading || customVideos.length === 0}
         >
-          {loading ? 'Creating Course...' : `Create Course with ${customVideos.length} Videos`}
+          {loading ? (
+            <>
+              <span className={styles.spinner}></span>
+              <span>Creating Course...</span>
+            </>
+          ) : (
+            <>
+              <span>Create Course ({customVideos.length} Lessons)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </>
+          )}
         </button>
       </div>
     </form>

@@ -22,16 +22,16 @@ const CoursesToolbar = ({
   return (
     <div className={styles.toolbarContainer}>
       <div className={styles.toolbarRow}>
-        {/* Search Input */}
+        {/* Search Input with shortcut hint */}
         <div className={styles.searchWrapper}>
           <svg
             className={styles.searchIcon}
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
@@ -40,12 +40,12 @@ const CoursesToolbar = ({
           </svg>
           <input 
             type="text" 
-            placeholder="Search by title, description or tags..." 
+            placeholder="Search by title, description, or topic tag..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchInput}
           />
-          {searchQuery && (
+          {searchQuery ? (
             <button 
               className={styles.clearSearchBtn}
               onClick={() => setSearchQuery('')}
@@ -54,6 +54,8 @@ const CoursesToolbar = ({
             >
               ✕
             </button>
+          ) : (
+            <span className={styles.searchKeyHint}>/</span>
           )}
         </div>
 
@@ -61,24 +63,28 @@ const CoursesToolbar = ({
         {activeMainTab === 'library' && (
           <div className={styles.filterTabs}>
             <button 
+              type="button"
               className={`${styles.filterTab} ${filterType === 'all' ? styles.activeFilter : ''}`}
               onClick={() => setFilterType('all')}
             >
               <span>⚡ All</span>
             </button>
             <button 
+              type="button"
               className={`${styles.filterTab} ${filterType === 'in-progress' ? styles.activeFilter : ''}`}
               onClick={() => setFilterType('in-progress')}
             >
               <span>⏳ In Progress</span>
             </button>
             <button 
+              type="button"
               className={`${styles.filterTab} ${filterType === 'not-started' ? styles.activeFilter : ''}`}
               onClick={() => setFilterType('not-started')}
             >
               <span>🎯 Not Started</span>
             </button>
             <button 
+              type="button"
               className={`${styles.filterTab} ${filterType === 'completed' ? styles.activeFilter : ''}`}
               onClick={() => setFilterType('completed')}
             >
@@ -88,12 +94,12 @@ const CoursesToolbar = ({
         )}
 
         {/* Sort & View Mode Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className={styles.controlsGroup}>
           <div className={styles.sortWrapper}>
             <label htmlFor="course-sort-select" className={styles.sortLabel}>
               <svg 
-                width="15" 
-                height="15" 
+                width="14" 
+                height="14" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
@@ -105,7 +111,6 @@ const CoursesToolbar = ({
                 <line x1="6" y1="12" x2="18" y2="12"></line>
                 <line x1="9" y1="18" x2="15" y2="18"></line>
               </svg>
-              <span>Sort by:</span>
             </label>
             <select 
               id="course-sort-select"
@@ -113,18 +118,18 @@ const CoursesToolbar = ({
               onChange={(e) => setSortBy(e.target.value)}
               className={styles.sortSelect}
             >
-              <option value="newest">✨ Newly Added First</option>
-              <option value="oldest">⏳ Oldest Added First</option>
-              <option value="title-asc">🔤 Title (A → Z)</option>
-              <option value="title-desc">🔤 Title (Z → A)</option>
+              <option value="newest">Newly Added</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title-asc">Title (A → Z)</option>
+              <option value="title-desc">Title (Z → A)</option>
               {activeMainTab === 'library' && (
                 <>
-                  <option value="progress-desc">📈 Highest Progress</option>
-                  <option value="progress-asc">📉 Lowest Progress</option>
+                  <option value="progress-desc">Highest Progress</option>
+                  <option value="progress-asc">Lowest Progress</option>
                 </>
               )}
-              <option value="videos-desc">📹 Most Lessons / Videos</option>
-              <option value="updated">⚡ Recently Updated</option>
+              <option value="videos-desc">Most Lessons</option>
+              <option value="updated">Recently Studied</option>
             </select>
           </div>
 
@@ -192,7 +197,7 @@ const CoursesToolbar = ({
       {/* Counter & Active Filter summary bar */}
       <div className={styles.metaRow}>
         <span className={styles.resultCountBadge}>
-          Showing {resultCount} of {totalCount} {activeMainTab === 'library' ? 'enrolled courses' : 'public courses'}
+          Showing <strong>{resultCount}</strong> of {totalCount} {activeMainTab === 'library' ? 'enrolled courses' : 'public courses'}
           {selectedTag !== 'all' && <span> • Topic: <strong>#{selectedTag}</strong></span>}
         </span>
 
@@ -202,11 +207,11 @@ const CoursesToolbar = ({
             className={styles.resetFiltersBtn}
             type="button"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
               <path d="M3 3v5h5"></path>
             </svg>
-            Reset Filters
+            <span>Reset Filters</span>
           </button>
         )}
       </div>
@@ -215,4 +220,3 @@ const CoursesToolbar = ({
 }
 
 export default CoursesToolbar
-

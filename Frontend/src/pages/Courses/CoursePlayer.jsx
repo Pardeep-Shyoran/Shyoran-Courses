@@ -852,8 +852,10 @@ const CoursePlayer = () => {
               />
 
               {/* Workstation Tab Headers */}
-              <div className={styles.tabHeaders}>
+              <div className={styles.tabHeaders} role="tablist">
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'notes'}
                   className={`${styles.tabHeader} ${activeTab === 'notes' ? styles.activeTab : ''}`}
                   onClick={() => setActiveTab('notes')}
                 >
@@ -862,8 +864,14 @@ const CoursePlayer = () => {
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                   <span>Video Notes</span>
+                  {activeVideo?.notes && activeVideo.notes.trim().length > 0 && (
+                    <span className={styles.tabBadgeDot} title="Notes saved for this lesson" />
+                  )}
                 </button>
+
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'ai'}
                   className={`${styles.tabHeader} ${activeTab === 'ai' ? styles.activeTab : ''}`}
                   onClick={() => setActiveTab('ai')}
                 >
@@ -874,8 +882,12 @@ const CoursePlayer = () => {
                     <path d="M15 13v2"></path>
                   </svg>
                   <span>AI Assistant</span>
+                  <span className={styles.tabMicroPill}>✨ Gemini</span>
                 </button>
+
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'practice'}
                   className={`${styles.tabHeader} ${activeTab === 'practice' ? styles.activeTab : ''}`}
                   onClick={() => setActiveTab('practice')}
                 >
@@ -883,8 +895,12 @@ const CoursePlayer = () => {
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                   </svg>
                   <span>Active Recall</span>
+                  <span className={styles.tabMicroPill}>Quiz</span>
                 </button>
+
                 <button
+                  role="tab"
+                  aria-selected={activeTab === 'about'}
                   className={`${styles.tabHeader} ${activeTab === 'about' ? styles.activeTab : ''}`}
                   onClick={() => setActiveTab('about')}
                 >
@@ -895,8 +911,11 @@ const CoursePlayer = () => {
                   </svg>
                   <span>About Course</span>
                 </button>
+
                 {isOwner && (
                   <button
+                    role="tab"
+                    aria-selected={activeTab === 'settings'}
                     className={`${styles.tabHeader} ${activeTab === 'settings' ? styles.activeTab : ''}`}
                     onClick={() => setActiveTab('settings')}
                   >

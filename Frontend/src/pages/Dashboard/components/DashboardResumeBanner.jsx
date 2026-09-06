@@ -1,22 +1,22 @@
 import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { calculateCourseDurations } from '../../../utils/duration'
-import styles from '../Courses.module.css'
+import styles from './DashboardResumeBanner.module.css'
 
-const CoursesHeroResume = ({ libraryCourses = [] }) => {
+const DashboardResumeBanner = ({ courses = [] }) => {
   const [dismissed, setDismissed] = useState(() => {
-    return sessionStorage.getItem('dismiss_hero_resume') === 'true'
+    return sessionStorage.getItem('dismiss_dashboard_resume') === 'true'
   })
 
   const targetData = useMemo(() => {
-    if (!libraryCourses || libraryCourses.length === 0) return null
+    if (!courses || courses.length === 0) return null
 
     // 1. Check lastPlayed in localStorage
     const lastPlayedJson = localStorage.getItem('lastPlayed')
     if (lastPlayedJson) {
       try {
         const { courseId, videoId } = JSON.parse(lastPlayedJson)
-        const matchedCourse = libraryCourses.find(c => c._id === courseId)
+        const matchedCourse = courses.find(c => c._id === courseId)
         if (matchedCourse && matchedCourse.videos && matchedCourse.videos.length > 0) {
           const matchedVideo = matchedCourse.videos.find(v => v._id === videoId) || matchedCourse.videos[0]
           const videoIndex = matchedCourse.videos.findIndex(v => v._id === matchedVideo._id)
@@ -27,19 +27,18 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
           }
         }
       } catch (e) {
-        console.error("Error reading lastPlayed for hero resume", e)
+        console.error("Error reading lastPlayed for dashboard resume banner", e)
       }
     }
 
     // 2. Fallback: Find first in-progress course
-    const inProgressCourse = libraryCourses.find(c => {
+    const inProgressCourse = courses.find(c => {
       const vids = c.videos || []
       const done = vids.filter(v => v.completed).length
       return done > 0 && done < vids.length
     })
 
     if (inProgressCourse && inProgressCourse.videos && inProgressCourse.videos.length > 0) {
-      // Find first uncompleted video
       const nextUncompletedIdx = inProgressCourse.videos.findIndex(v => !v.completed)
       const activeIdx = nextUncompletedIdx >= 0 ? nextUncompletedIdx : 0
       return {
@@ -50,7 +49,7 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
     }
 
     // 3. Fallback: First course with videos
-    const firstCourse = libraryCourses.find(c => c.videos && c.videos.length > 0)
+    const firstCourse = courses.find(c => c.videos && c.videos.length > 0)
     if (firstCourse) {
       return {
         course: firstCourse,
@@ -60,7 +59,7 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
     }
 
     return null
-  }, [libraryCourses])
+  }, [courses])
 
   if (dismissed || !targetData) return null
 
@@ -72,57 +71,58 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
 
   const handleDismiss = () => {
     setDismissed(true)
-    sessionStorage.setItem('dismiss_hero_resume', 'true')
+    sessionStorage.setItem('dismiss_dashboard_resume', 'true')
   }
 
   const resumeUrl = `/courses/${course._id}?videoId=${video._id}`
 
   return (
-    <div className={styles.heroResumeBanner}>
-      <div className={styles.heroResumeMain}>
+    <div className={styles.resumeHeroBanner}>
+      <div className={styles.resumeTopBeam}></div>
+      <div className={styles.resumeMain}>
         {/* Left Thumbnail with Play overlay */}
-        <Link to={resumeUrl} className={styles.heroResumeThumbWrap} title={`Resume ${course.title}`}>
+        <Link to={resumeUrl} className={styles.resumeThumbWrap} title={`Resume ${course.title}`}>
           {course.thumbnail ? (
-            <img src={course.thumbnail} alt={course.title} className={styles.heroResumeThumb} />
+            <img src={course.thumbnail} alt={course.title} className={styles.resumeThumb} />
           ) : (
-            <div className={styles.heroResumeThumbPlaceholder}>
+            <div className={styles.resumeThumbPlaceholder}>
               <span>📚</span>
             </div>
           )}
-          <div className={styles.heroResumePlayOverlay}>
-            <div className={styles.heroPlayIcon}>▶</div>
+          <div className={styles.resumePlayOverlay}>
+            <div className={styles.playIcon}>▶</div>
           </div>
         </Link>
 
         {/* Middle Info & Progress details */}
-        <div className={styles.heroResumeInfo}>
-          <div className={styles.heroResumeBadgeRow}>
-            <span className={styles.heroResumeBadge}>⚡ CONTINUE LEARNING</span>
+        <div className={styles.resumeInfo}>
+          <div className={styles.resumeBadgeRow}>
+            <span className={styles.resumeBadge}>⚡ CONTINUE LEARNING</span>
             {course.category && (
-              <span className={styles.heroCategoryBadge}>{course.category}</span>
+              <span className={styles.categoryBadge}>{course.category}</span>
             )}
           </div>
 
-          <h3 className={styles.heroResumeTitle}>
+          <h3 className={styles.resumeTitle}>
             <Link to={resumeUrl}>{course.title}</Link>
           </h3>
 
-          <div className={styles.heroResumeLesson}>
-            <span className={styles.heroLessonIndex}>Lesson {videoIndex + 1} of {totalCount}:</span>
-            <span className={styles.heroLessonTitle}>"{video.title || 'Next Lesson'}"</span>
+          <div className={styles.resumeLesson}>
+            <span className={styles.lessonIndex}>Lesson {videoIndex + 1} of {totalCount}:</span>
+            <span className={styles.lessonTitle}>"{video.title || 'Next Lesson'}"</span>
             {video.duration && (
-              <span className={styles.heroLessonDuration}>({video.duration})</span>
+              <span className={styles.lessonDuration}>({video.duration})</span>
             )}
           </div>
 
-          <div className={styles.heroResumeProgressRow}>
-            <div className={styles.heroProgressBarTrack}>
+          <div className={styles.progressRow}>
+            <div className={styles.progressBarTrack}>
               <div
-                className={styles.heroProgressBarFill}
+                className={styles.progressBarFill}
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
-            <span className={styles.heroProgressStats}>
+            <span className={styles.progressStats}>
               <strong>{completionPercentage}%</strong> complete
               {durations.remainingFormatted && durations.remainingFormatted !== '0m' && (
                 <span> • {durations.remainingFormatted} left</span>
@@ -132,8 +132,8 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
         </div>
 
         {/* Right Actions: Resume CTA & Dismiss */}
-        <div className={styles.heroResumeActions}>
-          <Link to={resumeUrl} className={styles.heroResumeBtn}>
+        <div className={styles.resumeActions}>
+          <Link to={resumeUrl} className={styles.resumeBtn}>
             <span>Resume Lesson</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -142,7 +142,7 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
           <button
             type="button"
             onClick={handleDismiss}
-            className={styles.heroDismissBtn}
+            className={styles.dismissBtn}
             title="Dismiss resume banner for this session"
             aria-label="Dismiss banner"
           >
@@ -154,4 +154,4 @@ const CoursesHeroResume = ({ libraryCourses = [] }) => {
   )
 }
 
-export default CoursesHeroResume
+export default DashboardResumeBanner
