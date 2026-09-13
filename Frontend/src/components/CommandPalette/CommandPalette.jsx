@@ -75,6 +75,15 @@ const CommandPalette = ({ isOpen, setIsOpen }) => {
       badge: 'Page'
     },
     {
+      id: 'ql-focus-feeds',
+      category: 'Quick Links',
+      title: 'Focus Feeds & Student Channels',
+      subtitle: 'Distraction-free YouTube channel feeds: Motivation, GK, and Daily News',
+      url: '/courses?tab=channels',
+      type: 'link',
+      badge: 'Feeds'
+    },
+    {
       id: 'ql-courses',
       category: 'Quick Links',
       title: 'My Courses Library',

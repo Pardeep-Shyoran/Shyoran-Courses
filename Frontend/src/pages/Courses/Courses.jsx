@@ -11,6 +11,7 @@ import CoursesToolbar from './components/CoursesToolbar'
 import CoursesCatalog from './components/CoursesCatalog'
 import CoursesAddTab from './components/CoursesAddTab'
 import CoursesHeroResume from './components/CoursesHeroResume'
+import FocusFeedsTab from './components/FocusFeedsTab'
 import styles from './Courses.module.css'
 
 const Courses = () => {
@@ -19,16 +20,24 @@ const Courses = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const location = useLocation()
+  const navigate = useNavigate()
   
-  // Tabs: 'library', 'explore', or 'add'
+  // Tabs: 'library', 'explore', 'add', or 'channels'
   const [activeMainTab, setActiveMainTab] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     const tabParam = params.get('tab')
     if (tabParam === 'add' || tabParam === 'add-course') return 'add'
     if (tabParam === 'library' || tabParam === 'courses') return 'library'
     if (tabParam === 'explore') return 'explore'
+    if (tabParam === 'channels' || tabParam === 'feeds' || tabParam === 'feed') return 'channels'
     return 'library'
   })
+
+  // Helper to switch tabs and sync URL query parameter
+  const handleTabChange = (tab) => {
+    setActiveMainTab(tab)
+    navigate(`/courses?tab=${tab}`, { replace: true })
+  }
   
   // Sync tab with URL search params changes
   useEffect(() => {
@@ -40,6 +49,8 @@ const Courses = () => {
       setActiveMainTab('library')
     } else if (tabParam === 'explore') {
       setActiveMainTab('explore')
+    } else if (tabParam === 'channels' || tabParam === 'feeds' || tabParam === 'feed') {
+      setActiveMainTab('channels')
     }
   }, [location.search])
 
@@ -59,8 +70,6 @@ const Courses = () => {
   const [showImportModal, setShowImportModal] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [initialImportUrl, setInitialImportUrl] = useState('')
-
-  const navigate = useNavigate()
 
   useEffect(() => {
     fetchCoursesList()
@@ -229,14 +238,14 @@ const Courses = () => {
     <div className={styles.container}>
       <CoursesHeader 
         activeMainTab={activeMainTab}
-        setActiveMainTab={setActiveMainTab}
+        setActiveMainTab={handleTabChange}
         setShowImportModal={setShowImportModal}
         setShowCreateModal={setShowCreateModal}
       />
 
       <CoursesTabs 
         activeMainTab={activeMainTab}
-        setActiveMainTab={setActiveMainTab}
+        setActiveMainTab={handleTabChange}
         setFilterType={setFilterType}
         libraryCount={libraryCourses.length}
         exploreCount={exploreCourses.length}
@@ -245,9 +254,11 @@ const Courses = () => {
       {activeMainTab === 'add' ? (
         <CoursesAddTab 
           fetchCoursesList={fetchCoursesList}
-          setActiveMainTab={setActiveMainTab}
+          setActiveMainTab={handleTabChange}
           initialPresetUrl={initialImportUrl}
         />
+      ) : activeMainTab === 'channels' ? (
+        <FocusFeedsTab />
       ) : (
         <>
           {activeMainTab === 'library' && (

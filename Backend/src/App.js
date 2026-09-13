@@ -8,6 +8,7 @@ import todoRoutes from "./routes/todo.routes.js";
 import certificateRoutes from "./routes/certificate.routes.js";
 import timetableRoutes from "./routes/timetable.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import channelRoutes from "./routes/channel.routes.js";
 
 const App = express();
 
@@ -29,6 +30,7 @@ App.use("/api/todos", todoRoutes);
 App.use("/api/certificates", certificateRoutes);
 App.use("/api/timetable", timetableRoutes);
 App.use("/api/analytics", analyticsRoutes);
+App.use("/api/channels", channelRoutes);
 
 
 // Basic health endpoint for uptime/keep-alive pings

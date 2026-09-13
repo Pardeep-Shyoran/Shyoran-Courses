@@ -34,6 +34,10 @@ const Dashboard = () => {
       navigate('/courses?tab=add', { replace: true })
       return authUser?.preferences?.defaultTab || 'overview'
     }
+    if (tabParam === 'channels' || tabParam === 'feeds') {
+      navigate('/courses?tab=channels', { replace: true })
+      return authUser?.preferences?.defaultTab || 'overview'
+    }
     return tabParam || authUser?.preferences?.defaultTab || 'overview'
   })
 
@@ -44,6 +48,8 @@ const Dashboard = () => {
       navigate('/courses?tab=library', { replace: true })
     } else if (tab === 'add-course') {
       navigate('/courses?tab=add', { replace: true })
+    } else if (tab === 'channels' || tab === 'feeds') {
+      navigate('/courses?tab=channels', { replace: true })
     } else if (tab && ['overview', 'analytics', 'checklist', 'rewards', 'profile'].includes(tab)) {
       setActiveTab(tab)
     }

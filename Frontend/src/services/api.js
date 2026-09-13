@@ -194,4 +194,47 @@ export function getAIStudyInsights() {
   return request('/analytics/ai-insights')
 }
 
+// Student YouTube Channels & Feeds endpoints
+export function getUserChannels(category) {
+  const query = category ? `?category=${category}` : ''
+  return request(`/channels${query}`)
+}
 
+export function addChannel(payload) {
+  return request('/channels', { method: 'POST', body: payload })
+}
+
+export function updateChannel(id, payload) {
+  return request(`/channels/${id}`, { method: 'PUT', body: payload })
+}
+
+export function deleteChannel(id) {
+  return request(`/channels/${id}`, { method: 'DELETE' })
+}
+
+export function getChannelFeed(category, channelIdOrLimit = null, videoType = null, limit = 50) {
+  const params = new URLSearchParams()
+  let actualChannelId = channelIdOrLimit
+  let actualLimit = limit
+
+  // If second arg is a number, treat as limit (e.g. getChannelFeed('all', 6))
+  if (typeof channelIdOrLimit === 'number') {
+    actualLimit = channelIdOrLimit
+    actualChannelId = null
+  }
+
+  if (actualChannelId) params.set('channelId', actualChannelId)
+  else if (category && category !== 'all') params.set('category', category)
+  if (videoType && videoType !== 'all') params.set('videoType', videoType)
+  if (actualLimit) params.set('limit', actualLimit)
+  const queryString = params.toString() ? `?${params.toString()}` : ''
+  return request(`/channels/feed${queryString}`)
+}
+
+export function getChannelPresets() {
+  return request('/channels/presets')
+}
+
+export function saveChannelVideoToCourse(payload) {
+  return request('/channels/save-to-course', { method: 'POST', body: payload })
+}

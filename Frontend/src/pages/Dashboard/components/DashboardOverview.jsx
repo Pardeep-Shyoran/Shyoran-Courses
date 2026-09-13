@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import QuickImportGrid from '../../../components/QuickImportGrid/QuickImportGrid'
 import DashboardResumeBanner from './DashboardResumeBanner'
+import DashboardDailyPulse from './DashboardDailyPulse'
 import styles from '../Dashboard.module.css'
 
 const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }) => {
@@ -206,6 +207,9 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }
           </div>
         </section>
       )}
+
+      {/* Distraction-Free Daily Student Pulse & Focus Feed */}
+      <DashboardDailyPulse />
 
       <div className={styles.dashboardSplit}>
         {/* Left Column */}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import styles from '../Courses.module.css'
 
 const CoursesTabs = ({ activeMainTab, setActiveMainTab, setFilterType, libraryCount, exploreCount }) => {
@@ -71,6 +72,28 @@ const CoursesTabs = ({ activeMainTab, setActiveMainTab, setFilterType, libraryCo
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
           <span>Add & Import</span>
+        </button>
+
+        <button 
+          type="button"
+          className={`${styles.mainTab} ${activeMainTab === 'channels' ? styles.activeMainTab : ''}`}
+          onClick={() => setActiveMainTab('channels')}
+          title="Distraction-Free Focus Feeds & Student Channels"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+          <span>Focus Feeds</span>
         </button>
       </div>
     </div>
