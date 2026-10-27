@@ -59,6 +59,12 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
     }
   }
 
+  const streakExtension = trackerStats?.streakExtension
+  const isGraceActive = !!streakExtension?.isGraceActive
+  const graceDaysUsed = streakExtension?.graceDaysUsed || 0
+  const graceDaysRemaining = streakExtension?.graceDaysRemaining !== undefined ? streakExtension.graceDaysRemaining : 2
+  const frozenDatesSet = new Set(streakExtension?.frozenDates || [])
+
   // Generate day items for consistency calendar heatmap
   const generateHeatmapDays = () => {
     const days = []
@@ -75,12 +81,15 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
     const curDate = new Date(startDate)
     while (curDate <= today) {
       const dateStr = getISTDateStr(curDate)
+      const count = trackerStats?.heatmap?.[dateStr] || 0
+      const isFrozen = frozenDatesSet.has(dateStr) && count === 0
       days.push({
         date: new Date(curDate),
         dateStr,
         dayOfWeek: curDate.getDay(),
         month: curDate.toLocaleString('default', { month: 'short' }),
-        count: trackerStats?.heatmap?.[dateStr] || 0
+        count,
+        isFrozen
       })
       curDate.setDate(curDate.getDate() + 1)
     }
@@ -99,13 +108,38 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
         </div>
       </div>
 
+      {/* 1.5. Streak Grace / Extension Protection Alert Banner */}
+      {isGraceActive && (
+        <section className={styles.streakGraceBanner}>
+          <div className={styles.streakGraceContent}>
+            <span className={styles.streakGraceBadge}>🛡️ 2-DAY EXTENSION ACTIVE</span>
+            <div className={styles.streakGraceText}>
+              <strong>Your {streak}-day study streak is currently protected!</strong>
+              <p>
+                You missed {graceDaysUsed} {graceDaysUsed === 1 ? 'day' : 'days'} ({graceDaysRemaining} grace {graceDaysRemaining === 1 ? 'day' : 'days'} remaining). Complete a video lesson or update lecture notes today to preserve your continuous streak!
+              </p>
+            </div>
+          </div>
+          <div className={styles.streakGracePill}>
+            <span>{graceDaysRemaining === 0 ? '⚠️ Last Chance Today' : '🛡️ 1 Day Left'}</span>
+          </div>
+        </section>
+      )}
+
       {/* 2. Top Streak & Activity Stats Row */}
       <section className={styles.topStreakRow}>
-        <div className={styles.streakSubCard}>
-          <span className={styles.streakEmoji}>🔥</span>
+        <div className={`${styles.streakSubCard} ${isGraceActive ? styles.streakSubCardProtected : ''}`}>
+          <span className={styles.streakEmoji}>{isGraceActive ? '🛡️' : '🔥'}</span>
           <div>
-            <span className={styles.streakVal}>{streak} {streak === 1 ? 'Day' : 'Days'}</span>
-            <span className={styles.streakLbl}>Current Streak</span>
+            <div className={styles.streakValRow}>
+              <span className={styles.streakVal}>{streak} {streak === 1 ? 'Day' : 'Days'}</span>
+              {isGraceActive && (
+                <span className={styles.streakProtectedTag}>Grace Active</span>
+              )}
+            </div>
+            <span className={styles.streakLbl}>
+              {isGraceActive ? 'Protected Streak' : 'Current Streak'}
+            </span>
           </div>
         </div>
         <div className={styles.streakSubCard}>
@@ -131,12 +165,15 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
             <span>📊 Contribution Grid & Habit Analytics (Past 365 Days)</span>
             <div className={styles.heatmapLegend}>
               <span>Less</span>
-              <div className={`${styles.legendBox} ${styles.lvl0}`}></div>
-              <div className={`${styles.legendBox} ${styles.lvl1}`}></div>
-              <div className={`${styles.legendBox} ${styles.lvl2}`}></div>
-              <div className={`${styles.legendBox} ${styles.lvl3}`}></div>
-              <div className={`${styles.legendBox} ${styles.lvl4}`}></div>
+              <div className={`${styles.legendBox} ${styles.lvl0}`} title="0 activities"></div>
+              <div className={`${styles.legendBox} ${styles.lvl1}`} title="1 activity"></div>
+              <div className={`${styles.legendBox} ${styles.lvl2}`} title="2 activities"></div>
+              <div className={`${styles.legendBox} ${styles.lvl3}`} title="3 activities"></div>
+              <div className={`${styles.legendBox} ${styles.lvl4}`} title="4+ activities"></div>
               <span>More</span>
+              <span style={{ margin: '0 4px', opacity: 0.5 }}>•</span>
+              <div className={`${styles.legendBox} ${styles.lvlFrozen}`} title="2-Day Streak Extension (Frozen Day)"></div>
+              <span>Protected</span>
             </div>
           </div>
 
@@ -160,7 +197,8 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
                   }
                   
                   let lvlClass = styles.lvl0
-                  if (day.count === 1) lvlClass = styles.lvl1
+                  if (day.isFrozen) lvlClass = styles.lvlFrozen
+                  else if (day.count === 1) lvlClass = styles.lvl1
                   else if (day.count === 2) lvlClass = styles.lvl2
                   else if (day.count === 3) lvlClass = styles.lvl3
                   else if (day.count >= 4) lvlClass = styles.lvl4
@@ -171,11 +209,15 @@ const DashboardChecklist = ({ streak, trackerStats, trackerLoading }) => {
                     year: 'numeric'
                   })
 
+                  const tooltipText = day.isFrozen
+                    ? `${formattedDate}: 🛡️ Protected by 2-Day Streak Extension (Frozen Day)`
+                    : `${formattedDate}: ${day.count} ${day.count === 1 ? 'activity' : 'activities'} logged`
+
                   return (
                     <div 
                       key={day.dateStr} 
                       className={`${styles.heatmapCell} ${lvlClass}`}
-                      title={`${formattedDate}: ${day.count} ${day.count === 1 ? 'activity' : 'activities'} logged`}
+                      title={tooltipText}
                     ></div>
                   )
                 })}

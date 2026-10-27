@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCourses, deleteCourse, getStudyTrackerStats } from '../../services/api'
-import { getISTDateStr, getPrevISTDateStr } from '../../utils/dateUtils'
+import { getISTDateStr, getPrevISTDateStr, getISTDayDiff } from '../../utils/dateUtils'
 import { useAuth } from '../../context/AuthContext'
 import DashboardHeader from './components/DashboardHeader'
 import DashboardOverview from './components/DashboardOverview'
@@ -100,7 +100,7 @@ const Dashboard = () => {
     )
   }
 
-  // Calculate Study Streak (using IST midnight boundaries)
+  // Calculate Study Streak (using IST midnight boundaries and 2-day streak extension)
   const calculateStreak = () => {
     const watchDates = new Set()
     courses.forEach(course => {
@@ -114,14 +114,25 @@ const Dashboard = () => {
     if (watchDates.size === 0) return 0
 
     const todayStr = getISTDateStr()
-    const yesterdayStr = getPrevISTDateStr(todayStr)
+    const sortedDates = Array.from(watchDates).sort()
+    const lastActiveDate = sortedDates[sortedDates.length - 1]
+    const daysSinceLastActive = getISTDayDiff(lastActiveDate, todayStr)
 
-    let streak = 0
-    if (watchDates.has(todayStr) || watchDates.has(yesterdayStr)) {
-      let checkStr = watchDates.has(todayStr) ? todayStr : yesterdayStr
-      while (watchDates.has(checkStr)) {
+    // Up to 2 missed consecutive days allowed (gap <= 3 days elapsed)
+    if (daysSinceLastActive > 3) {
+      return 0
+    }
+
+    let streak = 1
+    let currCheck = lastActiveDate
+    for (let i = sortedDates.length - 2; i >= 0; i--) {
+      const prevDate = sortedDates[i]
+      const gap = getISTDayDiff(prevDate, currCheck)
+      if (gap <= 3) {
         streak++
-        checkStr = getPrevISTDateStr(checkStr)
+        currCheck = prevDate
+      } else {
+        break
       }
     }
 
@@ -259,6 +270,7 @@ const Dashboard = () => {
                 user={user}
                 courses={courses}
                 streak={streak}
+                trackerStats={trackerStats}
                 resumeTarget={resumeTarget}
                 handleLogout={handleLogout}
               />

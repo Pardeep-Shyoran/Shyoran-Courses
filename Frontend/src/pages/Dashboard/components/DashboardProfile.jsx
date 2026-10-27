@@ -70,6 +70,7 @@ const DashboardProfile = ({ user, setUser }) => {
   // 4. Notifications State
   const [emailReminders, setEmailReminders] = useState(user?.preferences?.emailReminders ?? true)
   const [streakAlerts, setStreakAlerts] = useState(user?.preferences?.streakAlerts ?? true)
+  const [streakProtection, setStreakProtection] = useState(user?.preferences?.streakProtection ?? true)
   const [reminderTime, setReminderTime] = useState(user?.preferences?.reminderTime || '20:00')
   const [browserNotificationsGranted, setBrowserNotificationsGranted] = useState(
     typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted'
@@ -101,6 +102,7 @@ const DashboardProfile = ({ user, setUser }) => {
       setSoundEffects(user.preferences?.soundEffects ?? true)
       setEmailReminders(user.preferences?.emailReminders ?? true)
       setStreakAlerts(user.preferences?.streakAlerts ?? true)
+      setStreakProtection(user.preferences?.streakProtection ?? true)
       setReminderTime(user.preferences?.reminderTime || '20:00')
       if (user.preferences?.theme) {
         setTheme(user.preferences.theme)
@@ -176,6 +178,8 @@ const DashboardProfile = ({ user, setUser }) => {
           soundEffects,
           emailReminders,
           streakAlerts,
+          streakProtection,
+          streakGraceDays: 2,
           reminderTime,
           studyDaysSchedule,
           defaultTab,
@@ -1009,6 +1013,26 @@ const DashboardProfile = ({ user, setUser }) => {
                     type="checkbox"
                     checked={emailReminders}
                     onChange={e => setEmailReminders(e.target.checked)}
+                  />
+                  <span className={styles.sliderRound}></span>
+                </label>
+              </div>
+
+              {/* 2-Day Streak Extension Grace Window */}
+              <div className={styles.toggleRow}>
+                <div className={styles.toggleInfo}>
+                  <h4 className={styles.toggleTitle}>
+                    <span>🛡️</span> 2-Day Streak Extension (Grace Window)
+                  </h4>
+                  <p className={styles.toggleDesc}>
+                    Protect your study streak if you miss up to 2 consecutive days. Streak will not reset to zero.
+                  </p>
+                </div>
+                <label className={styles.switch}>
+                  <input
+                    type="checkbox"
+                    checked={streakProtection}
+                    onChange={e => setStreakProtection(e.target.checked)}
                   />
                   <span className={styles.sliderRound}></span>
                 </label>

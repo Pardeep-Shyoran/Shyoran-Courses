@@ -25,6 +25,8 @@ function sanitizeUser(user) {
       playbackSpeed: user.preferences?.playbackSpeed ?? 1,
       emailReminders: user.preferences?.emailReminders ?? true,
       streakAlerts: user.preferences?.streakAlerts ?? true,
+      streakProtection: user.preferences?.streakProtection ?? true,
+      streakGraceDays: user.preferences?.streakGraceDays ?? 2,
       reminderTime: user.preferences?.reminderTime ?? "20:00",
       soundEffects: user.preferences?.soundEffects ?? true,
       defaultTab: user.preferences?.defaultTab ?? "overview",

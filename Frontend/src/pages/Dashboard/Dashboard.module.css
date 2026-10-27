@@ -285,6 +285,15 @@
   border-color: rgba(15, 18, 29, 0.08);
 }
 
+.statsCardProtected {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.12) !important;
+}
+
+.statsCardProtected .cardTopBeam {
+  opacity: 1 !important;
+}
+
 .cardTopBeam {
   position: absolute;
   top: 0;
@@ -1818,6 +1827,11 @@ input:checked + .slider:before {
 .lvl2 { background-color: #ff886c; }
 .lvl3 { background-color: #ff522f; }
 .lvl4 { background-color: #ff1100; box-shadow: 0 0 6px rgba(255, 17, 0, 0.7); }
+.lvlFrozen {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
 
 /* Light Mode Overrides */
 [data-theme="light"] .lvl0 { 
@@ -1835,6 +1849,11 @@ input:checked + .slider:before {
 [data-theme="light"] .lvl4 {
   background-color: #b52c14;
   box-shadow: 0 0 5px rgba(181, 44, 20, 0.3);
+}
+[data-theme="light"] .lvlFrozen {
+  background: linear-gradient(135deg, #7dd3fc, #0ea5e9);
+  box-shadow: 0 0 5px rgba(14, 165, 233, 0.35);
+  border: 1px solid rgba(14, 165, 233, 0.5);
 }
 
 /* Streak Stats Column styling */
@@ -1929,6 +1948,118 @@ input:checked + .slider:before {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-top: 2px;
+}
+
+/* Streak Extension & Grace Banner Styling */
+.streakGraceBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.16), rgba(56, 189, 248, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.12);
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.streakGraceContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.streakGraceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  white-space: nowrap;
+}
+
+.streakGraceText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.streakGraceText strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.streakGraceText p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.streakGracePill {
+  display: flex;
+  align-items: center;
+}
+
+.streakGracePill span {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+}
+
+.streakValRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.streakProtectedTag {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.streakSubCardProtected {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.18) !important;
+}
+
+.streakSubCardProtected::before {
+  background: linear-gradient(to bottom, #38bdf8, #0284c7) !important;
+}
+
+@media (max-width: 768px) {
+  .streakGraceBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Todo List Section */

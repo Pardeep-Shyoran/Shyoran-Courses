@@ -19,6 +19,8 @@ const UserSchema = new mongoose.Schema(
       playbackSpeed: { type: Number, default: 1 },
       emailReminders: { type: Boolean, default: true },
       streakAlerts: { type: Boolean, default: true },
+      streakProtection: { type: Boolean, default: true },
+      streakGraceDays: { type: Number, default: 2 },
       reminderTime: { type: String, default: "20:00" },
       soundEffects: { type: Boolean, default: true },
       defaultTab: { type: String, default: "overview" },

@@ -20,6 +20,25 @@ function getPrevISTDateStr(dateStr) {
   const prev = new Date(Date.UTC(y, m - 1, d - 1));
   return prev.toISOString().split('T')[0];
 }
+
+function getISTDayDiff(dateStr1, dateStr2) {
+  const [y1, m1, d1] = dateStr1.split('-').map(Number);
+  const [y2, m2, d2] = dateStr2.split('-').map(Number);
+  const utc1 = Date.UTC(y1, m1 - 1, d1);
+  const utc2 = Date.UTC(y2, m2 - 1, d2);
+  return Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24));
+}
+
+function getDatesBetween(startDateStr, endDateStr) {
+  const result = [];
+  const [y, m, d] = startDateStr.split('-').map(Number);
+  const cur = new Date(Date.UTC(y, m - 1, d + 1));
+  while (cur.toISOString().split('T')[0] < endDateStr) {
+    result.push(cur.toISOString().split('T')[0]);
+    cur.setUTCDate(cur.getUTCDate() + 1);
+  }
+  return result;
+}
 import { extractPlaylistId, scrapePlaylist, fetchVideoMeta } from "../utils/youtubeScraper.js";
 
 // Helper function to merge enrollment progress and notes into a course object
@@ -712,48 +731,112 @@ export async function getStudyTrackerStats(req, res) {
       activeDatesSet.add(dStr);
     });
 
-    // 4. Compute streak details (longest and current)
-    const sortedDates = Array.from(activeDatesSet).sort(); // Ascending
+    // 4. Compute streak details (longest and current) with 2-Day Streak Extension (Grace Window)
+    const MAX_GRACE_DAYS = 2; // Up to 2 missed consecutive days tolerated without resetting streak
+    const sortedDates = Array.from(activeDatesSet).sort(); // Ascending "YYYY-MM-DD"
 
     let longestStreak = 0;
     let currentRun = 0;
-    let prevDate = null;
+    let prevDateStr = null;
 
     for (const dateStr of sortedDates) {
-      const curDate = new Date(dateStr);
-      if (!prevDate) {
+      if (!prevDateStr) {
         currentRun = 1;
       } else {
-        const diffTime = curDate - prevDate;
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) {
+        const diffDays = getISTDayDiff(prevDateStr, dateStr);
+        // diffDays === 1: consecutive days (0 missed)
+        // diffDays === 2: 1 day missed (bridged by extension)
+        // diffDays === 3: 2 days missed (bridged by extension)
+        if (diffDays <= MAX_GRACE_DAYS + 1) {
           currentRun++;
-        } else if (diffDays > 1) {
+        } else {
           longestStreak = Math.max(longestStreak, currentRun);
           currentRun = 1;
         }
       }
-      prevDate = curDate;
+      prevDateStr = dateStr;
     }
     longestStreak = Math.max(longestStreak, currentRun);
 
-    // Current streak relative to clientTodayStr (IST midnight boundaries)
-    const clientYesterdayStr = getPrevISTDateStr(clientTodayStr);
-
+    // Current streak & streak extension diagnostics relative to clientTodayStr (IST midnight boundaries)
     let currentStreak = 0;
-    if (activeDatesSet.has(clientTodayStr) || activeDatesSet.has(clientYesterdayStr)) {
-      let checkStr = activeDatesSet.has(clientTodayStr) ? clientTodayStr : clientYesterdayStr;
-      while (activeDatesSet.has(checkStr)) {
-        currentStreak++;
-        checkStr = getPrevISTDateStr(checkStr);
+    let isGraceActive = false;
+    let graceDaysUsed = 0;
+    let streakStatus = "inactive"; // "active" | "pending" | "grace" | "broken" | "inactive"
+    const frozenDates = [];
+
+    if (sortedDates.length > 0) {
+      const lastActiveDate = sortedDates[sortedDates.length - 1];
+      const daysSinceLastActive = getISTDayDiff(lastActiveDate, clientTodayStr);
+
+      if (daysSinceLastActive <= 0) {
+        // Studied today (or client clock boundary ahead)
+        streakStatus = "active";
+        isGraceActive = false;
+        graceDaysUsed = 0;
+      } else if (daysSinceLastActive === 1) {
+        // Studied yesterday, today is pending
+        streakStatus = "pending";
+        isGraceActive = false;
+        graceDaysUsed = 0;
+      } else if (daysSinceLastActive <= MAX_GRACE_DAYS + 1) {
+        // Missed 1 or 2 days, within the 2-day grace window!
+        streakStatus = "grace";
+        isGraceActive = true;
+        graceDaysUsed = daysSinceLastActive - 1; // 1 or 2 missed days
+        // Collect current missed days leading up to today
+        const missedLeadingDates = getDatesBetween(lastActiveDate, clientTodayStr);
+        frozenDates.push(...missedLeadingDates);
+      } else {
+        // Exceeded 2 missed days -> streak broken
+        streakStatus = "broken";
+        isGraceActive = false;
+        graceDaysUsed = 0;
+      }
+
+      // If within grace window or actively studying, calculate backward chain
+      if (daysSinceLastActive <= MAX_GRACE_DAYS + 1) {
+        currentStreak = 1;
+        let currCheck = lastActiveDate;
+
+        for (let i = sortedDates.length - 2; i >= 0; i--) {
+          const prevStudyDate = sortedDates[i];
+          const gap = getISTDayDiff(prevStudyDate, currCheck);
+
+          if (gap <= MAX_GRACE_DAYS + 1) {
+            currentStreak++;
+            // Collect any internal bridged missed dates
+            if (gap > 1) {
+              const internalMissed = getDatesBetween(prevStudyDate, currCheck);
+              frozenDates.push(...internalMissed);
+            }
+            currCheck = prevStudyDate;
+          } else {
+            // Gap in past was > 2 missed days; streak starts from currCheck
+            break;
+          }
+        }
       }
     }
+
+    // Sort and deduplicate frozen dates
+    const uniqueFrozenDates = Array.from(new Set(frozenDates)).sort();
+    const graceDaysRemaining = Math.max(0, MAX_GRACE_DAYS - graceDaysUsed);
 
     res.json({
       heatmap: dateCounts,
       currentStreak,
       longestStreak,
-      totalActivities: activities.length
+      totalActivities: activities.length,
+      streakExtension: {
+        isGraceActive,
+        graceDaysUsed,
+        graceDaysRemaining,
+        maxGraceDays: MAX_GRACE_DAYS,
+        status: streakStatus,
+        lastActiveDate: sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : null,
+        frozenDates: uniqueFrozenDates
+      }
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to load study tracker stats", error: error.message });

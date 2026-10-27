@@ -5,9 +5,12 @@ import DashboardResumeBanner from './DashboardResumeBanner'
 import DashboardDailyPulse from './DashboardDailyPulse'
 import styles from '../Dashboard.module.css'
 
-const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }) => {
+const DashboardOverview = ({ user, courses, streak, trackerStats, resumeTarget, handleLogout }) => {
   const navigate = useNavigate()
   if (!user) return null
+
+  const isGraceActive = !!trackerStats?.streakExtension?.isGraceActive
+  const graceDaysRemaining = trackerStats?.streakExtension?.graceDaysRemaining ?? 2
 
   // Calculate statistics
   const totalCourses = courses.length
@@ -120,20 +123,30 @@ const DashboardOverview = ({ user, courses, streak, resumeTarget, handleLogout }
             <span className={styles.statFooterText}>Finished study lessons</span>
           </div>
 
-          <div className={styles.statsCard}>
-            <div className={styles.cardTopBeam}></div>
+          <div className={`${styles.statsCard} ${isGraceActive ? styles.statsCardProtected : ''}`}>
+            <div className={styles.cardTopBeam} style={isGraceActive ? { background: 'linear-gradient(90deg, #38bdf8, #0284c7)' } : {}}></div>
             <div className={styles.statsCardHeader}>
-              <span className={styles.statLabel}>Study Streak</span>
-              <div className={styles.statIconWrapper} style={{ color: 'var(--primary-color)' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-                </svg>
+              <span className={styles.statLabel}>
+                {isGraceActive ? 'Protected Streak' : 'Study Streak'}
+              </span>
+              <div className={styles.statIconWrapper} style={{ color: isGraceActive ? '#38bdf8' : 'var(--primary-color)' }}>
+                {isGraceActive ? (
+                  <span style={{ fontSize: '1rem', lineHeight: 1 }}>🛡️</span>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                  </svg>
+                )}
               </div>
             </div>
             <h3 className={styles.statValue}>
               {streak} <span className={styles.statValueSub}>{streak === 1 ? 'day' : 'days'}</span>
             </h3>
-            <span className={styles.statFooterText}>IST midnight cycle active</span>
+            <span className={styles.statFooterText} style={isGraceActive ? { color: '#38bdf8', fontWeight: 600 } : {}}>
+              {isGraceActive 
+                ? `🛡️ 2-Day Extension: ${graceDaysRemaining} grace ${graceDaysRemaining === 1 ? 'day' : 'days'} left` 
+                : 'IST midnight cycle active'}
+            </span>
           </div>
         </div>
       </section>
